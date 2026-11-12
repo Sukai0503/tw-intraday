@@ -124,13 +124,14 @@ async function showK(code){const box=document.getElementById('kbox');box.style.d
  box.scrollIntoView({behavior:'smooth',block:'nearest'})}
 
 render();
-(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k)showK(k[1])}})();
+let HASHED=false;function applyHash(){if(HASHED)return;HASHED=true;(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k)showK(k[1])}})()}
+if(D)applyHash();
 const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/data.json?ref=data';
 async function poll(){let ok=false;
  if(location.protocol.startsWith('http')){
   try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok){D=await r.json();ok=true}}catch(e){}
   if(!ok){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(r.ok){D=await r.json();ok=true}}catch(e){}}
-  if(ok)render();
+  if(ok){render();applyHash()}
  }}
 function live(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));const m=n.getHours()*60+n.getMinutes();return n.getDay()>0&&n.getDay()<6&&m>=535&&m<=820}
 if(location.protocol.startsWith('http')){poll();setInterval(()=>{if(live()||!D)poll()},70000)}else setTimeout(()=>location.reload(),60000);
