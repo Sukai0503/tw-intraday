@@ -39,20 +39,21 @@ svg{width:100%;height:auto;display:block}
 .tip .btn{margin-top:8px;display:flex;gap:8px}.tip .btn a{flex:1;text-align:center;background:#17c8d822;color:#33e1f0;border-radius:6px;padding:5px 0;text-decoration:none}
 @media (max-width:560px){.tip{left:8px!important;right:8px;bottom:8px;top:auto!important}}
 .kmodal{position:fixed;inset:0;background:#000a;z-index:30;display:none;align-items:center;justify-content:center;padding:10px}.kpanel{background:#0d1a2e;border:1px solid #17c8d8;border-radius:12px;padding:12px;width:min(560px,100%);max-height:92vh;overflow:auto}
-.nav{display:flex;justify-content:flex-end;margin:0 0 -6px}.nav a{font-size:12.5px;color:#33e1f0;text-decoration:none;border:1px solid #17c8d866;border-radius:999px;padding:3px 10px;background:#0d2236}
+.nav{display:flex;gap:8px;margin:0 0 10px}.nav a{flex:1;text-align:center;padding:7px 0;border-radius:8px;background:#232733;color:#9fb3c8;text-decoration:none;font-size:14px}.nav a.on{background:#3a4152;color:#fff}
+body.vheat [data-v="intra"]{display:none!important}body:not(.vheat) [data-v="heat"]{display:none!important}
 </style></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
-<nav class="nav"><a href="signals/">非常態儀表板</a></nav>
+<nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a href="signals/">非常態投資</a></nav>
 <h1 id="ttl">今日盤中｜即時 --:--</h1>
-<div class="card"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
+<div class="card" data-v="intra"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
 <div class="leg"><span><i style="background:var(--today)"></i>今日</span><span><i style="background:var(--prev)"></i>前一交易日</span></div>
 <div id="c1"></div></div>
-<div class="card"><h2>盤中廣度</h2>
+<div class="card" data-v="intra"><h2>盤中廣度</h2>
 <div class="kpi"><span>站上20MA <b id="b20" style="color:var(--or)">-</b></span><span>站上均價線 <b id="bvw" style="color:var(--bl)">-</b></span></div>
 <div class="leg"><span><i style="background:var(--or)"></i>站上20MA %</span><span><i style="background:var(--bl)"></i>站上均價線 %</span></div>
 <div id="c2"></div></div>
-<div class="card hm" id="heatcard"><h2>族群熱力圖 <span class="mut" id="hstat"></span></h2>
+<div class="card hm" id="heatcard" data-v="heat"><h2>族群熱力圖 <span class="mut" id="hstat"></span></h2>
 <div class="seg" id="hmode"><button data-m="live">即時</button><button data-m="close">盤後</button></div>
 <div class="seg" id="hseg" style="margin-top:6px"><button data-k="d1" class="on">今日</button><button data-k="d3">近3日</button><button data-k="d10">近10日</button></div>
 <div class="hsummary" id="hsummary" aria-live="polite"></div>
@@ -64,9 +65,9 @@ svg{width:100%;height:auto;display:block}
 <div class="tip" id="tip"></div>
 
 
-<div class="card"><h2>族群強弱 <span class="mut">等權平均；法人為近3日買賣超（股數×現價，億）</span></h2>
+<div class="card" data-v="heat"><h2>族群強弱 <span class="mut">等權平均；法人為近3日買賣超（股數×現價，億）</span></h2>
 <div style="overflow-x:auto"><table class="tb" id="rtab"></table></div></div>
-<div class="card"><h2>族群輪動 <span class="mut">近10交易日名次，越紅越強</span></h2>
+<div class="card" data-v="heat"><h2>族群輪動 <span class="mut">近10交易日名次，越紅越強</span></h2>
 <div style="overflow-x:auto"><table class="tb rot" id="rot"></table></div></div>
 <div class="foot" id="foot"></div>
 </div>
@@ -209,4 +210,6 @@ async function poll(){let ok=false;
 function live(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));const m=n.getHours()*60+n.getMinutes();return n.getDay()>0&&n.getDay()<6&&m>=535&&m<=820}
 if(location.protocol.startsWith('http')){poll();setInterval(()=>{if(live()||!D)poll()},70000)}else setTimeout(()=>location.reload(),60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+function applyView(){const v=location.hash==='#heat';document.body.classList.toggle('vheat',v);document.getElementById('nv-heat').classList.toggle('on',v);document.getElementById('nv-intra').classList.toggle('on',!v);try{renderHeat()}catch(e){}}
+addEventListener('hashchange',applyView);applyView();
 </script></body></html>
