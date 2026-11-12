@@ -43,6 +43,7 @@ details details{background:#1e222b;margin:10px 0 0}
 details ul{margin:8px 0 2px;padding-left:18px;font-size:13px;color:#c9ced6}details li{margin:3px 0}
 .foot{color:var(--mut);font-size:11px;padding:0 4px 24px}
 #err{display:none;background:#43191c;color:#ffb3b3;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px}
+a.stk{color:#33e1f0;text-decoration:none;border-bottom:1px dashed #33e1f088;cursor:pointer}
 </style></head><body><div class="wrap">
 <div class="nav"><a href="../">今日盤中</a><a class="on" href="./">非常態儀表板</a></div>
 <div id="err"></div>
@@ -51,6 +52,7 @@ details ul{margin:8px 0 2px;padding-left:18px;font-size:13px;color:#c9ced6}detai
 <div id="app"></div>
 <div class="foot">數值由程式每晚自動取得；判讀與操作方向依課程與文章規則推論，非 Wade 本人發言，不構成投資建議。</div>
 </div>
+<script src="../stockchart.js"></script>
 <script>
 const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/signals/data.json?ref=data';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -58,6 +60,7 @@ const n=x=>(x&&typeof x.v==='number')?x.v:NaN;
 const ts=x=>(x&&x.as_of)?`${x.as_of}${x.stale?'（前一日）':''}`:'—';
 const f=(v,d=0)=>(v==null||isNaN(v))?'—':Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
 const pct=(a,b)=>Math.round(a/b*1000)/10;
+const pickL=p=>(p&&p.length)?p.map(x=>{const m=String(x.code||'').match(/\d{4}/);const t=esc(`${x.code}${x.name}${x.note?`（${x.note}）`:''}`);return m?`<a href="#" class="stk" data-code="${m[0]}">${t}</a>`:t}).join('、'):'無';
 const pick=p=>(p&&p.length)?p.map(x=>`${x.code}${x.name}${x.note?`（${x.note}）`:''}`).join('、'):'無';
 const longRange=t=>[Math.max(t.below_5y,t.w5y,t.below_10y,t.w10y),t.below_5y+t.w5y+t.below_10y+t.w10y];
 const ST={off:{label:'未亮'},part:{label:'部分亮'},on:{label:'亮燈',tone:'warning'},max:{label:'極端',tone:'danger'}};
@@ -154,7 +157,7 @@ function render(J){
     <div class="met warning"><div class="v">${sk.current} / ${sk.record}</div><div class="l">連續無觀察類股（日）</div><div class="d">紀錄 ${sk.record}（前紀錄 ${sk.prev_record}）</div></div>
    </div>
    <div class="rows">${cells.map(c=>`<div class="row"><div class="t">${c.name}</div><div class="w">${esc(c.why)}</div><span class="pill ${ST[c.st].tone||''}">${ST[c.st].label}</span></div>`).join('')}</div>
-   <dl class="props"><dt>觀察類股（${esc(last.date)}）</dt><dd>${esc(pick(last.watch))}</dd><dt>稍微觀察類股</dt><dd>${esc(pick(last.few))}</dd><dt>完全沒有觀察類股</dt><dd>${esc(D.no_watch.days.join('、'))}</dd></dl></div>`;
+   <dl class="props"><dt>觀察類股（${esc(last.date)}）</dt><dd>${pickL(last.watch)}</dd><dt>稍微觀察類股</dt><dd>${pickL(last.few)}</dd><dt>完全沒有觀察類股</dt><dd>${esc(D.no_watch.days.join('、'))}</dd></dl></div>`;
   h+=`<div class="card"><h2>操作方向</h2><div class="cap">${esc(A.disclaimer)}｜規則更新：${esc(A.rules_updated)}${A.as_of?`｜判讀日 ${esc(A.as_of)}`:''}</div>
    <dl class="props"><dt>階段</dt><dd>${esc(A.stage)}</dd><dt>左側／右側</dt><dd>${esc(A.side)}</dd><dt>部位</dt><dd>${esc(A.size)}</dd><dt>哪筆錢</dt><dd>${esc(A.money)}</dd></dl>
    <div class="call warning"><b>今日對應</b>${esc(A.text)}</div></div>`;
@@ -168,7 +171,7 @@ function render(J){
   h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%')}</div>
    <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}</div></div>`;
   h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
-  h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${esc(pick(d.watch))}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${esc(pick(d.few))}</div>`:''}</div>`).join('')}</div>`;
+  h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${pickL(d.watch)}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${pickL(d.few)}</div>`:''}</div>`).join('')}</div>`;
   h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
    <details><summary>操作規則</summary><ul>${(RU.ops||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details></details>`;
   document.getElementById('app').innerHTML=h;
@@ -183,4 +186,5 @@ function render(J){
   if(!J){const e=document.getElementById('err');e.style.display='block';e.textContent='資料載入失敗，請稍後重新整理。';document.getElementById('sub').textContent='';return}
   try{render(J)}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
 })();
+document.addEventListener('click',e=>{const a=e.target.closest('a.stk');if(!a)return;e.preventDefault();if(window.StockChart)StockChart.open(a.dataset.code)});
 </script></body></html>
