@@ -41,11 +41,11 @@ svg{width:100%;height:auto;display:block}
 <div class="card"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
 <div class="leg"><span><i style="background:var(--today)"></i>今日</span><span><i style="background:var(--prev)"></i>前一交易日</span></div>
-<svg id="c1" viewBox="0 0 360 200"></svg></div>
+<div id="c1"></div></div>
 <div class="card"><h2>盤中廣度</h2>
 <div class="kpi"><span>站上20MA <b id="b20" style="color:var(--or)">-</b></span><span>站上均價線 <b id="bvw" style="color:var(--bl)">-</b></span></div>
 <div class="leg"><span><i style="background:var(--or)"></i>站上20MA %</span><span><i style="background:var(--bl)"></i>站上均價線 %</span></div>
-<svg id="c2" viewBox="0 0 360 200"></svg></div>
+<div id="c2"></div></div>
 <div class="card hm" id="heatcard"><h2>族群熱力圖 <span class="mut" id="hstat"></span></h2>
 <div class="seg" id="hmode"><button data-m="live">即時</button><button data-m="close">盤後</button></div>
 <div class="seg" id="hseg" style="margin-top:6px"><button data-k="d1" class="on">今日</button><button data-k="d3">近3日</button><button data-k="d10">近10日</button></div>
@@ -78,7 +78,7 @@ const v=D.value,td=v.today,pv=v.prev;
 document.getElementById('cur').textContent=v.cur!=null?Math.round(v.cur).toLocaleString():'-';
 const pe=document.getElementById('pct');if(v.vs_prev_pct!=null){pe.textContent=(v.vs_prev_pct>0?'+':'')+v.vs_prev_pct+'%';pe.className=v.vs_prev_pct>=0?'up':'dn'}
 const mx=Math.max(1,...td.map(p=>p[1]),...pv.map(p=>p[1]));const st=nice(mx),top=Math.ceil(mx/st)*st;const tk=[];for(let a=0;a<=top;a+=st)tk.push(a);
-document.getElementById('c1').innerHTML=axes(null,0,top,tk,a=>a.toLocaleString())+path(pv,0,top,'var(--prev)',1.5)+path(td,0,top,'var(--today)',2.2);
+StockChart.ts('c1',{kind:'hm',height:210,pad:['09:00','13:30'],unit:' 億',fmt:v=>Math.round(v).toLocaleString(),series:[{name:'前一交易日',color:'#8b929c',width:1.5,last:false,data:pv},{name:'今日',type:'area',color:'#4ea1ff',data:td}]});
 const br=D.breadth.map(b=>[b[0],b[1],b[2]]);const last=br[br.length-1];
 if(last){document.getElementById('b20').textContent=last[1]+'%';document.getElementById('bvw').textContent=last[2]+'%'}
 const Y=p=>T+(1-p/100)*(H-T-B);
@@ -87,7 +87,7 @@ g+=`<rect x="${L}" y="${Y(100)}" width="${W-L-R}" height="${Y(70)-Y(100)}" fill=
 g+=`<line x1="${L}" x2="${W-R}" y1="${Y(50)}" y2="${Y(50)}" stroke="#aaa" stroke-dasharray="4 3"/>`;
 g+=`<text x="${W-R-2}" y="${Y(70)-3}" fill="var(--up)" font-size="10" text-anchor="end">&gt;70% 買盤強</text><text x="${W-R-2}" y="${Y(30)+11}" fill="var(--dn)" font-size="10" text-anchor="end">&lt;30% 賣壓重</text>`;
 g+=path(br.map(b=>[b[0],b[1]]),0,100,'var(--or)',2.2)+path(br.map(b=>[b[0],b[2]]),0,100,'var(--bl)',2.2);
-document.getElementById('c2').innerHTML=g;try{renderHeat()}catch(e){console.error(e)}
+StockChart.ts('c2',{kind:'hm',height:210,pad:['09:00','13:30'],range:[0,100],unit:'%',dec:1,hlines:[{v:70,color:'#ff5b5b',title:'買盤強'},{v:50,color:'#9aa4b2',title:''},{v:30,color:'#22c55e',title:'賣壓重'}],series:[{name:'站上20MA',color:'#ff9f43',data:br.map(b=>[b[0],b[1]])},{name:'站上均價線',color:'#4ea1ff',data:br.map(b=>[b[0],b[2]])}]});try{renderHeat()}catch(e){console.error(e)}
 document.getElementById('foot').innerHTML=D.demo?'示範資料，非真實行情。資料來源接上後會每分鐘自動更新。<br>僅供盤面觀察，非投資建議。':`${D.date.slice(0,4)}/${D.date.slice(4,6)}/${D.date.slice(6)}　前一交易日 ${D.prev_date?D.prev_date.slice(4,6)+'/'+D.prev_date.slice(6):'-'}　更新 ${D.updated_full}<br>成交金額約每分鐘更新（證交所 MIS），頁面每 70 秒自動重抓；廣度約每 2 分鐘，全上市櫃普通股約 ${D.universe||'-'} 檔。族群＝證交所／櫃買中心官方產業別。20MA 含即時價；均價線為依成交量增量估算的當日 VWAP${D.notes?'（'+D.notes+'）':''}。<br>僅供盤面觀察，非投資建議。`;}
 let HK='d1',HZ=null,HIST=null,HM=null,HCLOSE=null;
 const LIM={d1:5,d3:10,d10:20};
