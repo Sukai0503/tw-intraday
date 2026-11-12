@@ -1,0 +1,186 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>非常態訊號儀表板</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1115;--card:#171a21;--fg:#e8eaed;--mut:#8b929c;--grid:#2a2f39;--or:#ff9f43;--bl:#4ea1ff;--up:#ff5b5b;--dn:#22c55e;--warn:#f5b041;--dang:#ff5b5b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:14px}
+.nav{display:flex;gap:8px;margin-bottom:10px}.nav a{flex:1;text-align:center;padding:7px 0;border-radius:8px;background:#232733;color:var(--mut);text-decoration:none;font-size:14px}.nav a.on{background:#3a4152;color:var(--fg)}
+h1{font-size:19px;margin:4px 0 2px}.sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:12px}
+.card h2{font-size:15.5px;margin:0 0 2px;color:#dfe3e8;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cap{color:var(--mut);font-size:11.5px;margin:0 0 8px}
+.mut{color:var(--mut);font-size:12px}
+.call{border-left:4px solid var(--bl);background:#1d2533;border-radius:8px;padding:9px 11px;margin:6px 0 10px;font-size:14px}
+.call b{display:block;margin-bottom:2px;font-size:15px}
+.call.warning{border-color:var(--warn);background:#2a2416}.call.warning b{color:var(--warn)}
+.call.danger{border-color:var(--dang);background:#2c1a1c}.call.danger b{color:var(--dang)}
+.call.info b{color:var(--bl)}
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 10px}
+@media (max-width:560px){.mets{grid-template-columns:repeat(2,1fr)}}
+.met{background:#1e222b;border-radius:10px;padding:8px 10px}.met .v{font-size:18px;font-weight:700;line-height:1.3}.met .l{font-size:12px;color:#c9ced6}.met .d{font-size:11px;color:var(--mut)}
+.met.warning .v{color:var(--warn)}.met.danger .v{color:var(--dang)}
+.rows{margin:4px 0 8px}.row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #222731}
+.row .t{flex:0 0 82px;font-weight:600;font-size:14px}.row .w{flex:1;font-size:13px;color:#c9ced6}
+.pill{flex:0 0 auto;font-size:11.5px;border-radius:999px;padding:1px 9px;background:#2a2f39;color:#aab1bb;white-space:nowrap}
+.pill.warning{background:#3d3015;color:var(--warn)}.pill.danger{background:#43191c;color:var(--dang)}
+.props{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px;margin:4px 0}.props dt{color:var(--mut);white-space:nowrap}.props dd{margin:0}
+@media (max-width:480px){.props{grid-template-columns:1fr}.props dt{margin-top:4px}}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:4px 0}
+table.tb{border-collapse:collapse;width:100%;font-size:12.5px}
+.tb th{color:var(--mut);font-weight:400;text-align:left;padding:5px 6px;border-bottom:1px solid var(--grid);white-space:nowrap}
+.tb td{padding:5px 6px;border-bottom:1px solid #1f232b;vertical-align:top}
+.tb td.k{min-width:8.5em}.tb td.n,.tb th.n{text-align:right;white-space:nowrap}.tb td.nw{white-space:nowrap}
+.tb tr.hl td{background:#2a2416;color:var(--warn)}
+.r{color:var(--up)}.g{color:var(--dn)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media (max-width:700px){.grid2{grid-template-columns:1fr}}
+.seg{display:flex;gap:6px}.seg button{background:#232733;color:var(--mut);border:0;border-radius:8px;padding:4px 10px;font-size:12.5px}.seg button.on{background:#3a4152;color:var(--fg)}
+svg{width:100%;height:auto;display:block}
+.log{padding:7px 0;border-bottom:1px solid #222731}.log .lh{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;font-size:13.5px}.log .lb{font-size:13px;color:#c9ced6;margin-top:2px}
+details{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+details summary{cursor:pointer;font-weight:600;font-size:15px}
+details details{background:#1e222b;margin:10px 0 0}
+details ul{margin:8px 0 2px;padding-left:18px;font-size:13px;color:#c9ced6}details li{margin:3px 0}
+.foot{color:var(--mut);font-size:11px;padding:0 4px 24px}
+#err{display:none;background:#43191c;color:#ffb3b3;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px}
+</style></head><body><div class="wrap">
+<div class="nav"><a href="../">今日盤中</a><a class="on" href="./">非常態儀表板</a></div>
+<div id="err"></div>
+<h1>非常態訊號儀表板｜機會與風險判讀</h1>
+<div class="sub" id="sub">載入中…</div>
+<div id="app"></div>
+<div class="foot">數值由程式每晚自動取得；判讀與操作方向依課程與文章規則推論，非 Wade 本人發言，不構成投資建議。</div>
+</div>
+<script>
+const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/signals/data.json?ref=data';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const n=x=>(x&&typeof x.v==='number')?x.v:NaN;
+const ts=x=>(x&&x.as_of)?`${x.as_of}${x.stale?'（前一日）':''}`:'—';
+const f=(v,d=0)=>(v==null||isNaN(v))?'—':Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+const pct=(a,b)=>Math.round(a/b*1000)/10;
+const pick=p=>(p&&p.length)?p.map(x=>`${x.code}${x.name}${x.note?`（${x.note}）`:''}`).join('、'):'無';
+const longRange=t=>[Math.max(t.below_5y,t.w5y,t.below_10y,t.w10y),t.below_5y+t.w5y+t.below_10y+t.w10y];
+const ST={off:{label:'未亮'},part:{label:'部分亮'},on:{label:'亮燈',tone:'warning'},max:{label:'極端',tone:'danger'}};
+const sd=x=>(x&&x.as_of)?`${md(x.as_of)}${x.stale?'（前日）':''}`:'—';
+const md=d=>{const p=String(d).split('-');return p.length===3?`${p[1]}/${p[2]}`:d};
+const yi=v=>v==null?'<td class="n">—</td>':`<td class="n ${v>0?'r':v<0?'g':''}">${v>0?'+':''}${f(v,2)}</td>`;
+const tbl=(cols,rows,numCols=[])=>`<div class="tw"><table class="tb"><thead><tr>${cols.map((c,i)=>`<th class="${numCols.includes(i)?'n':''}">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+const tr=(cells,cls='')=>`<tr class="${cls}">${cells.map(c=>c.startsWith('<td')?c:`<td>${c}</td>`).join('')}</tr>`;
+
+function lineChart(pts,floor,ceil,unit){
+  const W=360,H=190,L=34,R=8,T=10,B=26,w=W-L-R,h=H-T-B;
+  if(!pts.length)return'<div class="mut">無資料</div>';
+  const lo=Math.min(floor,...pts.map(p=>p[1])),hi=Math.max(ceil,...pts.map(p=>p[1]));
+  const X=i=>L+(pts.length<2?w/2:i*w/(pts.length-1)),Y=v=>T+h-(v-lo)/(hi-lo)*h;
+  let g='';const step=(hi-lo)>30?10:5;
+  for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step){g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2a2f39"/><text x="${L-4}" y="${Y(v)+3}" fill="#8b929c" font-size="9" text-anchor="end">${v}</text>`}
+  [150,140,130].forEach(v=>{if(v>=lo&&v<=hi)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===130?'#ff5b5b':v===140?'#f5b041':'#6b7280'}" stroke-dasharray="3 3" stroke-width="1"/>`});
+  const ev=Math.max(1,Math.ceil(pts.length/6));
+  pts.forEach((p,i)=>{if((i%ev===0&&pts.length-1-i>=ev/2+1)||i===pts.length-1)g+=`<text x="${X(i)}" y="${H-8}" fill="#8b929c" font-size="9" text-anchor="${i===pts.length-1?'end':i===0?'start':'middle'}">${p[0]}</text>`});
+  g+=`<polyline fill="none" stroke="#4ea1ff" stroke-width="2" points="${pts.map((p,i)=>`${X(i)},${Y(p[1])}`).join(' ')}"/>`;
+  pts.forEach((p,i)=>{g+=`<circle cx="${X(i)}" cy="${Y(p[1])}" r="2.2" fill="#4ea1ff"/>`});
+  const lp=pts[pts.length-1];g+=`<text x="${X(pts.length-1)-2}" y="${Y(lp[1])-6}" fill="#e8eaed" font-size="10" text-anchor="end">${lp[1]}${unit}</text>`;
+  return`<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">虛線：150／140（黃）／130（紅）</div>`;
+}
+function columns(months){
+  const W=360,H=120,B=20,T=14,mx=Math.max(1,...months.map(m=>m[1])),bw=W/months.length;
+  return`<svg viewBox="0 0 ${W} ${H}">${months.map(([k,v],i)=>{const bh=(H-B-T)*v/mx,x=i*bw+bw*0.2,y=H-B-bh,last=i===months.length-1;
+   return`<rect x="${x}" y="${y}" width="${bw*0.6}" height="${bh}" rx="3" fill="${last?'#ff9f43':'#3a4b66'}"/><text x="${x+bw*0.3}" y="${y-3}" fill="#e8eaed" font-size="10" text-anchor="middle">${v}</text><text x="${x+bw*0.3}" y="${H-6}" fill="#8b929c" font-size="10" text-anchor="middle">${Number(k.split('-')[1])}月</text>`}).join('')}</svg>`;
+}
+
+let BB=null,BSORT='date';
+function buyTable(){
+  const list=[...BB.list].sort((a,b)=>{
+    if(BSORT==='lots')return (b.lots??0)-(a.lots??0)||b.date.localeCompare(a.date);
+    if(BSORT==='purpose'){const rk=p=>p==='維護信用'?0:p==='轉讓員工'?1:2;return rk(a.purpose)-rk(b.purpose)||b.date.localeCompare(a.date)||a.code.localeCompare(b.code)}
+    return b.date.localeCompare(a.date)||(Number(b.purpose==='維護信用')-Number(a.purpose==='維護信用'))||a.code.localeCompare(b.code)});
+  document.getElementById('bbt').innerHTML=tbl(['日期','市場','代號名稱','張數','價格區間','目的'],list.map(r=>tr([md(r.date),esc(r.market),`<td class="nw">${esc(r.code+r.name)}</td>`,`<td class="n">${r.lots==null?'—':f(r.lots)}</td>`,`<td class="nw">${esc(r.price)}</td>`,`<td class="nw">${esc(r.purpose)}${r.done?' <span class="mut">已完成</span>':''}</td>`],r.purpose==='維護信用'?'hl':'')),[3]);
+  document.querySelectorAll('#bsort button').forEach(b=>b.classList.toggle('on',b.dataset.s===BSORT));
+}
+
+function render(J){
+  const D=J.DATA,DAILY=J.DAILY_LOG||[],RISK=J.RISK_LOG||[],RU=J.RULES||{};
+  const mt=n(D.margin_ex_etf.twse_latest),mo=n(D.margin_ex_etf.tpex_latest||{}),vix=n(D.vix);
+  const twL=longRange(D.top100.twse),tpL=longRange(D.top100.tpex);
+  const b1y=pct(n(D.breadth.below_year),D.breadth.year_n),b1m=pct(n(D.breadth.below_month),D.breadth.month_n);
+  const sk=D.no_watch_streak;
+  const ice=D.taiex.ma_dir.every(x=>x==='down');
+  const posOn=D.taiex.vs_5y<=0||twL[0]>=30||tpL[0]>=30;
+  const posPart=!posOn&&(D.taiex.vs_year<0||D.tpex.vs_2y<=0);
+  const mSt=isNaN(mt)?'off':mt<130?'max':mt<140?'on':mt<150?'part':'off';
+  const nw=D.no_watch.month_count;
+  const eSt=(nw>=5||vix>=50)?'max':(nw>=3||vix>=40)?'on':(nw>=1||vix>=30)?'part':'off';
+  const xSt=D.nsf.state!=='none'?'on':(D.intl.sox_vs_year<0||D.intl.kospi_vs_year<0)?'part':'off';
+  const arrow=d=>d==='down'?'↓':d==='up'?'↑':'—';
+  const cells=[
+    {name:'水溫',st:ice?'on':'off',why:`加權 10日${arrow(D.taiex.ma_dir[0])} 10週${arrow(D.taiex.ma_dir[1])} 10月${arrow(D.taiex.ma_dir[2])}${ice?'：冰水區':'：非冰水區'}`},
+    {name:'位置',st:posOn?'on':posPart?'part':'off',why:`加權年線${D.taiex.vs_year>=0?'上':'下'} ${D.taiex.vs_year}%；櫃買年線${D.tpex.vs_year>=0?'上':'下'} ${D.tpex.vs_year}%；前100大落入長均 上市 ${twL[0]}–${twL[1]}、上櫃 ${tpL[0]}–${tpL[1]} 家`},
+    {name:'壓力',st:mSt,why:`扣除ETF融資維持率 ${f(mt,2)}%（${ts(D.margin_ex_etf.twse_latest)}）`},
+    {name:'情緒',st:eSt,why:`近一月完全沒有觀察類股 ${nw} 次；VIX ${f(vix,2)}`},
+    {name:'外部與官方',st:xSt,why:`國安基金 ${D.nsf.note}；費半年線 ${D.intl.sox_vs_year}%、韓股年線 ${D.intl.kospi_vs_year}%`},
+  ];
+  const litC=cells.filter(c=>c.st==='on'||c.st==='max'),lit=litC.length;
+  const verdict=lit>=3?'非常態':lit>=1?'非常態警戒':'常態';
+  const tone=lit>=3?'danger':lit>=1?'warning':'info';
+  const today=RISK[RISK.length-1]||{trend:'—'},last=DAILY[DAILY.length-1]||{date:'—',watch:[],few:[]};
+  const streakTxt=sk.current<sk.record?`差 ${sk.record-sk.current} 日追平紀錄`:sk.current===sk.record?'已追平紀錄，明天再無即創新紀錄':`創新紀錄（超越原紀錄 ${sk.current-sk.record} 日）`;
+  document.getElementById('sub').textContent=`資料日 ${D.trade_date}｜更新 ${D.updated_at}｜數值自動取得，不是投資建議`;
+  const A=D.action, M=D.margin_ex_etf, I=D.institutional, B=D.buybacks; BB=B;
+  const sig=[
+    ['融資維持率（上市，扣除ETF）',`${f(mt,2)}%`,ts(M.twse_latest),ST[mSt].label],
+    ['融資維持率（上櫃，扣除ETF）',isNaN(mo)?'—':`${f(mo,2)}%`,isNaN(mo)?'尚無來源':ts(M.tpex_latest),'觀察項'],
+    ['追繳戶數／整戶<130%（輔助）',`${f(n(D.aux.call_accounts))}／${f(n(D.aux.below130))} 戶`,ts(D.aux.call_accounts),'觀察項'],
+    ['整戶擔保維持率（輔助）',`${f(n(D.aux.keep_rate),2)}%`,ts(D.aux.keep_rate),'觀察項'],
+    ['跌破年線比例',`${b1y}%（${f(n(D.breadth.below_year))} 家）`,ts(D.breadth.below_year),b1y>=50?'出現：過半':'未出現'],
+    ['跌破月線比例',`${b1m}%（${f(n(D.breadth.below_month))} 家）`,ts(D.breadth.below_month),b1m>=70?'出現：>70%':'未出現'],
+    ['60日新低家數',`${f(n(D.breadth.new_60d_low))} 家`,ts(D.breadth.new_60d_low),'觀察項'],
+    ['外資現貨（當日／5日）',`${f(n(D.foreign.spot),1)}／${f(n(D.foreign.spot_5d),0)} 億`,ts(D.foreign.spot),'觀察項'],
+    ['外資台指期淨空單',`${f(n(D.foreign.fut_net_short))} 口`,ts(D.foreign.fut_net_short),'觀察項'],
+    ['VIX',f(vix,2),ts(D.vix),vix>=60?'歷史級':vix>=50?'核心區':vix>=40?'第一批':vix>=30?'提高注意':'未達 30'],
+    ['加權',`${f(n(D.taiex.close),2)}（${D.taiex.pct}%）年線 ${D.taiex.vs_year>=0?'+':''}${D.taiex.vs_year}%、高點 ${D.taiex.dd}%`,ts(D.taiex.close),D.taiex.vs_year>=0?'年線之上':'跌破年線'],
+    ['櫃買',`${f(n(D.tpex.close),2)}（${D.tpex.pct}%）年線 ${D.tpex.vs_year>=0?'+':''}${D.tpex.vs_year}%、2年線 ${D.tpex.vs_2y>=0?'+':''}${D.tpex.vs_2y}%`,ts(D.tpex.close),D.tpex.vs_year>=0?'年線之上':'跌破年線'],
+    ['前100大 年線之上',`上市 ${D.top100.twse.above_year}、上櫃 ${D.top100.tpex.above_year} 家`,D.top100.as_of,'觀察項'],
+    ['前100大 落入長均（≥30 亮）',`上市 ${twL[0]}–${twL[1]}、上櫃 ${tpL[0]}–${tpL[1]} 家`,D.top100.as_of,posOn?'亮燈':posPart?'部分亮':'未亮'],
+  ];
+  const instT=(name,m)=>tbl([name,'單日','近3日','近一週','近一月'],[['外資',m.foreign],['投信',m.trust],['自營商',m.dealer],['合計',m.total]].map(([k,w])=>tr([k,yi(w.d1),yi(w.d3),yi(w.d5),yi(w.d20)])),[1,2,3,4]);
+  const months=Object.entries(B.monthly||{});
+  let h='';
+  h+=`<div class="card"><h2>今日風險提示 <span class="mut">${esc(D.trade_date)}</span></h2>
+   <div class="call ${tone}"><b>${verdict}｜亮 ${lit} / 5 格｜${esc(today.trend)}</b>連續無觀察類股 ${sk.current} / ${sk.record} 日（${esc(sk.since)} 起），${streakTxt}</div>
+   <div class="mets">
+    <div class="met ${lit>=3?'danger':''}"><div class="v">${verdict}</div><div class="l">判讀</div><div class="d">≥3 格＝非常態（3-1）</div></div>
+    <div class="met"><div class="v">${lit} / 5</div><div class="l">亮燈格數</div><div class="d">${litC.map(c=>c.name).join('、')||'—'}</div></div>
+    <div class="met"><div class="v">${esc(today.trend)}</div><div class="l">vs 前一交易日</div><div class="d">${RISK.length>1?RISK[RISK.length-2].lit:'—'} → ${lit} 格</div></div>
+    <div class="met warning"><div class="v">${sk.current} / ${sk.record}</div><div class="l">連續無觀察類股（日）</div><div class="d">紀錄 ${sk.record}（前紀錄 ${sk.prev_record}）</div></div>
+   </div>
+   <div class="rows">${cells.map(c=>`<div class="row"><div class="t">${c.name}</div><div class="w">${esc(c.why)}</div><span class="pill ${ST[c.st].tone||''}">${ST[c.st].label}</span></div>`).join('')}</div>
+   <dl class="props"><dt>觀察類股（${esc(last.date)}）</dt><dd>${esc(pick(last.watch))}</dd><dt>稍微觀察類股</dt><dd>${esc(pick(last.few))}</dd><dt>完全沒有觀察類股</dt><dd>${esc(D.no_watch.days.join('、'))}</dd></dl></div>`;
+  h+=`<div class="card"><h2>操作方向</h2><div class="cap">${esc(A.disclaimer)}｜規則更新：${esc(A.rules_updated)}${A.as_of?`｜判讀日 ${esc(A.as_of)}`:''}</div>
+   <dl class="props"><dt>階段</dt><dd>${esc(A.stage)}</dd><dt>左側／右側</dt><dd>${esc(A.side)}</dd><dt>部位</dt><dd>${esc(A.size)}</dd><dt>哪筆錢</dt><dd>${esc(A.money)}</dd></dl>
+   <div class="call warning"><b>今日對應</b>${esc(A.text)}</div></div>`;
+  h+=`<div class="card"><h2>關鍵訊號</h2>${tbl(['訊號','數值','日期','燈號'],sig.map(r=>tr([`<td class="k">${esc(r[0])}</td>`,esc(r[1]),`<td class="nw">${esc(/^\d{4}-\d\d-\d\d/.test(r[2])?md(r[2].slice(0,10))+r[2].slice(10).replace('（前一日）','（前日）'):r[2])}</td>`,`<td class="nw">${esc(r[3])}</td>`])))}</div>`;
+  h+=`<div class="card"><h2>三大法人買賣超</h2><div class="cap">單位：億元｜紅＝買超、綠＝賣超｜資料日 ${esc(I.as_of)}${I.stale?'（前一日）':''}｜近一週＝5 個交易日、近一月＝20 個交易日</div><div class="grid2"><div>${instT('上市',I.twse)}</div><div>${instT('上櫃',I.tpex)}</div></div></div>`;
+  h+=`<div class="card"><h2>庫藏股（董事會決議買回）</h2>
+   <div class="cap">公開資訊觀測站 t35sc09｜資料日 ${esc(B.as_of)}｜查詢自 ${esc(B.coverage_start)} 起（7 月可能未含 7/4 前）｜黃底＝維護信用</div>
+   <div class="mets">${[['單日','d1'],['近5日','d5'],['近20日','d20'],['本月','mtd']].map(([l,k])=>`<div class="met"><div class="v">${f(B.counts[k])}</div><div class="l">${l}</div><div class="d">家</div></div>`).join('')}</div>
+   ${columns(months)}<div class="seg" id="bsort" style="margin:6px 0"><span class="mut" style="align-self:center">排序</span><button data-s="date">日期</button><button data-s="lots">張數</button><button data-s="purpose">目的</button></div><div id="bbt"></div>
+   <div class="call info">只當觀察項：家數暴增代表恐慌加深；個股庫藏股+現金充足+位階基本面＝左側輔助參考，非單獨買進理由（Wade 11/9）</div></div>`;
+  h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%')}</div>
+   <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}</div></div>`;
+  h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
+  h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${esc(pick(d.watch))}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${esc(pick(d.few))}</div>`:''}</div>`).join('')}</div>`;
+  h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+   <details><summary>操作規則</summary><ul>${(RU.ops||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details></details>`;
+  document.getElementById('app').innerHTML=h;
+  buyTable();
+  document.querySelectorAll('#bsort button').forEach(b=>b.onclick=()=>{BSORT=b.dataset.s;buyTable()});
+}
+
+(async()=>{
+  let J=null;
+  try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok)J=await r.json()}catch(e){}
+  if(!J){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(r.ok)J=await r.json()}catch(e){}}
+  if(!J){const e=document.getElementById('err');e.style.display='block';e.textContent='資料載入失敗，請稍後重新整理。';document.getElementById('sub').textContent='';return}
+  try{render(J)}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
+})();
+</script></body></html>
