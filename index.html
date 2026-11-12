@@ -60,7 +60,7 @@ body.vheat [data-v="intra"]{display:none!important}body:not(.vheat) [data-v="hea
 <label class="hfilter" for="hfilter">族群篩選 <select id="hfilter"><option value="">全部</option></select></label>
 <div id="hcrumb" class="crumb"></div>
 <div class="tmwrap" id="tmwrap"><div class="tm" id="tm"></div></div>
-<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">色塊大小依成交值，小色塊保留可讀面積・底色＝個股漲跌幅・點個股看分時／日K</span></div>
+<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">色塊與族群框大小依成交值，小色塊只顯示名稱、滑過看漲跌・底色＝個股漲跌幅・點個股看分時／日K</span></div>
 </div>
 <div class="tip" id="tip"></div>
 
@@ -118,17 +118,19 @@ function curHeat(){if(HM==='close'){if(inSession())return HCLOSE;return D&&D.hea
 async function loadClose(){if(HCLOSE)return;try{const r=await fetch('heat_close.json?t='+Date.now(),{cache:'no-store'});if(r.ok){HCLOSE=await r.json();renderHeat()}}catch(e){}}
 function heatEscape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function tile(s,c,ki,lim){const fs=Math.max(10,Math.min(14,(c.w-6)/Math.max(1,Array.from(s[1]).length),(c.h-18)/2));
- let t=`<span class="nm" style="font-size:${fs}px">${heatEscape(s[1])}</span><span class="pc" style="font-size:${fs}px">${fp(s[ki])}</span>`;
+ const L=Array.from(s[1]).length,fit=c.w>=L*10+4;let t='';
+ if(fit&&c.h>=34)t=`<span class="nm" style="font-size:${fs}px">${heatEscape(s[1])}</span><span class="pc" style="font-size:${fs}px">${fp(s[ki])}</span>`;
+ else if(c.h>=16&&c.w>=Math.min(L,2)*10+2)t=`<span class="nm" style="font-size:${Math.max(9,Math.min(11,(c.w-2)/Math.max(1,Math.min(L,4))))}px">${heatEscape(c.w>=L*10+2?s[1]:Array.from(s[1]).slice(0,Math.max(1,Math.floor((c.w-2)/10))).join(''))}</span>`;
  if(s[13])t+='<span class="ld">龍頭</span>';
  return`<button type="button" class="s" data-s="${heatEscape(s[0])}" aria-label="${heatEscape(s[1])} ${fp(s[ki])}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${pcol(s[ki],lim)}">${t}</button>`}
 function readableTiles(stocks,w,h){
  if(!stocks.length||w<=0)return{cells:[],height:h};
- const sv=s=>Math.sqrt(Math.max(0,Number.isFinite(s[3])?s[3]:0));const peak=Math.max(1,...stocks.map(sv));
- const items=stocks.map(s=>({s,v:Math.max(sv(s),peak/4)}));
+ const sv=s=>Math.max(0,Number.isFinite(s[3])?s[3]:0);const peak=Math.max(0.01,...stocks.map(sv));
+ const items=stocks.map(s=>({s,v:Math.max(sv(s),peak/25)}));
  let cells;
  for(let attempt=0;attempt<60;attempt++){
   cells=squarify(items,0,0,w,h);
-  if(cells.every(c=>c.h>=34&&c.w>=Math.min(w,Math.max(44,Array.from(c.s[1]).length*10+4))))break;
+  if(cells.every(c=>c.h>=16&&c.w>=Math.min(w,26)))break;
   h=Math.ceil(h*1.2);
  }
  return{cells,height:h};
@@ -150,12 +152,13 @@ function renderHeat(){const H=curHeat();const card=document.getElementById('heat
  document.getElementById('hsummary').innerHTML=`<span class="mut">全部個股（當日）</span><span class="up">上漲 ${counts.up} 家</span><span class="dn">下跌 ${counts.dn} 家</span><span>平盤 ${counts.flat} 家</span>`;
  const tmap={};for(const r of H.table)tmap[r.g]=r;let g='';const layouts=[];
  document.getElementById('hcrumb').textContent=HZ==null?`全部族群・${H.groups.length}個`:H.groups[HZ];
+ const GT=H.groups.map((_,i)=>H.stocks.filter(x=>x[2]===i).reduce((a,x)=>a+(Number.isFinite(x[3])?x[3]:0),0));const GMAX=Math.max(0.01,...GT);
  for(const [i,n] of H.groups.entries()){
   if(HZ!=null&&HZ!==i)continue;
   const ss=H.stocks.filter(s=>s[2]===i);
   const values=ss.map(s=>s[ki]).filter(v=>Number.isFinite(v));
   const pv=tmap[n]?tmap[n][HK]:values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
-  const height=Math.max(2,Math.min(10,ss.length))*30;
+  const gt=ss.reduce((a,x)=>a+(Number.isFinite(x[3])?x[3]:0),0),height=Math.round(70+250*Math.sqrt(gt/GMAX));
   g+=`<div class="g${HZ!=null?' selected':''}"><div class="gh"><span>${heatEscape(n)}</span><b class="${cls(pv)}">${fp(pv)}</b></div><div class="tiles" style="height:${height}px"><div class="tilecanvas"></div></div></div>`;
   layouts.push(ss);
  }
