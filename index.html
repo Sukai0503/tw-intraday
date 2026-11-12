@@ -32,6 +32,7 @@ svg{width:100%;height:auto;display:block}
 .tip .t1{font-size:15px;font-weight:700;margin-bottom:4px}.tip table{width:100%;border-collapse:collapse}.tip td{padding:1px 0}.tip td:last-child{text-align:right}
 .tip .btn{margin-top:8px;display:flex;gap:8px}.tip .btn a{flex:1;text-align:center;background:#17c8d822;color:#33e1f0;border-radius:6px;padding:5px 0;text-decoration:none}
 @media (max-width:560px){.tip{left:8px!important;right:8px;bottom:8px;top:auto!important}}
+.kmodal{position:fixed;inset:0;background:#000a;z-index:30;display:none;align-items:center;justify-content:center;padding:10px}.kpanel{background:#0d1a2e;border:1px solid #17c8d8;border-radius:12px;padding:12px;width:min(560px,100%);max-height:92vh;overflow:auto}
 </style></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
 <h1 id="ttl">今日盤中｜即時 --:--</h1>
@@ -48,10 +49,12 @@ svg{width:100%;height:auto;display:block}
 <div class="seg" id="hseg" style="margin-top:6px"><button data-k="d1" class="on">今日</button><button data-k="d3">近3日</button><button data-k="d10">近10日</button></div>
 <div id="hcrumb" class="crumb"></div>
 <div class="tmwrap" id="tmwrap"><div class="tm" id="tm"></div></div>
-<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">方塊大小＝成交值・點族群名稱放大・點個股看日K</span></div>
-<div id="kbox" style="display:none;margin-top:8px"></div>
+<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">方塊大小＝成交值・點族群名稱放大・點個股看分時／日K</span></div>
 </div>
 <div class="tip" id="tip"></div>
+<div id="kmodal" class="kmodal"><div class="kpanel"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div id="khead"></div><a href="#" onclick="closeK();return false" style="color:var(--mut);font-size:20px;text-decoration:none;line-height:1">✕</a></div>
+<div class="seg" id="ktabs" style="margin:8px 0"><button data-v="intra" class="on">分時</button><button data-v="day">日線</button></div><div id="kbody"></div></div></div>
+
 <div class="card"><h2>族群強弱 <span class="mut">等權平均；法人為近3日買賣超（股數×現價，億）</span></h2>
 <div style="overflow-x:auto"><table class="tb" id="rtab"></table></div></div>
 <div class="card"><h2>族群輪動 <span class="mut">近10交易日名次，越紅越強</span></h2>
@@ -145,7 +148,7 @@ function tipHtml(s){const H=curHeat(),up=s[9]>0,dn=s[9]<0,ar=up?'▲':dn?'▼':'
  <tr><td class="mut">漲跌幅</td><td class="${c}">${fp(s[4])}</td></tr><tr><td class="mut">最高</td><td class="up">${s[10]}</td></tr><tr><td class="mut">最低</td><td class="dn">${s[11]}</td></tr>
  <tr><td class="mut">成交金額</td><td>${s[3].toFixed(2)} 億</td></tr></table>`}
 const TIP=document.getElementById('tip');let tipCode=null;
-function showTip(code,x,y,touch){const s=findS(code);if(!s)return;tipCode=code;TIP.innerHTML=tipHtml(s)+(touch?`<div class="btn"><a href="#" id="tk">看日K</a><a href="#" id="tc">關閉</a></div>`:'');TIP.style.display='block';
+function showTip(code,x,y,touch){const s=findS(code);if(!s)return;tipCode=code;TIP.innerHTML=tipHtml(s)+(touch?`<div class="btn"><a href="#" id="tk">看走勢</a><a href="#" id="tc">關閉</a></div>`:'');TIP.style.display='block';
  if(!touch){const w=TIP.offsetWidth,h=TIP.offsetHeight;TIP.style.left=Math.min(innerWidth-w-8,x+14)+'px';TIP.style.top=Math.min(innerHeight-h-8,y+14)+'px'}else{TIP.style.left='';TIP.style.top=''}
  if(touch){document.getElementById('tk').onclick=e=>{e.preventDefault();TIP.style.display='none';showK(code)};document.getElementById('tc').onclick=e=>{e.preventDefault();TIP.style.display='none'}}}
 const TMEL=document.getElementById('tm');let isTouch=false;
@@ -158,24 +161,55 @@ document.getElementById('hseg').onclick=e=>{const b=e.target.closest('button');i
 document.getElementById('hmode').onclick=e=>{const b=e.target.closest('button');if(!b)return;HM=b.dataset.m;HZ=null;renderHeat()};
 document.getElementById('rtab').onclick=e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.g!=null&&+tr.dataset.g>=0){HZ=+tr.dataset.g;renderHeat();document.getElementById('heatcard').scrollIntoView({behavior:'smooth'})}};
 let rzT;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(renderHeat,200)});
-async function showK(code){const box=document.getElementById('kbox');box.style.display='block';box.innerHTML='<span class="mut">載入日線…</span>';
- try{if(!HIST){const r=await fetch('hist.json',{cache:'no-cache'});HIST=await r.json()}}catch(e){box.innerHTML='<span class="mut">日線資料載入失敗</span>';return}
- const s=findS(code);let c=(HIST.c[code]||[]).slice();const days=HIST.days.slice();
- if(s&&D.date>days.at(-1)){const y=c.at(-1);if(y!=null){c.push(+(y*(1+s[4]/100)).toFixed(2));days.push(D.date)}}
- const pts=c.map((v,i)=>[i,v]).filter(p=>p[1]!=null);if(pts.length<5){box.innerHTML='<span class="mut">歷史不足</span>';return}
- const ma=n=>c.map((_,i)=>{if(i<n-1)return null;const w=c.slice(i-n+1,i+1);return w.some(v=>v==null)?null:w.reduce((a,b)=>a+b,0)/n});
- const m5=ma(5),m20=ma(20),m60=ma(60);const all=[...pts.map(p=>p[1]),...m5,...m20,...m60].filter(v=>v!=null);const lo=Math.min(...all),hi=Math.max(...all);
- const W3=360,H3=170,l=40,r=6,tp=8,bt=18,N=c.length;const xx=i=>l+i/(N-1)*(W3-l-r),yy=v=>tp+(1-(v-lo)/(hi-lo||1))*(H3-tp-bt);
- const pl=(arr,col,w)=>{const p=arr.map((v,i)=>v==null?null:xx(i).toFixed(1)+','+yy(v).toFixed(1)).filter(Boolean);return`<polyline fill="none" stroke="${col}" stroke-width="${w}" points="${p.join(' ')}"/>`};
- let g='';for(const v of[lo,(lo+hi)/2,hi])g+=`<line x1="${l}" x2="${W3-r}" y1="${yy(v)}" y2="${yy(v)}" stroke="var(--grid)"/><text x="${l-3}" y="${yy(v)+3}" fill="var(--mut)" font-size="9" text-anchor="end">${v>=100?v.toFixed(0):v.toFixed(1)}</text>`;
- for(const i of[0,Math.floor(N/2),N-1])g+=`<text x="${xx(i)}" y="${H3-4}" fill="var(--mut)" font-size="9" text-anchor="${i===0?'start':i===N-1?'end':'middle'}">${days[i].slice(4,6)}/${days[i].slice(6)}</text>`;
- g+=pl(c,'#e8eaed',1.6)+pl(m5,'#f6c344',1)+pl(m20,'#ff9f43',1)+pl(m60,'#b48cff',1);
- box.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline"><b>${code} ${s?s[1]:''} <span class="${s?cls(s[4]):''}">${s?fp(s[4]):''}</span></b><a href="#" onclick="this.parentNode.parentNode.style.display='none';return false" style="color:var(--mut);font-size:12px">關閉</a></div>
- <div class="leg"><span><i style="background:#e8eaed"></i>收盤</span><span><i style="background:#f6c344"></i>MA5</span><span><i style="background:#ff9f43"></i>MA20</span><span><i style="background:#b48cff"></i>MA60</span></div><svg viewBox="0 0 ${W3} ${H3}">${g}</svg><div class="mut">近 ${N} 日收盤線（非 K 棒）；今日以即時價計。</div>`;
- box.scrollIntoView({behavior:'smooth',block:'nearest'})}
+let INTRA=null,INTRA_T=0,KC=null,KV='intra';const OHLC={};
+async function getIntra(){if(INTRA&&Date.now()-INTRA_T<110000)return INTRA;
+ try{const r=await fetch('https://api.github.com/repos/Sukai0503/tw-intraday/contents/intraday.json?ref=data',{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok){INTRA=await r.json();INTRA_T=Date.now()}}catch(e){}
+ return INTRA}
+async function getOHLC(code){if(OHLC[code])return OHLC[code];try{const r=await fetch('hist/'+code+'.json',{cache:'no-cache'});if(r.ok)return OHLC[code]=await r.json()}catch(e){}return null}
+function showK(code){KC=code;KV='intra';const m=document.getElementById('kmodal');m.style.display='flex';drawK()}
+function closeK(){document.getElementById('kmodal').style.display='none'}
+async function drawK(){const code=KC,s=findS(code),box=document.getElementById('kbody');
+ const up=s&&s[9]>0,dn=s&&s[9]<0,c=up?'up':dn?'dn':'';
+ document.getElementById('khead').innerHTML=s?`<b style="font-size:16px">${s[1]}</b> <span class="mut">${s[0]}・${curHeat().groups[s[2]]}</span>${s[13]?' <span style="background:#ffd400;color:#222;font-size:10px;border-radius:3px;padding:0 4px">龍頭</span>':''}<div><b class="${c}" style="font-size:20px">${s[8]}</b> <span class="${c}">${up?'▲':dn?'▼':''}${Math.abs(s[9])}　${fp(s[4])}</span>　<span class="mut">高</span> <span class="up">${s[10]}</span> <span class="mut">低</span> <span class="dn">${s[11]}</span>　<span class="mut">成交</span> ${s[3].toFixed(1)} 億</div>`:code;
+ [...document.querySelectorAll('#ktabs button')].forEach(b=>b.classList.toggle('on',b.dataset.v===KV));
+ box.innerHTML='<div class="mut" style="padding:40px 0;text-align:center">載入中…</div>';
+ if(KV==='intra'){const I=await getIntra();if(KC!==code||KV!=='intra')return;
+  if(!I||!I.p||!I.p[code]){box.innerHTML='<div class="mut" style="padding:30px 0;text-align:center">暫無分時資料</div>';return}
+  const t=I.t.slice(),p=I.p[code].slice(),y=I.y[code]||(s&&s[8]-s[9]);
+  const hm=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
+  if(s&&D.heat&&D.heat.asof&&I.date===D.date&&t.length&&D.heat.asof>t.at(-1)){t.push(D.heat.asof);p.push(s[8])}
+  const pts=t.map((x,i)=>[tm(x),p[i]]).filter(q=>q[1]!=null);
+  const W=360,H=210,L=40,R=40,T=10,B=20;let dev=Math.max(...pts.map(q=>Math.abs(q[1]-y)),y*0.01);if(s)dev=Math.max(dev,Math.abs(s[10]-y),Math.abs(s[11]-y));dev*=1.08;
+  const X=m=>L+(m-540)/270*(W-L-R),Y=v=>T+(1-(v-(y-dev))/(2*dev))*(H-T-B);
+  let g='';for(const v of[y-dev,y-dev/2,y,y+dev/2,y+dev]){const pc=(v/y-1)*100;g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===y?'#8b929c':'var(--grid)'}" ${v===y?'stroke-dasharray="4 3"':''}/><text x="${L-3}" y="${Y(v)+3}" fill="${v>y?'var(--up)':v<y?'var(--dn)':'var(--mut)'}" font-size="9" text-anchor="end">${v>=100?v.toFixed(0):v.toFixed(2)}</text><text x="${W-R+3}" y="${Y(v)+3}" fill="${v>y?'var(--up)':v<y?'var(--dn)':'var(--mut)'}" font-size="9">${(pc>0?'+':'')+pc.toFixed(1)}%</text>`}
+  for(const x of['09:00','10:00','11:00','12:00','13:00','13:30'])g+=`<text x="${X(tm(x))}" y="${H-5}" fill="var(--mut)" font-size="9" text-anchor="middle">${x}</text>`;
+  const last=pts.at(-1)[1],col=last>y?'#ff4d5e':last<y?'#16c79a':'#cfd3d8';
+  const line=pts.map(q=>X(q[0]).toFixed(1)+','+Y(q[1]).toFixed(1)).join(' ');
+  g+=`<polygon points="${X(pts[0][0])},${Y(y)} ${line} ${X(pts.at(-1)[0])},${Y(y)}" fill="${col}" opacity=".12"/><polyline points="${line}" fill="none" stroke="${col}" stroke-width="1.8"/>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">分時走勢（虛線＝昨收 ${y}）；盤中約每 2 分鐘一點${I.t.length&&I.t[1]&&tm(I.t[1])-tm(I.t[0])>=5?'，早段為 5 分鐘回補':''}。</div>`;return}
+ // 日線
+ const O=await getOHLC(code);if(KC!==code||KV!=='day')return;
+ if(!O){box.innerHTML='<div class="mut" style="padding:30px 0;text-align:center">暫無日線資料</div>';return}
+ let d=O.d.slice(),o=O.o.slice(),h=O.h.slice(),l=O.l.slice(),c=O.c.slice(),v=O.v.slice();
+ if(s&&D.date>d.at(-1)){d.push(D.date);o.push(s[14]||s[8]);h.push(s[10]);l.push(s[11]);c.push(s[8]);v.push(s[15]||0)}
+ const N=c.length,ma=n=>c.map((_,i)=>i<n-1?null:c.slice(i-n+1,i+1).reduce((a,b)=>a+b,0)/n),m5=ma(5),m20=ma(20),m60=ma(60);
+ const W=360,H=250,L=40,R=6,T=8,PH=170,VH=50,cw=(W-L-R)/N;const all=[...h,...l,...m60.filter(x=>x!=null),...m20.filter(x=>x!=null)];const lo=Math.min(...all),hi=Math.max(...all),vmax=Math.max(...v,1);
+ const X=i=>L+(i+.5)*cw,Y=x=>T+(1-(x-lo)/(hi-lo||1))*(PH-T);
+ let g='';for(const x of[lo,(lo+hi)/2,hi])g+=`<line x1="${L}" x2="${W-R}" y1="${Y(x)}" y2="${Y(x)}" stroke="var(--grid)"/><text x="${L-3}" y="${Y(x)+3}" fill="var(--mut)" font-size="9" text-anchor="end">${x>=100?x.toFixed(0):x.toFixed(2)}</text>`;
+ for(let i=0;i<N;i++){const u=c[i]>=o[i],col=c[i]>o[i]?'#ff4d5e':c[i]<o[i]?'#16c79a':'#cfd3d8';const bw=Math.max(1,cw*.7);
+  g+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(h[i])}" y2="${Y(l[i])}" stroke="${col}" stroke-width="1"/><rect x="${X(i)-bw/2}" y="${Y(Math.max(o[i],c[i]))}" width="${bw}" height="${Math.max(.8,Math.abs(Y(o[i])-Y(c[i])))}" fill="${col}"/>`;
+  const vh=v[i]/vmax*(VH-6);g+=`<rect x="${X(i)-bw/2}" y="${PH+VH+4-vh}" width="${bw}" height="${vh}" fill="${col}" opacity=".6"/>`}
+ const pl=(a,col)=>`<polyline fill="none" stroke="${col}" stroke-width="1.1" points="${a.map((x,i)=>x==null?null:X(i).toFixed(1)+','+Y(x).toFixed(1)).filter(Boolean).join(' ')}"/>`;
+ g+=pl(m5,'#f6c344')+pl(m20,'#ff9f43')+pl(m60,'#b48cff');
+ for(const i of[0,Math.floor(N/2),N-1])g+=`<text x="${X(i)}" y="${H-2}" fill="var(--mut)" font-size="9" text-anchor="${i===0?'start':i===N-1?'end':'middle'}">${+d[i].slice(4,6)}/${+d[i].slice(6)}</text>`;
+ g+=`<text x="${L}" y="${PH+14}" fill="var(--mut)" font-size="9">量（張）最高 ${vmax.toLocaleString()}</text>`;
+ const f=x=>x==null?'-':(x>=100?x.toFixed(1):x.toFixed(2));
+ box.innerHTML=`<div class="leg"><span><i style="background:#f6c344"></i>MA5 ${f(m5.at(-1))}</span><span><i style="background:#ff9f43"></i>MA20 ${f(m20.at(-1))}</span><span><i style="background:#b48cff"></i>MA60 ${f(m60.at(-1))}</span></div><svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">日K（近 ${N} 日，Yahoo 日線＋今日即時）。</div>`}
+document.getElementById('ktabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;KV=b.dataset.v;drawK()};
+document.getElementById('kmodal').onclick=e=>{if(e.target.id==='kmodal')closeK()};
 
 render();
-let HASHED=false;function applyHash(){if(HASHED)return;HASHED=true;(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k)showK(k[1])}})()}
+let HASHED=false;function applyHash(){if(HASHED)return;HASHED=true;(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k){showK(k[1]);if(/v=day/.test(location.hash)){KV='day';drawK()}}}})()}
 if(D)applyHash();
 const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/data.json?ref=data';
 async function poll(){let ok=false;
