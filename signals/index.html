@@ -70,27 +70,31 @@ const yi=v=>v==null?'<td class="n">—</td>':`<td class="n ${v>0?'r':v<0?'g':''}
 const tbl=(cols,rows,numCols=[])=>`<div class="tw"><table class="tb"><thead><tr>${cols.map((c,i)=>`<th class="${numCols.includes(i)?'n':''}">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 const tr=(cells,cls='')=>`<tr class="${cls}">${cells.map(c=>c.startsWith('<td')?c:`<td>${c}</td>`).join('')}</tr>`;
 
-function lineChart(pts,floor,ceil,unit){
-  const W=360,H=190,L=34,R=8,T=10,B=26,w=W-L-R,h=H-T-B;
+function lineChart(pts,floor,ceil,unit,name){
   if(!pts.length)return'<div class="mut">無資料</div>';
-  const lo=Math.min(floor,...pts.map(p=>p[1])),hi=Math.max(ceil,...pts.map(p=>p[1]));
-  const X=i=>L+(pts.length<2?w/2:i*w/(pts.length-1)),Y=v=>T+h-(v-lo)/(hi-lo)*h;
-  let g='';const step=(hi-lo)>30?10:5;
-  for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step){g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2a2f39"/><text x="${L-4}" y="${Y(v)+3}" fill="#8b929c" font-size="9" text-anchor="end">${v}</text>`}
-  [150,140,130].forEach(v=>{if(v>=lo&&v<=hi)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===130?'#ff5b5b':v===140?'#f5b041':'#6b7280'}" stroke-dasharray="3 3" stroke-width="1"/>`});
-  const ev=Math.max(1,Math.ceil(pts.length/6));
-  pts.forEach((p,i)=>{if((i%ev===0&&pts.length-1-i>=ev/2+1)||i===pts.length-1)g+=`<text x="${X(i)}" y="${H-8}" fill="#8b929c" font-size="9" text-anchor="${i===pts.length-1?'end':i===0?'start':'middle'}">${p[0]}</text>`});
-  g+=`<polyline fill="none" stroke="#4ea1ff" stroke-width="2" points="${pts.map((p,i)=>`${X(i)},${Y(p[1])}`).join(' ')}"/>`;
-  pts.forEach((p,i)=>{g+=`<circle cx="${X(i)}" cy="${Y(p[1])}" r="2.2" fill="#4ea1ff"/>`});
-  const lp=pts[pts.length-1];g+=`<text x="${X(pts.length-1)-2}" y="${Y(lp[1])-6}" fill="#e8eaed" font-size="10" text-anchor="end">${lp[1]}${unit}</text>`;
-  return`<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">虛線：150／140（黃）／130（紅）</div>`;
+  if(!window.StockChart)return'<div class="mut">圖表載入失敗</div>';
+  return StockChart.tsHTML({kind:'day',height:210,pan:true,visible:60,unit,dec:2,minRange:[floor,ceil],
+    hlines:[{v:150,color:'#8b929c'},{v:140,color:'#f5b041'},{v:130,color:'#ff5b5b'}],
+    series:[{name:name||'維持率',color:'#4ea1ff',points:true,data:pts}]})+'<div class="mut">虛線：150／140（黃）／130（紅）｜拖曳看各日數值</div>';
 }
 function columns(months){
-  const W=360,H=120,B=20,T=14,mx=Math.max(1,...months.map(m=>m[1])),bw=W/months.length;
-  return`<svg viewBox="0 0 ${W} ${H}">${months.map(([k,v],i)=>{const bh=(H-B-T)*v/mx,x=i*bw+bw*0.2,y=H-B-bh,last=i===months.length-1;
-   return`<rect x="${x}" y="${y}" width="${bw*0.6}" height="${bh}" rx="3" fill="${last?'#ff9f43':'#3a4b66'}"/><text x="${x+bw*0.3}" y="${y-3}" fill="#e8eaed" font-size="10" text-anchor="middle">${v}</text><text x="${x+bw*0.3}" y="${H-6}" fill="#8b929c" font-size="10" text-anchor="middle">${Number(k.split('-')[1])}月</text>`}).join('')}</svg>`;
+  if(!window.StockChart)return'';
+  return StockChart.tsHTML({kind:'month',height:150,unit:' 家',dec:0,series:[{name:'董事會決議買回',type:'hist',color:'#3a4b66',data:months.map(m=>[m[0],m[1]]),colorFn:(v,p)=>p[0]===months[months.length-1][0]?'#ff9f43':'#4a6a99'}]});
 }
-
+// 三大法人逐日／市場廣度逐日（/signals_series.json，另一程式產生；失敗時不顯示）
+async function loadSeries(){let S=null;
+  try{const r=await fetch('https://api.github.com/repos/Sukai0503/tw-intraday/contents/signals_series.json?ref=data',{cache:'no-store',headers:{Accept:'application/vnd.github.raw'}});if(r.ok)S=await r.json()}catch(e){}
+  if(!S){try{const r=await fetch('../signals_series.json',{cache:'no-cache'});if(r.ok)S=await r.json()}catch(e){}}
+  if(!S||!window.StockChart)return;
+  const inst=(m,id)=>{const rows=(S.inst||{})[m]||[];const el=document.getElementById(id);if(!el||!rows.length)return;
+    StockChart.ts(el,{kind:'day',height:200,pan:true,visible:20,unit:' 億',dec:1,hlines:[{v:0,color:'#6b7280',axis:false}],series:[
+      {name:'合計',type:'hist',color:'#888',data:rows.map(r=>[r[0],r[4]]),colorFn:v=>v>=0?'#ff5b5b99':'#22c55e99'},
+      {name:'外資',color:'#4ea1ff',width:1.5,data:rows.map(r=>[r[0],r[1]])},{name:'投信',color:'#ff9f43',width:1.5,data:rows.map(r=>[r[0],r[2]])},{name:'自營',color:'#b48cff',width:1.5,data:rows.map(r=>[r[0],r[3]])}]})};
+  inst('twse','inst_twse');inst('tpex','inst_tpex');
+  const br=S.breadth||[];const be=document.getElementById('breadth_ch');
+  if(be&&br.length)StockChart.ts(be,{kind:'day',height:210,pan:true,visible:120,unit:'%',dec:1,range:[0,100],hlines:[{v:50,color:'#f5b041',title:'年線過半'},{v:70,color:'#ff5b5b',title:'月線70%'}],series:[
+    {name:'跌破年線',color:'#ff9f43',data:br.map(r=>[r[0],r[1]])},{name:'跌破月線',color:'#4ea1ff',data:br.map(r=>[r[0],r[2]])}]});
+}
 let BB=null,BSORT='date';
 function buyTable(){
   const list=[...BB.list].sort((a,b)=>{
@@ -162,14 +166,14 @@ function render(J){
    <dl class="props"><dt>階段</dt><dd>${esc(A.stage)}</dd><dt>左側／右側</dt><dd>${esc(A.side)}</dd><dt>部位</dt><dd>${esc(A.size)}</dd><dt>哪筆錢</dt><dd>${esc(A.money)}</dd></dl>
    <div class="call warning"><b>今日對應</b>${esc(A.text)}</div></div>`;
   h+=`<div class="card"><h2>關鍵訊號</h2>${tbl(['訊號','數值','日期','燈號'],sig.map(r=>tr([`<td class="k">${esc(r[0])}</td>`,esc(r[1]),`<td class="nw">${esc(/^\d{4}-\d\d-\d\d/.test(r[2])?md(r[2].slice(0,10))+r[2].slice(10).replace('（前一日）','（前日）'):r[2])}</td>`,`<td class="nw">${esc(r[3])}</td>`])))}</div>`;
-  h+=`<div class="card"><h2>三大法人買賣超</h2><div class="cap">單位：億元｜紅＝買超、綠＝賣超｜資料日 ${esc(I.as_of)}${I.stale?'（前一日）':''}｜近一週＝5 個交易日、近一月＝20 個交易日</div><div class="grid2"><div>${instT('上市',I.twse)}</div><div>${instT('上櫃',I.tpex)}</div></div></div>`;
+  h+=`<div class="card"><h2>三大法人買賣超</h2><div class="cap">單位：億元｜紅＝買超、綠＝賣超｜資料日 ${esc(I.as_of)}${I.stale?'（前一日）':''}｜近一週＝5 個交易日、近一月＝20 個交易日</div><div class="grid2"><div>${instT('上市',I.twse)}</div><div>${instT('上櫃',I.tpex)}</div></div><div class="cap" style="margin-top:8px">逐日買賣超（億）：柱＝三大法人合計，線＝外資／投信／自營｜拖曳看各日</div><div class="grid2"><div><div class="mut">上市</div><div id="inst_twse" style="min-height:200px"></div></div><div><div class="mut">上櫃</div><div id="inst_tpex" style="min-height:200px"></div></div></div></div>`;
   h+=`<div class="card"><h2>庫藏股（董事會決議買回）</h2>
    <div class="cap">公開資訊觀測站 t35sc09｜資料日 ${esc(B.as_of)}｜查詢自 ${esc(B.coverage_start)} 起（7 月可能未含 7/4 前）｜黃底＝維護信用</div>
    <div class="mets">${[['單日','d1'],['近5日','d5'],['近20日','d20'],['本月','mtd']].map(([l,k])=>`<div class="met"><div class="v">${f(B.counts[k])}</div><div class="l">${l}</div><div class="d">家</div></div>`).join('')}</div>
    ${columns(months)}<div class="seg" id="bsort" style="margin:6px 0"><span class="mut" style="align-self:center">排序</span><button data-s="date">日期</button><button data-s="lots">張數</button><button data-s="purpose">目的</button></div><div id="bbt"></div>
    <div class="call info">只當觀察項：家數暴增代表恐慌加深；個股庫藏股+現金充足+位階基本面＝左側輔助參考，非單獨買進理由（Wade 11/9）</div></div>`;
-  h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%')}</div>
-   <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}</div></div>`;
+  h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%','上市')}${(M.tpex_series&&M.tpex_series.length)?`<div class="cap" style="margin-top:8px">上櫃（扣除ETF）</div>${lineChart(M.tpex_series,125,165,'%','上櫃')}`:''}</div>
+   <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}<div class="cap" style="margin-top:8px">跌破年線／月線比例（上市櫃普通股，官方收盤自算）｜拖曳看各日</div><div id="breadth_ch" style="min-height:210px"></div></div></div>`;
   h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
   h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${pickL(d.watch)}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${pickL(d.few)}</div>`:''}</div>`).join('')}</div>`;
   h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
@@ -184,7 +188,7 @@ function render(J){
   try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok)J=await r.json()}catch(e){}
   if(!J){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(r.ok)J=await r.json()}catch(e){}}
   if(!J){const e=document.getElementById('err');e.style.display='block';e.textContent='資料載入失敗，請稍後重新整理。';document.getElementById('sub').textContent='';return}
-  try{render(J)}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
+  try{render(J);loadSeries()}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
 })();
 document.addEventListener('click',e=>{const a=e.target.closest('a.stk');if(!a)return;e.preventDefault();if(window.StockChart)StockChart.open(a.dataset.code)});
 </script></body></html>
