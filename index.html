@@ -20,19 +20,19 @@ svg{width:100%;height:auto;display:block}
 .hm{background:#0b1426}
 @media (min-width:780px){.hm{width:min(1400px,calc(100vw - 32px));position:relative;left:50%;transform:translateX(-50%)}}
 .crumb{font-size:12.5px;color:#9fb3c8;margin:8px 0 6px}.crumb a{color:#33e1f0;text-decoration:none}
-.tmwrap{min-width:0}.tm{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;align-items:start}
-.tm .g{min-width:0;border:1px solid #17c8d855;border-radius:8px;overflow:hidden;background:#0a1222}
-.tm .g.selected{grid-column:1 / -1}
+.tmwrap{min-width:0}.tm{column-width:180px;column-gap:6px;line-height:0}
+.tm .g{display:inline-block;vertical-align:top;line-height:1.5;width:100%;margin:0 0 6px;break-inside:avoid;min-width:0;border:1px solid #17c8d855;border-radius:8px;overflow:hidden;background:#0a1222}
+.tm.filtered{column-count:1;column-width:auto}
 .tm .gh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:7px 6px;font-size:12px;font-weight:600;color:#bff6fb;background:#0d2236;border-bottom:1px solid #17c8d833;overflow-wrap:anywhere}
 .tm .gh b{flex-shrink:0;font-variant-numeric:tabular-nums}
-.tm .tiles{position:relative;background:#070d1a;overflow:hidden}
+.tm .tiles{position:relative;background:#070d1a;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable}.tm .tilecanvas{position:relative;width:100%}
 .tm .s{position:absolute;display:flex;flex-direction:column;justify-content:center;align-items:center;margin:0;padding:0;border:1px solid #070d1a;color:#fff;overflow:hidden;font:inherit;cursor:pointer;line-height:1.15}
 .tm .s:hover,.tm .s:focus-visible{outline:1px solid #17c8d8;outline-offset:-2px;z-index:1}
 .tm .s .nm,.tm .s .pc{max-width:100%;white-space:nowrap;overflow:hidden;text-shadow:0 1px 2px #0009;pointer-events:none}
 .tm .s .ld{position:absolute;left:2px;top:2px;background:#ffd400;color:#222;font-size:9px;font-weight:700;border-radius:3px;padding:0 3px;line-height:13px;pointer-events:none}
 .hsummary{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-size:13px}.hfilter{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;color:#9fb3c8}
 .hfilter select{min-width:0;max-width:100%;padding:6px 10px;border:1px solid #17c8d855;border-radius:6px;background:#0d2236;color:var(--fg);font:inherit}
-@media(max-width:560px){.tm{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.tm{column-count:2;column-width:auto}.tm.filtered{column-count:1}}
 .legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11.5px}.legend .bar{flex:0 0 140px;height:10px;border-radius:5px;background:linear-gradient(90deg,#0fb59a,#13413f,#2b3346,#5a1f24,#ff2d3d)}.legend .note{color:#9fb3c8;flex:1 1 100%}
 .tip{position:fixed;z-index:20;display:none;min-width:180px;background:#0d1a2e;border:1px solid #17c8d8;border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 6px 24px #000a}
 .tip .t1{font-size:15px;font-weight:700;margin-bottom:4px}.tip table{width:100%;border-collapse:collapse}.tip td{padding:1px 0}.tip td:last-child{text-align:right}
@@ -59,7 +59,7 @@ svg{width:100%;height:auto;display:block}
 <label class="hfilter" for="hfilter">族群篩選 <select id="hfilter"><option value="">全部</option></select></label>
 <div id="hcrumb" class="crumb"></div>
 <div class="tmwrap" id="tmwrap"><div class="tm" id="tm"></div></div>
-<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">色塊大小＝成交值・底色＝個股漲跌幅・點個股看分時／日K</span></div>
+<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">色塊大小依成交值，小色塊保留可讀面積・底色＝個股漲跌幅・點個股看分時／日K</span></div>
 </div>
 <div class="tip" id="tip"></div>
 
@@ -116,10 +116,22 @@ function inSession(){const n=tpeNow(),m=n.getHours()*60+n.getMinutes();const ds=
 function curHeat(){if(HM==='close'){if(inSession())return HCLOSE;return D&&D.heat}return D&&D.heat}
 async function loadClose(){if(HCLOSE)return;try{const r=await fetch('heat_close.json?t='+Date.now(),{cache:'no-store'});if(r.ok){HCLOSE=await r.json();renderHeat()}}catch(e){}}
 function heatEscape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function tile(s,c,ki,lim){const fs=Math.max(8,Math.min(26,Math.sqrt(c.w*c.h)/5.2));let t='';
- if(c.w>26&&c.h>14){t+=`<span class="nm" style="font-size:${fs}px">${heatEscape(s[1])}</span>`;if(c.h>fs*2.3)t+=`<span class="pc" style="font-size:${Math.max(8,fs*.8)}px">${fp(s[ki])}</span>`}
- if(s[13]&&c.w>30&&c.h>26)t+='<span class="ld">龍頭</span>';
+function tile(s,c,ki,lim){const fs=Math.max(10,Math.min(14,(c.w-6)/Math.max(1,Array.from(s[1]).length),(c.h-18)/2));
+ let t=`<span class="nm" style="font-size:${fs}px">${heatEscape(s[1])}</span><span class="pc" style="font-size:${fs}px">${fp(s[ki])}</span>`;
+ if(s[13])t+='<span class="ld">龍頭</span>';
  return`<button type="button" class="s" data-s="${heatEscape(s[0])}" aria-label="${heatEscape(s[1])} ${fp(s[ki])}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${pcol(s[ki],lim)}">${t}</button>`}
+function readableTiles(stocks,w,h){
+ if(!stocks.length||w<=0)return{cells:[],height:h};
+ const peak=Math.max(1,...stocks.map(s=>Number.isFinite(s[3])?s[3]:0));
+ const items=stocks.map(s=>({s,v:Math.max(Number.isFinite(s[3])?s[3]:0,peak/8)}));
+ let cells;
+ for(let attempt=0;attempt<60;attempt++){
+  cells=squarify(items,0,0,w,h);
+  if(cells.every(c=>c.h>=46&&c.w>=Math.min(w,Math.max(64,Array.from(c.s[1]).length*10+6))))break;
+  h=Math.ceil(h*1.2);
+ }
+ return{cells,height:h};
+}
 function renderHeat(){const H=curHeat();const card=document.getElementById('heatcard');
  if(!D||!D.heat){card.style.display='none';return}card.style.display='block';
  if(HM==null)HM=inSession()?'live':'close';
@@ -142,14 +154,15 @@ function renderHeat(){const H=curHeat();const card=document.getElementById('heat
   const ss=H.stocks.filter(s=>s[2]===i);
   const values=ss.map(s=>s[ki]).filter(v=>Number.isFinite(v));
   const pv=tmap[n]?tmap[n][HK]:values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
-  const height=Math.min(260,120+Math.ceil(ss.length/10)*20);
-  g+=`<div class="g${HZ!=null?' selected':''}"><div class="gh"><span>${heatEscape(n)}</span><b class="${cls(pv)}">${fp(pv)}</b></div><div class="tiles" style="height:${height}px"></div></div>`;
+  const height=Math.max(2,Math.min(12,ss.length))*46;
+  g+=`<div class="g${HZ!=null?' selected':''}"><div class="gh"><span>${heatEscape(n)}</span><b class="${cls(pv)}">${fp(pv)}</b></div><div class="tiles" style="height:${height}px"><div class="tilecanvas"></div></div></div>`;
   layouts.push(ss);
  }
+ tm.classList.toggle('filtered',HZ!=null);
  tm.innerHTML=g;
  const panes=[...tm.querySelectorAll('.tiles')];
  const sizes=panes.map(el=>({w:el.clientWidth,h:el.clientHeight}));
- panes.forEach((el,i)=>{const {w,h}=sizes[i];el.innerHTML=squarify(layouts[i].map(s=>({s,v:s[3]})),0,0,w,h).map(c=>tile(c.s,c,ki,lim)).join('')});
+ panes.forEach((el,i)=>{const {w,h}=sizes[i],layout=readableTiles(layouts[i],w,h),canvas=el.firstElementChild;canvas.style.height=layout.height+'px';canvas.innerHTML=layout.cells.map(c=>tile(c.s,c,ki,lim)).join('')});
  const rows=[...H.table].sort((a,b)=>b[HK]-a[HK]);const hasI=H.inst_days&&H.inst_days.length;
  let t=`<tr><th>名次</th><th>族群</th><th class="${HK==='d1'?'s':''}">今日</th><th class="${HK==='d3'?'s':''}">3日</th><th class="${HK==='d10'?'s':''}">10日</th>${hasI?'<th>外資3日</th><th>投信3日</th>':''}</tr>`;
  rows.forEach((r,i)=>{t+=`<tr data-g="${H.groups.indexOf(r.g)}"><td>${i+1}</td><td>${r.g}<span class="mut"> ${r.n}</span></td><td class="${cls(r.d1)}">${fp(r.d1)}</td><td class="${cls(r.d3)}">${fp(r.d3)}</td><td class="${cls(r.d10)}">${fp(r.d10)}</td>${hasI?`<td class="${cls(r.f3)}">${r.f3==null?'-':r.f3.toFixed(1)}</td><td class="${cls(r.t3)}">${r.t3==null?'-':r.t3.toFixed(1)}</td>`:''}</tr>`});
