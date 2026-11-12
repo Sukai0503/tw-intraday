@@ -21,11 +21,11 @@ svg{width:100%;height:auto;display:block}
 @media (min-width:780px){.hm{width:min(1400px,calc(100vw - 32px));position:relative;left:50%;transform:translateX(-50%)}}
 .crumb{font-size:12.5px;color:#9fb3c8;margin:8px 0 6px}.crumb a{color:#33e1f0;text-decoration:none}
 .tmwrap{min-width:0}.tm{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;align-items:start}
-.tm .g{min-width:0;border:1px solid #17c8d855;border-radius:8px;overflow:hidden;background:#0a1222}
-.tm .gh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:9px 8px;font-size:12px;font-weight:600;color:var(--fg);border-bottom:1px solid #17c8d833;overflow-wrap:anywhere}
+.tm .g{min-width:0;border:1px solid #17c8d8;box-shadow:0 0 4px #17c8d880;border-radius:8px;overflow:hidden;background:#0a1222}
+.tm .gh{text-shadow:0 1px 2px #0009;display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:9px 8px;font-size:12px;font-weight:600;color:var(--fg);border-bottom:1px solid #17c8d833;overflow-wrap:anywhere}
 .tm .gh b{flex-shrink:0;font-variant-numeric:tabular-nums}
-.tm .s{display:flex;width:100%;justify-content:space-between;align-items:baseline;gap:6px;padding:6px 8px;border:0;border-bottom:1px solid #1f2939;background:transparent;text-align:left;font:inherit;font-size:12px;cursor:pointer}
-.tm .s:last-child{border-bottom:0}.tm .s:hover,.tm .s:focus-visible{background:#17273c;outline:1px solid #17c8d8;outline-offset:-1px}
+.tm .s{display:flex;width:100%;justify-content:space-between;align-items:baseline;gap:6px;padding:7px 8px;border:0;border-bottom:1px solid #070d1a;color:#fff;font-weight:600;text-shadow:0 1px 2px #0009;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.tm .s:last-child{border-bottom:0}.tm .s:hover,.tm .s:focus-visible{filter:brightness(1.25);outline:1px solid #17c8d8;outline-offset:-1px}
 .tm .s .nm{min-width:0;overflow-wrap:anywhere}.tm .s .pc{flex-shrink:0;font-variant-numeric:tabular-nums}
 .hsummary{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-size:13px}.hfilter{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;color:#9fb3c8}
 .hfilter select{min-width:0;max-width:100%;padding:6px 10px;border:1px solid #17c8d855;border-radius:6px;background:#0d2236;color:var(--fg);font:inherit}
@@ -136,7 +136,7 @@ function renderHeat(){const H=curHeat();const card=document.getElementById('heat
   const values=ss.map(s=>s[ki]).filter(v=>Number.isFinite(v));
   const pv=tmap[n]?tmap[n][HK]:values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
   g+=`<div class="g"><div class="gh" style="background:${pcol(pv,lim)}"><span>${heatEscape(n)}</span><b>${fp(pv)}</b></div>`;
-  for(const s of ss)g+=`<button type="button" class="s ${cls(s[ki])}" data-s="${heatEscape(s[0])}"><span class="nm">${heatEscape(s[1])}</span><span class="pc">${fp(s[ki])}</span></button>`;
+  for(const s of ss)g+=`<button type="button" class="s" style="background:${pcol(s[ki],lim)}" data-s="${heatEscape(s[0])}"><span class="nm">${heatEscape(s[1])}</span><span class="pc">${fp(s[ki])}</span></button>`;
   g+='</div>';
  }
  tm.innerHTML=g;
