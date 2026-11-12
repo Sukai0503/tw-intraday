@@ -20,13 +20,16 @@ svg{width:100%;height:auto;display:block}
 .hm{background:#0b1426}
 @media (min-width:780px){.hm{width:min(1400px,calc(100vw - 32px));position:relative;left:50%;transform:translateX(-50%)}}
 .crumb{font-size:12.5px;color:#9fb3c8;margin:8px 0 6px}.crumb a{color:#33e1f0;text-decoration:none}
-.tmwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.tm{position:relative;background:#070d1a}
-.tm .g{position:absolute;border:1px solid #17c8d8;box-shadow:0 0 4px #17c8d880 inset;overflow:hidden;background:#0a1222}
-.tm .gh{position:absolute;left:0;right:0;top:0;height:17px;line-height:17px;font-size:11.5px;font-weight:600;color:#bff6fb;background:#0d2236;padding:0 4px;white-space:nowrap;overflow:hidden;cursor:pointer;border-bottom:1px solid #17c8d855}
-.tm .gh b{font-weight:600}.tm .gh .u{color:#ff6b6b}.tm .gh .d{color:#2fe0b0}
-.tm .s{position:absolute;border:1px solid #070d1a;color:#fff;overflow:hidden;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;line-height:1.15}
-.tm .s .nm{white-space:nowrap;text-shadow:0 1px 2px #0009}.tm .s .pc{opacity:.95;white-space:nowrap;text-shadow:0 1px 2px #0009}
-.tm .s .ld{position:absolute;left:2px;top:2px;background:#ffd400;color:#222;font-size:9px;font-weight:700;border-radius:3px;padding:0 3px;line-height:13px}
+.tmwrap{min-width:0}.tm{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;align-items:start}
+.tm .g{min-width:0;border:1px solid #17c8d855;border-radius:8px;overflow:hidden;background:#0a1222}
+.tm .gh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:9px 8px;font-size:12px;font-weight:600;color:var(--fg);border-bottom:1px solid #17c8d833;overflow-wrap:anywhere}
+.tm .gh b{flex-shrink:0;font-variant-numeric:tabular-nums}
+.tm .s{display:flex;width:100%;justify-content:space-between;align-items:baseline;gap:6px;padding:6px 8px;border:0;border-bottom:1px solid #1f2939;background:transparent;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.tm .s:last-child{border-bottom:0}.tm .s:hover,.tm .s:focus-visible{background:#17273c;outline:1px solid #17c8d8;outline-offset:-1px}
+.tm .s .nm{min-width:0;overflow-wrap:anywhere}.tm .s .pc{flex-shrink:0;font-variant-numeric:tabular-nums}
+.hsummary{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-size:13px}.hfilter{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;color:#9fb3c8}
+.hfilter select{min-width:0;max-width:100%;padding:6px 10px;border:1px solid #17c8d855;border-radius:6px;background:#0d2236;color:var(--fg);font:inherit}
+@media(max-width:560px){.tm{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11.5px}.legend .bar{flex:0 0 140px;height:10px;border-radius:5px;background:linear-gradient(90deg,#0fb59a,#13413f,#2b3346,#5a1f24,#ff2d3d)}.legend .note{color:#9fb3c8;flex:1 1 100%}
 .tip{position:fixed;z-index:20;display:none;min-width:180px;background:#0d1a2e;border:1px solid #17c8d8;border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 6px 24px #000a}
 .tip .t1{font-size:15px;font-weight:700;margin-bottom:4px}.tip table{width:100%;border-collapse:collapse}.tip td{padding:1px 0}.tip td:last-child{text-align:right}
@@ -49,9 +52,11 @@ svg{width:100%;height:auto;display:block}
 <div class="card hm" id="heatcard"><h2>族群熱力圖 <span class="mut" id="hstat"></span></h2>
 <div class="seg" id="hmode"><button data-m="live">即時</button><button data-m="close">盤後</button></div>
 <div class="seg" id="hseg" style="margin-top:6px"><button data-k="d1" class="on">今日</button><button data-k="d3">近3日</button><button data-k="d10">近10日</button></div>
+<div class="hsummary" id="hsummary" aria-live="polite"></div>
+<label class="hfilter" for="hfilter">族群篩選 <select id="hfilter"><option value="">全部</option></select></label>
 <div id="hcrumb" class="crumb"></div>
 <div class="tmwrap" id="tmwrap"><div class="tm" id="tm"></div></div>
-<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">方塊大小＝成交值・點族群名稱放大・點個股看分時／日K</span></div>
+<div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">標題底色＝族群平均漲跌幅・個股依漲跌幅排序・點個股看分時／日K</span></div>
 </div>
 <div class="tip" id="tip"></div>
 
@@ -107,32 +112,33 @@ function tpeNow(){return new Date(new Date().toLocaleString('en-US',{timeZone:'A
 function inSession(){const n=tpeNow(),m=n.getHours()*60+n.getMinutes();const ds=n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0');return n.getDay()>0&&n.getDay()<6&&m>=540&&m<810&&D&&D.date===ds}
 function curHeat(){if(HM==='close'){if(inSession())return HCLOSE;return D&&D.heat}return D&&D.heat}
 async function loadClose(){if(HCLOSE)return;try{const r=await fetch('heat_close.json?t='+Date.now(),{cache:'no-store'});if(r.ok){HCLOSE=await r.json();renderHeat()}}catch(e){}}
-function tile(s,c,ki,lim){const area=c.w*c.h,fs=Math.max(8,Math.min(26,Math.sqrt(area)/5.2));let t='';
- if(c.w>26&&c.h>14){t+=`<span class="nm" style="font-size:${fs}px">${s[1]}</span>`;if(c.h>fs*2.3)t+=`<span class="pc" style="font-size:${Math.max(8,fs*.8)}px">${fp(s[ki])}</span>`}
- if(s[13]&&c.w>30&&c.h>26)t+='<span class="ld">龍頭</span>';
- return`<div class="s" data-s="${s[0]}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${pcol(s[ki],lim)}">${t}</div>`}
+function heatEscape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderHeat(){const H=curHeat();const card=document.getElementById('heatcard');
  if(!D||!D.heat){card.style.display='none';return}card.style.display='block';
  if(HM==null)HM=inSession()?'live':'close';
  [...document.querySelectorAll('#hmode button')].forEach(b=>b.classList.toggle('on',b.dataset.m===HM));
  const st=document.getElementById('hstat'),wrap=document.getElementById('tmwrap'),tm=document.getElementById('tm');
  if(HM==='live')st.innerHTML=inSession()?`<span style="color:#ff6b6b">● 即時</span> ${D.heat.asof||D.updated}`:`收盤 ${D.date.slice(4,6)}/${D.date.slice(6)} 13:30（非交易時段）`;
- else{if(!H){st.textContent='盤後（載入前一交易日收盤…）';loadClose();tm.innerHTML='';return}const dd=H.date||D.date;st.textContent=`盤後 ${dd.slice(4,6)}/${dd.slice(6)} 收盤`}
+ else{if(!H){st.textContent='盤後（載入前一交易日收盤…）';loadClose();tm.innerHTML='';document.getElementById('hsummary').textContent='';return}const dd=H.date||D.date;st.textContent=`盤後 ${dd.slice(4,6)}/${dd.slice(6)} 收盤`}
  const lim=LIM[HK],ki={d1:4,d3:5,d10:6}[HK];document.getElementById('lgl').textContent='-'+lim+'%';document.getElementById('lgr').textContent='+'+lim+'%';
- const W=Math.max(320,wrap.clientWidth),Hh=HZ!=null?Math.round(Math.max(420,W*(W<560?1.3:.6))):Math.round(W<560?Math.max(1100,W*3):W*.62);
- tm.style.width=W+'px';tm.style.height=Hh+'px';
+ const filter=document.getElementById('hfilter');
+ if(HZ!=null&&!H.groups[HZ])HZ=null;
+ filter.innerHTML='<option value="">全部</option>'+H.groups.map((n,i)=>`<option value="${i}">${heatEscape(n)}</option>`).join('');
+ filter.value=HZ==null?'':String(HZ);
+ const seen=new Set(),counts={up:0,dn:0,flat:0};
+ for(const s of H.stocks){if(seen.has(s[0]))continue;seen.add(s[0]);const v=s[4];if(v==null||!Number.isFinite(v))continue;counts[v>0?'up':v<0?'dn':'flat']++}
+ document.getElementById('hsummary').innerHTML=`<span class="mut">全部個股（當日）</span><span class="up">上漲 ${counts.up} 家</span><span class="dn">下跌 ${counts.dn} 家</span><span>平盤 ${counts.flat} 家</span>`;
  const tmap={};for(const r of H.table)tmap[r.g]=r;let g='';
- if(HZ==null){document.getElementById('hcrumb').innerHTML=`全部族群・${H.ng}個・點族群名稱放大`;
-  const gs=H.groups.map((n,i)=>({n,i,v:tmap[n]?tmap[n].val:0}));
-  for(const b of squarify(gs,0,0,W,Hh)){const r=tmap[b.n],pv=r?r[HK]:null;
-   g+=`<div class="g" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px"><div class="gh" data-g="${b.i}">${b.n} <b class="${pv>0?'u':pv<0?'d':''}">${fp(pv)}</b></div>`;
-   const ss=H.stocks.filter(s=>s[2]===b.i).map(s=>({s,v:s[3]}));
-   for(const c of squarify(ss,0,17,b.w-2,b.h-19))g+=tile(c.s,c,ki,lim);
-   g+='</div>'}
- }else{const n=H.groups[HZ],r=tmap[n];document.getElementById('hcrumb').innerHTML=`<a href="#" id="hback">← 全部族群</a>　<b style="color:#bff6fb">${n}</b> ${r?r.n+' 檔　<span class="'+cls(r[HK])+'">'+fp(r[HK])+'</span>':''}`;
-  g+=`<div class="g" style="left:0;top:0;width:${W}px;height:${Hh}px"><div class="gh">${n} <b class="${r&&r[HK]>0?'u':'d'}">${fp(r&&r[HK])}</b></div>`;
-  const ss=H.stocks.filter(s=>s[2]===HZ).map(s=>({s,v:s[3]}));for(const c of squarify(ss,0,17,W-2,Hh-19))g+=tile(c.s,c,ki,lim);g+='</div>';
-  setTimeout(()=>{const a=document.getElementById('hback');if(a)a.onclick=e=>{e.preventDefault();HZ=null;renderHeat()}},0)}
+ document.getElementById('hcrumb').textContent=HZ==null?`全部族群・${H.groups.length}個`:H.groups[HZ];
+ for(const [i,n] of H.groups.entries()){
+  if(HZ!=null&&HZ!==i)continue;
+  const ss=H.stocks.filter(s=>s[2]===i).sort((a,b)=>(b[ki]??-Infinity)-(a[ki]??-Infinity));
+  const values=ss.map(s=>s[ki]).filter(v=>Number.isFinite(v));
+  const pv=tmap[n]?tmap[n][HK]:values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
+  g+=`<div class="g"><div class="gh" style="background:${pcol(pv,lim)}"><span>${heatEscape(n)}</span><b>${fp(pv)}</b></div>`;
+  for(const s of ss)g+=`<button type="button" class="s ${cls(s[ki])}" data-s="${heatEscape(s[0])}"><span class="nm">${heatEscape(s[1])}</span><span class="pc">${fp(s[ki])}</span></button>`;
+  g+='</div>';
+ }
  tm.innerHTML=g;
  const rows=[...H.table].sort((a,b)=>b[HK]-a[HK]);const hasI=H.inst_days&&H.inst_days.length;
  let t=`<tr><th>名次</th><th>族群</th><th class="${HK==='d1'?'s':''}">今日</th><th class="${HK==='d3'?'s':''}">3日</th><th class="${HK==='d10'?'s':''}">10日</th>${hasI?'<th>外資3日</th><th>投信3日</th>':''}</tr>`;
@@ -159,6 +165,7 @@ TMEL.addEventListener('mousemove',e=>{if(isTouch)return;const el=e.target.closes
 TMEL.addEventListener('mouseleave',()=>{if(!isTouch)TIP.style.display='none'});
 TMEL.onclick=e=>{const gh=e.target.closest('.gh');if(gh&&gh.dataset.g!=null){HZ=+gh.dataset.g;TIP.style.display='none';renderHeat();document.getElementById('heatcard').scrollIntoView({behavior:'smooth'});return}
  const el=e.target.closest('.s');if(!el)return;if(isTouch)showTip(el.dataset.s,0,0,true);else{TIP.style.display='none';showK(el.dataset.s)}};
+document.getElementById('hfilter').onchange=e=>{HZ=e.target.value===''?null:+e.target.value;TIP.style.display='none';renderHeat()};
 document.getElementById('hseg').onclick=e=>{const b=e.target.closest('button');if(!b)return;HK=b.dataset.k;[...document.querySelectorAll('#hseg button')].forEach(x=>x.classList.toggle('on',x===b));renderHeat()};
 document.getElementById('hmode').onclick=e=>{const b=e.target.closest('button');if(!b)return;HM=b.dataset.m;HZ=null;renderHeat()};
 document.getElementById('rtab').onclick=e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.g!=null&&+tr.dataset.g>=0){HZ=+tr.dataset.g;renderHeat();document.getElementById('heatcard').scrollIntoView({behavior:'smooth'})}};
