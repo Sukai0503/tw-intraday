@@ -18,9 +18,9 @@ svg{width:100%;height:auto;display:block}
 .tb th.s{color:var(--fg)}.rot td{text-align:center;padding:3px 1px;font-size:10.5px;min-width:22px}.rot td:first-child{text-align:left;padding-right:6px;position:sticky;left:0;background:var(--card)}
 #tm text{pointer-events:none}
 .hm{background:#0b1426}
-@media (min-width:780px){.hm{width:min(1400px,calc(100vw - 32px));position:relative;left:50%;transform:translateX(-50%)}}
+@media (min-width:780px){.hm{width:calc(100vw - 24px);position:relative;left:50%;transform:translateX(-50%)}}
 .crumb{font-size:12.5px;color:#9fb3c8;margin:8px 0 6px}.crumb a{color:#33e1f0;text-decoration:none}
-.tmwrap{min-width:0}.tm{column-width:180px;column-gap:6px;line-height:0}
+.tmwrap{min-width:0}.tm{column-width:220px;column-gap:6px;line-height:0}
 .tm .g{display:inline-block;vertical-align:top;line-height:1.5;width:100%;margin:0 0 6px;break-inside:avoid;min-width:0;border:1px solid #17c8d855;border-radius:8px;overflow:hidden;background:#0a1222}
 .tm.filtered{column-count:1;column-width:auto}
 .tm .gh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:7px 6px;font-size:12px;font-weight:600;color:#bff6fb;background:#0d2236;border-bottom:1px solid #17c8d833;overflow-wrap:anywhere}
@@ -122,8 +122,8 @@ function tile(s,c,ki,lim){const fs=Math.max(10,Math.min(14,(c.w-6)/Math.max(1,Ar
  return`<button type="button" class="s" data-s="${heatEscape(s[0])}" aria-label="${heatEscape(s[1])} ${fp(s[ki])}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${pcol(s[ki],lim)}">${t}</button>`}
 function readableTiles(stocks,w,h){
  if(!stocks.length||w<=0)return{cells:[],height:h};
- const peak=Math.max(1,...stocks.map(s=>Number.isFinite(s[3])?s[3]:0));
- const items=stocks.map(s=>({s,v:Math.max(Number.isFinite(s[3])?s[3]:0,peak/8)}));
+ const sv=s=>Math.sqrt(Math.max(0,Number.isFinite(s[3])?s[3]:0));const peak=Math.max(1,...stocks.map(sv));
+ const items=stocks.map(s=>({s,v:Math.max(sv(s),peak/4)}));
  let cells;
  for(let attempt=0;attempt<60;attempt++){
   cells=squarify(items,0,0,w,h);
@@ -154,7 +154,7 @@ function renderHeat(){const H=curHeat();const card=document.getElementById('heat
   const ss=H.stocks.filter(s=>s[2]===i);
   const values=ss.map(s=>s[ki]).filter(v=>Number.isFinite(v));
   const pv=tmap[n]?tmap[n][HK]:values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
-  const height=Math.max(2,Math.min(12,ss.length))*46;
+  const height=Math.max(2,Math.min(14,ss.length))*40;
   g+=`<div class="g${HZ!=null?' selected':''}"><div class="gh"><span>${heatEscape(n)}</span><b class="${cls(pv)}">${fp(pv)}</b></div><div class="tiles" style="height:${height}px"><div class="tilecanvas"></div></div></div>`;
   layouts.push(ss);
  }
@@ -162,7 +162,7 @@ function renderHeat(){const H=curHeat();const card=document.getElementById('heat
  tm.innerHTML=g;
  const panes=[...tm.querySelectorAll('.tiles')];
  const sizes=panes.map(el=>({w:el.clientWidth,h:el.clientHeight}));
- panes.forEach((el,i)=>{const {w,h}=sizes[i],layout=readableTiles(layouts[i],w,h),canvas=el.firstElementChild;canvas.style.height=layout.height+'px';canvas.innerHTML=layout.cells.map(c=>tile(c.s,c,ki,lim)).join('')});
+ panes.forEach((el,i)=>{const {w,h}=sizes[i],layout=readableTiles(layouts[i],w,h),canvas=el.firstElementChild;canvas.style.height=layout.height+'px';el.style.height=layout.height+'px';canvas.innerHTML=layout.cells.map(c=>tile(c.s,c,ki,lim)).join('')});
  const rows=[...H.table].sort((a,b)=>b[HK]-a[HK]);const hasI=H.inst_days&&H.inst_days.length;
  let t=`<tr><th>名次</th><th>族群</th><th class="${HK==='d1'?'s':''}">今日</th><th class="${HK==='d3'?'s':''}">3日</th><th class="${HK==='d10'?'s':''}">10日</th>${hasI?'<th>外資3日</th><th>投信3日</th>':''}</tr>`;
  rows.forEach((r,i)=>{t+=`<tr data-g="${H.groups.indexOf(r.g)}"><td>${i+1}</td><td>${r.g}<span class="mut"> ${r.n}</span></td><td class="${cls(r.d1)}">${fp(r.d1)}</td><td class="${cls(r.d3)}">${fp(r.d3)}</td><td class="${cls(r.d10)}">${fp(r.d10)}</td>${hasI?`<td class="${cls(r.f3)}">${r.f3==null?'-':r.f3.toFixed(1)}</td><td class="${cls(r.t3)}">${r.t3==null?'-':r.t3.toFixed(1)}</td>`:''}</tr>`});
