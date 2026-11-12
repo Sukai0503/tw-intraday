@@ -54,8 +54,7 @@ svg{width:100%;height:auto;display:block}
 <div class="legend"><span class="mut" id="lgl">-5%</span><span class="bar"></span><span class="mut" id="lgr">+5%</span><span class="note">方塊大小＝成交值・點族群名稱放大・點個股看分時／日K</span></div>
 </div>
 <div class="tip" id="tip"></div>
-<div id="kmodal" class="kmodal"><div class="kpanel"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div id="khead"></div><a href="#" onclick="closeK();return false" style="color:var(--mut);font-size:20px;text-decoration:none;line-height:1">✕</a></div>
-<div class="seg" id="ktabs" style="margin:8px 0"><button data-v="intra" class="on">分時</button><button data-v="day">日線</button></div><div id="kbody"></div></div></div>
+
 
 <div class="card"><h2>族群強弱 <span class="mut">等權平均；法人為近3日買賣超（股數×現價，億）</span></h2>
 <div style="overflow-x:auto"><table class="tb" id="rtab"></table></div></div>
@@ -63,6 +62,7 @@ svg{width:100%;height:auto;display:block}
 <div style="overflow-x:auto"><table class="tb rot" id="rot"></table></div></div>
 <div class="foot" id="foot"></div>
 </div>
+<script src="stockchart.js"></script>
 <script>
 let D=/*__DATA__*/null;
 const W=360,H=200,L=40,R=8,T=10,B=22;
@@ -163,55 +163,11 @@ document.getElementById('hseg').onclick=e=>{const b=e.target.closest('button');i
 document.getElementById('hmode').onclick=e=>{const b=e.target.closest('button');if(!b)return;HM=b.dataset.m;HZ=null;renderHeat()};
 document.getElementById('rtab').onclick=e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.g!=null&&+tr.dataset.g>=0){HZ=+tr.dataset.g;renderHeat();document.getElementById('heatcard').scrollIntoView({behavior:'smooth'})}};
 let rzT;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(renderHeat,200)});
-let INTRA=null,INTRA_T=0,KC=null,KV='intra';const OHLC={};
-async function getIntra(){if(INTRA&&Date.now()-INTRA_T<110000)return INTRA;
- try{const r=await fetch('https://api.github.com/repos/Sukai0503/tw-intraday/contents/intraday.json?ref=data',{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok){INTRA=await r.json();INTRA_T=Date.now()}}catch(e){}
- return INTRA}
-async function getOHLC(code){if(OHLC[code])return OHLC[code];try{const r=await fetch('hist/'+code+'.json',{cache:'no-cache'});if(r.ok)return OHLC[code]=await r.json()}catch(e){}return null}
-function showK(code){KC=code;KV='intra';const m=document.getElementById('kmodal');m.style.display='flex';drawK()}
-function closeK(){document.getElementById('kmodal').style.display='none'}
-async function drawK(){const code=KC,s=findS(code),box=document.getElementById('kbody');
- const up=s&&s[9]>0,dn=s&&s[9]<0,cc=up?'up':dn?'dn':'';
- document.getElementById('khead').innerHTML=s?`<b style="font-size:16px">${s[1]}</b> <span class="mut">${s[0]}・${curHeat().groups[s[2]]}</span>${s[13]?' <span style="background:#ffd400;color:#222;font-size:10px;border-radius:3px;padding:0 4px">龍頭</span>':''}<div><b class="${cc}" style="font-size:20px">${s[8]}</b> <span class="${cc}">${up?'▲':dn?'▼':''}${Math.abs(s[9])}　${fp(s[4])}</span>　<span class="mut">高</span> <span class="up">${s[10]}</span> <span class="mut">低</span> <span class="dn">${s[11]}</span>　<span class="mut">成交</span> ${s[3].toFixed(1)} 億</div>`:code;
- [...document.querySelectorAll('#ktabs button')].forEach(b=>b.classList.toggle('on',b.dataset.v===KV));
- box.innerHTML='<div class="mut" style="padding:40px 0;text-align:center">載入中…</div>';
- if(KV==='intra'){const I=await getIntra();if(KC!==code||KV!=='intra')return;
-  if(!I||!I.p||!I.p[code]){box.innerHTML='<div class="mut" style="padding:30px 0;text-align:center">暫無分時資料</div>';return}
-  const t=I.t.slice(),p=I.p[code].slice(),y=I.y[code]||(s&&s[8]-s[9]);
-  const hm=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
-  if(s&&D.heat&&D.heat.asof&&I.date===D.date&&t.length&&D.heat.asof>t.at(-1)){t.push(D.heat.asof);p.push(s[8])}
-  const pts=t.map((x,i)=>[tm(x),p[i]]).filter(q=>q[1]!=null);
-  const W=360,H=210,L=40,R=40,T=10,B=20;let dev=Math.max(...pts.map(q=>Math.abs(q[1]-y)),y*0.01);if(s)dev=Math.max(dev,Math.abs(s[10]-y),Math.abs(s[11]-y));dev*=1.08;
-  const X=m=>L+(m-540)/270*(W-L-R),Y=v=>T+(1-(v-(y-dev))/(2*dev))*(H-T-B);
-  let g='';for(const v of[y-dev,y-dev/2,y,y+dev/2,y+dev]){const pc=(v/y-1)*100;g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===y?'#8b929c':'var(--grid)'}" ${v===y?'stroke-dasharray="4 3"':''}/><text x="${L-3}" y="${Y(v)+3}" fill="${v>y?'var(--up)':v<y?'var(--dn)':'var(--mut)'}" font-size="9" text-anchor="end">${v>=100?v.toFixed(0):v.toFixed(2)}</text><text x="${W-R+3}" y="${Y(v)+3}" fill="${v>y?'var(--up)':v<y?'var(--dn)':'var(--mut)'}" font-size="9">${(pc>0?'+':'')+pc.toFixed(1)}%</text>`}
-  for(const x of['09:00','10:00','11:00','12:00','13:00','13:30'])g+=`<text x="${X(tm(x))}" y="${H-5}" fill="var(--mut)" font-size="9" text-anchor="middle">${x}</text>`;
-  const last=pts.at(-1)[1],col=last>y?'#ff4d5e':last<y?'#16c79a':'#cfd3d8';
-  const line=pts.map(q=>X(q[0]).toFixed(1)+','+Y(q[1]).toFixed(1)).join(' ');
-  g+=`<polygon points="${X(pts[0][0])},${Y(y)} ${line} ${X(pts.at(-1)[0])},${Y(y)}" fill="${col}" opacity=".12"/><polyline points="${line}" fill="none" stroke="${col}" stroke-width="1.8"/>`;
-  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">分時走勢（虛線＝昨收 ${y}）；盤中約每 2 分鐘一點${I.t.length&&I.t[1]&&tm(I.t[1])-tm(I.t[0])>=5?'，早段為 5 分鐘回補':''}。</div>`;return}
- // 日線
- const O=await getOHLC(code);if(KC!==code||KV!=='day')return;
- if(!O){box.innerHTML='<div class="mut" style="padding:30px 0;text-align:center">暫無日線資料</div>';return}
- let d=O.d.slice(),o=O.o.slice(),h=O.h.slice(),l=O.l.slice(),c=O.c.slice(),v=O.v.slice();
- if(s&&D.date>d.at(-1)){d.push(D.date);o.push(s[14]||s[8]);h.push(s[10]);l.push(s[11]);c.push(s[8]);v.push(s[15]||0)}
- const N=c.length,ma=n=>c.map((_,i)=>i<n-1?null:c.slice(i-n+1,i+1).reduce((a,b)=>a+b,0)/n),m5=ma(5),m20=ma(20),m60=ma(60);
- const W=360,H=250,L=40,R=6,T=8,PH=170,VH=50,cw=(W-L-R)/N;const all=[...h,...l,...m60.filter(x=>x!=null),...m20.filter(x=>x!=null)];const lo=Math.min(...all),hi=Math.max(...all),vmax=Math.max(...v,1);
- const X=i=>L+(i+.5)*cw,Y=x=>T+(1-(x-lo)/(hi-lo||1))*(PH-T);
- let g='';for(const x of[lo,(lo+hi)/2,hi])g+=`<line x1="${L}" x2="${W-R}" y1="${Y(x)}" y2="${Y(x)}" stroke="var(--grid)"/><text x="${L-3}" y="${Y(x)+3}" fill="var(--mut)" font-size="9" text-anchor="end">${x>=100?x.toFixed(0):x.toFixed(2)}</text>`;
- for(let i=0;i<N;i++){const u=c[i]>=o[i],col=c[i]>o[i]?'#ff4d5e':c[i]<o[i]?'#16c79a':'#cfd3d8';const bw=Math.max(1,cw*.7);
-  g+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(h[i])}" y2="${Y(l[i])}" stroke="${col}" stroke-width="1"/><rect x="${X(i)-bw/2}" y="${Y(Math.max(o[i],c[i]))}" width="${bw}" height="${Math.max(.8,Math.abs(Y(o[i])-Y(c[i])))}" fill="${col}"/>`;
-  const vh=v[i]/vmax*(VH-6);g+=`<rect x="${X(i)-bw/2}" y="${PH+VH+4-vh}" width="${bw}" height="${vh}" fill="${col}" opacity=".6"/>`}
- const pl=(a,col)=>`<polyline fill="none" stroke="${col}" stroke-width="1.1" points="${a.map((x,i)=>x==null?null:X(i).toFixed(1)+','+Y(x).toFixed(1)).filter(Boolean).join(' ')}"/>`;
- g+=pl(m5,'#f6c344')+pl(m20,'#ff9f43')+pl(m60,'#b48cff');
- for(const i of[0,Math.floor(N/2),N-1])g+=`<text x="${X(i)}" y="${H-2}" fill="var(--mut)" font-size="9" text-anchor="${i===0?'start':i===N-1?'end':'middle'}">${+d[i].slice(4,6)}/${+d[i].slice(6)}</text>`;
- g+=`<text x="${L}" y="${PH+14}" fill="var(--mut)" font-size="9">量（張）最高 ${vmax.toLocaleString()}</text>`;
- const f=x=>x==null?'-':(x>=100?x.toFixed(1):x.toFixed(2));
- box.innerHTML=`<div class="leg"><span><i style="background:#f6c344"></i>MA5 ${f(m5.at(-1))}</span><span><i style="background:#ff9f43"></i>MA20 ${f(m20.at(-1))}</span><span><i style="background:#b48cff"></i>MA60 ${f(m60.at(-1))}</span></div><svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="mut">日K（近 ${N} 日，Yahoo 日線＋今日即時）。</div>`}
-document.getElementById('ktabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;KV=b.dataset.v;drawK()};
-document.getElementById('kmodal').onclick=e=>{if(e.target.id==='kmodal')closeK()};
+function showK(code){StockChart.open(code)}
+StockChart.setRowProvider(code=>{const H=curHeat(),r=findS(code);return r?{row:r,date:(H&&H.date)||D.date,groups:H.groups,asof:H.asof}:null});
 
 render();
-let HASHED=false;function applyHash(){if(HASHED)return;HASHED=true;(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k){showK(k[1]);if(/v=day/.test(location.hash)){KV='day';drawK()}}}})()}
+let HASHED=false;function applyHash(){if(HASHED)return;HASHED=true;(function(){const m=location.hash.match(/z=(\d+)/),k=location.hash.match(/s=(\w+)/);if(D&&D.heat){if(m){HZ=+m[1];renderHeat()}if(k){StockChart.open(k[1],{view:/v=day/.test(location.hash)?'day':'intra'})}}})()}
 if(D)applyHash();
 const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/data.json?ref=data';
 async function poll(){let ok=false;
