@@ -23,13 +23,18 @@ svg{width:100%;height:auto;display:block}
 .tmwrap{min-width:0}.tm{column-width:150px;column-gap:6px;line-height:0}
 .tm .g{display:inline-block;vertical-align:top;line-height:1.5;width:100%;margin:0 0 6px;break-inside:avoid;min-width:0;border:0;border-radius:4px;overflow:hidden;background:transparent}
 .tm.filtered{column-count:1;column-width:auto}
-.tm .gh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:7px 6px;font-size:12px;font-weight:600;color:#bff6fb;background:#0d2236;border-bottom:0;overflow-wrap:anywhere}
-.tm .gh b{flex-shrink:0;font-variant-numeric:tabular-nums}
+.tm .gh{display:flex;align-items:baseline;gap:6px;padding:7px 6px;font-size:12px;font-weight:600;color:#bff6fb;background:#0b1a2a;border-top:2px solid #17c8d8;white-space:nowrap;overflow:hidden}
+.tm .gh>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tm .gh b{flex-shrink:0;font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+.tm .up{color:#ff6b9a}.tm .dn{color:#3ee6c4}
+.tm .gh b:not(.up):not(.dn){color:#8b929c}
 .tm .tiles{position:relative;background:transparent;overflow:hidden}.tm .tilecanvas{position:relative;width:100%}
-.tm .s{position:absolute;display:flex;flex-direction:column;justify-content:center;align-items:center;margin:0;padding:0;border:1px solid #070d1a;color:#fff;overflow:hidden;font:inherit;cursor:pointer;line-height:1.15}
+.tm .s{position:absolute;display:flex;flex-direction:column;justify-content:center;align-items:center;margin:0;padding:0;border:1px solid var(--edge,#3a4258);border-radius:4px;box-shadow:0 0 6px var(--glow,#3a425866);color:#fff;overflow:hidden;font:inherit;cursor:pointer;line-height:1.15}
 .tm .s:hover,.tm .s:focus-visible{outline:1px solid #17c8d8;outline-offset:-2px;z-index:1}
 .tm .s .nm,.tm .s .pc{max-width:100%;white-space:nowrap;overflow:hidden;text-shadow:0 1px 2px #0009;pointer-events:none}
-.tm .s .ld{position:absolute;left:2px;top:2px;background:#ffd400;color:#222;font-size:9px;font-weight:700;border-radius:3px;padding:0 3px;line-height:13px;pointer-events:none}
+.tm .s .nm{color:#fff;font-weight:700;text-align:center}
+.tm .s .pc{font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;color:var(--pct,#8b929c)}
+.tm .s .ld{position:absolute;right:2px;top:2px;background:#f5c518;color:#222;font-size:9px;font-weight:700;border-radius:3px;padding:0 3px;line-height:13px;pointer-events:none}
 .hsummary{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-size:13px}.hfilter{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;color:#9fb3c8}
 .hfilter select{min-width:0;max-width:100%;padding:6px 10px;border:1px solid #17c8d855;border-radius:6px;background:#0d2236;color:var(--fg);font:inherit}
 @media(max-width:560px){.tm{column-count:2;column-width:auto}.tm.filtered{column-count:1}}
@@ -117,12 +122,17 @@ function inSession(){const n=tpeNow(),m=n.getHours()*60+n.getMinutes();const ds=
 function curHeat(){if(HM==='close'){if(inSession())return HCLOSE;return D&&D.heat}return D&&D.heat}
 async function loadClose(){if(HCLOSE)return;try{const r=await fetch('heat_close.json?t='+Date.now(),{cache:'no-store'});if(r.ok){HCLOSE=await r.json();renderHeat()}}catch(e){}}
 function heatEscape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function tile(s,c,ki,lim){const fs=Math.max(10,Math.min(14,(c.w-6)/Math.max(1,Array.from(s[1]).length),(c.h-18)/2));
+function tile(s,c,ki,lim){c={...c,x:c.x+1.5,y:c.y+1.5,w:Math.max(0,c.w-3),h:Math.max(0,c.h-3)};
+ const v=s[ki],a=v==null?0:Math.sqrt(Math.min(1,Math.abs(v)/lim)),flat=v==null||Math.abs(v)<0.005;
+ const edge=flat?'#3a4258':v>0?'#ff2d6f':'#19d3b0',pct=flat?'#8b929c':v>0?'#ff6b9a':'#3ee6c4';
+ const bg=flat?'#1c2233':v>0?`rgba(150,20,60,${.15+.4*a})`:`rgba(15,140,120,${.1+.4*a})`;
+ const glow=flat?'#3a425866':`rgba(${v>0?'255,45,111':'25,211,176'},${.2+.2*a})`;
+ const fs=Math.max(10,Math.min(14,(c.w-6)/Math.max(1,Array.from(s[1]).length),(c.h-18)/2));
  const L=Array.from(s[1]).length,fit=c.w>=L*10+4;let t='';
  if(fit&&c.h>=34)t=`<span class="nm" style="font-size:${fs}px">${heatEscape(s[1])}</span><span class="pc" style="font-size:${fs}px">${fp(s[ki])}</span>`;
  else if(c.h>=16&&c.w>=Math.min(L,2)*10+2)t=`<span class="nm" style="font-size:${Math.max(9,Math.min(11,(c.w-2)/Math.max(1,Math.min(L,4))))}px">${heatEscape(c.w>=L*10+2?s[1]:Array.from(s[1]).slice(0,Math.max(1,Math.floor((c.w-2)/10))).join(''))}</span>`;
  if(s[13])t+='<span class="ld">龍頭</span>';
- return`<button type="button" class="s" data-s="${heatEscape(s[0])}" aria-label="${heatEscape(s[1])} ${fp(s[ki])}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${pcol(s[ki],lim)}">${t}</button>`}
+ return`<button type="button" class="s" data-s="${heatEscape(s[0])}" aria-label="${heatEscape(s[1])} ${fp(s[ki])}" style="left:${c.x}px;top:${c.y}px;width:${Math.max(0,c.w)}px;height:${Math.max(0,c.h)}px;background:${bg};--edge:${edge};--glow:${glow};--pct:${pct}">${t}</button>`}
 function readableTiles(stocks,w,h){
  if(!stocks.length||w<=0)return{cells:[],height:h};
  const sv=s=>Math.max(0,Number.isFinite(s[3])?s[3]:0);const peak=Math.max(0.01,...stocks.map(sv));
