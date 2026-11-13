@@ -105,6 +105,53 @@ function buyTable(){
   document.querySelectorAll('#bsort button').forEach(b=>b.classList.toggle('on',b.dataset.s===BSORT));
 }
 
+
+function arrCard(A){
+  if(!A||!A.markets)return '';
+  const keys=[['short_bull','短均多頭'],['short_bear','短均空頭'],['long_bull','長均多頭'],['long_bear','長均空頭']];
+  const m=A.markets.all||{};
+  const cell=(x,bull)=>x&&typeof x.pct==='number'?`<span class="${bull?'r':'g'}">${f(x.pct,1)}%</span>`:'—';
+  const sub=(x,lab)=>`${lab}｜${x&&x.n!=null?`${f(x.n)}／${f(x.universe)} 家`:'—'}`;
+  const mkts=['all','twse','tpex'];
+  const rows=mkts.map(k=>{
+    const r=A.markets[k]||{};
+    return tr([esc(r.name||k),
+      `<td class="n r">${r.short_bull&&r.short_bull.pct!=null?f(r.short_bull.pct,1)+'%':'—'}</td>`,
+      `<td class="n g">${r.short_bear&&r.short_bear.pct!=null?f(r.short_bear.pct,1)+'%':'—'}</td>`,
+      `<td class="n r">${r.long_bull&&r.long_bull.pct!=null?f(r.long_bull.pct,1)+'%':'—'}</td>`,
+      `<td class="n g">${r.long_bear&&r.long_bear.pct!=null?f(r.long_bear.pct,1)+'%':'—'}</td>`,
+      `<td class="n">${(r.short_bull&&r.short_bull.universe)!=null?f(r.short_bull.universe):'—'}</td>`]);
+  });
+  window._ARR=A;window._ARRM='all';
+  return `<div class="card" id="arrbox"><h2>多空頭排列比例 <span class="mut">${esc(A.as_of||'')}</span></h2>
+   <div class="cap">${esc(A.source||'官方收盤自算')}｜觀察項，與近日比較，無固定門檻｜非投資建議</div>
+   <div class="mets">
+    <div class="met"><div class="v r">${cell(m.short_bull,true)}</div><div class="l">短均多頭</div><div class="d">${sub(m.short_bull,'5／10／20，反應較快')}</div></div>
+    <div class="met"><div class="v g">${cell(m.short_bear,false)}</div><div class="l">短均空頭</div><div class="d">${sub(m.short_bear,'5／10／20，反應較快')}</div></div>
+    <div class="met"><div class="v r">${cell(m.long_bull,true)}</div><div class="l">長均多頭（中期趨勢）</div><div class="d">${sub(m.long_bull,'10／20／60')}</div></div>
+    <div class="met"><div class="v g">${cell(m.long_bear,false)}</div><div class="l">長均空頭（中期趨勢）</div><div class="d">${sub(m.long_bear,'10／20／60')}</div></div>
+   </div>
+   ${tbl(['市場','短均多頭','短均空頭','長均多頭','長均空頭','家數'],rows,[1,2,3,4,5])}
+   <div class="cap" style="margin-top:8px">近 ${((A.history||[]).length||'—')} 個交易日｜短均線反應較快，長均線看中期趨勢｜拖曳看各日</div>
+   <div class="seg" id="arrseg"><button data-m="all" class="on">上市櫃</button><button data-m="twse">上市</button><button data-m="tpex">上櫃</button></div>
+   <div id="arr_ch" style="min-height:210px"></div></div>`;
+}
+function arrChart(mkt){
+  const A=window._ARR;const el=document.getElementById('arr_ch');
+  if(!A||!el||!window.StockChart)return;
+  window._ARRM=mkt||window._ARRM||'all';
+  const hist=A.history||[];
+  const pts=(k)=>hist.map(h=>[h.date,((h[window._ARRM]||{})[k])]).filter(p=>typeof p[1]==='number');
+  if(!pts('short_bull').length){el.innerHTML='<div class="mut">無歷史資料</div>';return}
+  StockChart.ts(el,{kind:'day',height:210,pan:true,visible:20,unit:'%',dec:1,range:[0,100],series:[
+    {name:'短均多頭',color:'#ff5b5b',data:pts('short_bull')},
+    {name:'短均空頭',color:'#22c55e',data:pts('short_bear')},
+    {name:'長均多頭（中期）',color:'#ff9f43',dashed:true,data:pts('long_bull')},
+    {name:'長均空頭（中期）',color:'#4ea1ff',dashed:true,data:pts('long_bear')}
+  ]});
+  document.querySelectorAll('#arrseg button').forEach(b=>b.classList.toggle('on',b.dataset.m===window._ARRM));
+}
+
 function render(J){
   const D=J.DATA,DAILY=J.DAILY_LOG||[],RISK=J.RISK_LOG||[],RU=J.RULES||{};
   const mt=n(D.margin_ex_etf.twse_latest),mo=n(D.margin_ex_etf.tpex_latest||{}),vix=n(D.vix);
@@ -174,6 +221,7 @@ function render(J){
    <div class="call info">只當觀察項：家數暴增代表恐慌加深；個股庫藏股+現金充足+位階基本面＝左側輔助參考，非單獨買進理由（Wade 11/9）</div></div>`;
   h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%','上市')}${(M.tpex_series&&M.tpex_series.length)?`<div class="cap" style="margin-top:8px">上櫃（扣除ETF）</div>${lineChart(M.tpex_series,125,165,'%','上櫃')}`:''}</div>
    <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}<div class="cap" style="margin-top:8px">跌破年線／月線比例（上市櫃普通股，官方收盤自算）｜拖曳看各日</div><div id="breadth_ch" style="min-height:210px"></div></div></div>`;
+  h+=arrCard(D.ma_arrangement);
   h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
   h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${pickL(d.watch)}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${pickL(d.few)}</div>`:''}</div>`).join('')}</div>`;
   h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
@@ -188,7 +236,7 @@ function render(J){
   try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok)J=await r.json()}catch(e){}
   if(!J){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(r.ok)J=await r.json()}catch(e){}}
   if(!J){const e=document.getElementById('err');e.style.display='block';e.textContent='資料載入失敗，請稍後重新整理。';document.getElementById('sub').textContent='';return}
-  try{render(J);loadSeries()}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
+  try{render(J);loadSeries();arrChart('all')}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
 })();
-document.addEventListener('click',e=>{const a=e.target.closest('a.stk');if(!a)return;e.preventDefault();if(window.StockChart)StockChart.open(a.dataset.code)});
+document.addEventListener('click',e=>{const b=e.target.closest('#arrseg button');if(b){arrChart(b.dataset.m);return}const a=e.target.closest('a.stk');if(!a)return;e.preventDefault();if(window.StockChart)StockChart.open(a.dataset.code)});
 </script></body></html>
