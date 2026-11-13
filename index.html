@@ -218,12 +218,13 @@ if(D)applyHash();
 const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/data.json?ref=data';
 async function poll(){let ok=false;
  if(location.protocol.startsWith('http')){
-  try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok){D=await r.json();ok=true}}catch(e){}
+  try{const r=await fetch('https://raw.githubusercontent.com/Sukai0503/tw-intraday/data/data.json?t='+Date.now(),{cache:'no-store'});if(r.ok){D=await r.json();ok=true}}catch(e){}
+  if(!ok)try{const r=await fetch(API,{cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}});if(r.ok){D=await r.json();ok=true}}catch(e){}
   if(!ok){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});if(r.ok){D=await r.json();ok=true}}catch(e){}}
   if(ok){render();applyHash()}
  }}
 function live(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));const m=n.getHours()*60+n.getMinutes();return n.getDay()>0&&n.getDay()<6&&m>=535&&m<=820}
-if(location.protocol.startsWith('http')){poll();setInterval(()=>{if(live()||!D)poll()},70000)}else setTimeout(()=>location.reload(),60000);
+if(location.protocol.startsWith('http')){poll();setInterval(()=>{if(live()||!D)poll()},30000)}else setTimeout(()=>location.reload(),60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
 function applyView(){const v=location.hash==='#heat';document.body.classList.toggle('vheat',v);document.getElementById('nv-heat').classList.toggle('on',v);document.getElementById('nv-intra').classList.toggle('on',!v);try{renderHeat()}catch(e){}}
 addEventListener('hashchange',applyView);applyView();
