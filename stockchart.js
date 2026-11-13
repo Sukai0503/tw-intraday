@@ -160,7 +160,7 @@ async function mount(el,cfg){addCss();await lw();const L=window.LightweightChart
   const data=[];const vm=new Map();
   for(const p of s.data){const t=tkey(p[0],kind);const v=p[1];vm.set(keyOf(t),v);if(v==null)data.push({time:t});else{const o={time:t,value:v};if(s.colorFn)o.color=s.colorFn(v,p);data.push(o)}}
   data.sort((a,b)=>a.time<b.time?-1:a.time>b.time?1:0);
-  if(i===0&&cfg.pad&&kind==='hm'){const lastT=data.length?data.at(-1).time:null,end=tkey(cfg.pad[1],'hm'),st=tkey(cfg.pad[0],'hm');if(data.length&&data[0].time>st)data.unshift({time:st});for(let t=(lastT||st)+60;t<=end;t+=60)data.push({time:t})}
+  if(cfg.pad&&kind==='hm'){const end=tkey(cfg.pad[1],'hm'),st=tkey(cfg.pad[0],'hm'),have=new Map(data.map(d=>[d.time,d])),g=[],fT=data.length?data[0].time:1e18,lT=data.length?data.at(-1).time:0;let prev=null;for(let t=st;t<=end;t+=60){const d=have.get(t);if(d&&d.value!=null)prev=d;g.push(d||(prev&&t>fT&&t<lT?{time:t,value:prev.value,...(prev.color?{color:prev.color}:{})}:{time:t}))}for(const d of data)if(d.time<st||d.time>end||(d.time-st)%60)g.push(d);g.sort((x,y)=>x.time-y.time);data.length=0;data.push(...g)}
   ser.setData(data);if(s.scale&&s.scale!=='right')chart.priceScale(s.scale).applyOptions({scaleMargins:s.margins||{top:.7,bottom:0},visible:false});
   R.series.push({s:ser});R.vals.push(vm)});
  if(cfg.series[0]&&cfg.hlines)cfg.hlines.forEach(h=>R.series[0].s.createPriceLine({price:h.v,color:h.color||'#6b7280',lineWidth:1,lineStyle:h.solid?L.LineStyle.Solid:L.LineStyle.Dashed,axisLabelVisible:h.axis!==false,title:h.title||''}));
