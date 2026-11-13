@@ -46,9 +46,26 @@ svg{width:100%;height:auto;display:block}
 .kmodal{position:fixed;inset:0;background:#000a;z-index:30;display:none;align-items:center;justify-content:center;padding:10px}.kpanel{background:#0d1a2e;border:1px solid #17c8d8;border-radius:12px;padding:12px;width:min(560px,100%);max-height:92vh;overflow:auto}
 .nav{display:flex;gap:8px;margin:0 0 10px}.nav a{flex:1;text-align:center;padding:7px 0;border-radius:8px;background:#232733;color:#9fb3c8;text-decoration:none;font-size:14px}.nav a.on{background:#3a4152;color:#fff}
 body.vheat [data-v="intra"]{display:none!important}body:not(.vheat) [data-v="heat"]{display:none!important}
+body.vinst [data-v="intra"],body.vinst #ttl,body.vinst #demo,body.vinst #foot,body.vinst #tip{display:none!important}
+body:not(.vinst) [data-v="inst"]{display:none!important}
+.inst{max-width:720px;margin:0 auto 12px;padding:20px 12px;background:#0b1426;border-radius:14px}
+.inst:before{content:"";display:block;width:32px;height:4px;margin-bottom:12px;border-radius:2px;background:#dbb866}
+.inst h2{margin:0;color:#fff;font-size:22px;line-height:1.5}.inst h2 span{display:block;color:#dbb866;font-size:19px}
+.inst-period{margin:12px 0 4px;color:#e8eaed}.inst-days,.inst-sort{margin:4px 0;color:#94a3b8;font-size:12px;overflow-wrap:anywhere}
+.inst-scroll{overflow-x:auto;margin-top:12px}.inst-table{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:13px;white-space:nowrap}
+.inst-table th{padding:0 8px;color:#94a3b8;font-weight:400;text-align:right}.inst-table th:nth-child(2){text-align:left}
+.inst-table td{padding:12px 8px;text-align:right;background:#14233c;border-top:1px solid transparent;border-bottom:1px solid transparent}
+.inst-table td:first-child{border-left:1px solid transparent;border-radius:9px 0 0 9px;text-align:center}
+.inst-table td:last-child{border-right:1px solid transparent;border-radius:0 9px 9px 0}
+.inst-table tbody tr:first-child td{border-color:#dbb866}.inst-table tbody tr{cursor:pointer}
+.inst-table tbody tr:hover td,.inst-table tbody tr:focus-visible td{background:#1c3150}
+.inst-table td:nth-child(2){text-align:left}.inst-table .inst-code{display:block;color:#94a3b8;font-size:11px}
+.inst-table b{color:#fff}.inst-num{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}.inst-main{color:#dbb866}
+.inst-footer{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}.inst-footer p{margin:4px 0}
+@media(max-width:400px){.nav{gap:4px}.nav a{font-size:12px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
 </style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
-<nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a href="signals/">非常態投資</a></nav>
+<nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
 <h1 id="ttl">今日盤中｜即時 --:--</h1>
 <div class="card" data-v="intra"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
@@ -75,6 +92,17 @@ body.vheat [data-v="intra"]{display:none!important}body:not(.vheat) [data-v="hea
 <div class="card" data-v="heat"><h2>族群輪動 <span class="mut">近10交易日名次，越紅越強</span></h2>
 <div style="overflow-x:auto"><table class="tb rot" id="rot"></table></div></div>
 <div class="foot" id="foot"></div>
+<section class="inst" id="instcard" data-v="inst" aria-labelledby="inst-heading">
+<h2 id="inst-heading">外資・投信・主力<span>累計同步買超前 10 名</span></h2>
+<p class="inst-period" id="inst-period"></p>
+<p class="inst-days" id="inst-days"></p>
+<p class="inst-sort" id="inst-sort"></p>
+<p class="mut" id="inst-status" role="status" aria-live="polite">載入中…</p>
+<div class="inst-scroll"><table class="inst-table" aria-label="法人同步買超前十名">
+<thead><tr><th scope="col">名次</th><th scope="col">個股</th><th scope="col">外資</th><th scope="col">投信</th><th scope="col">主力</th></tr></thead>
+<tbody id="inst-rows"></tbody></table></div>
+<footer class="inst-footer" id="inst-footer"></footer>
+</section>
 </div>
 <script src="stockchart.js?v=1113c"></script>
 <script>
@@ -226,6 +254,54 @@ async function poll(){let ok=false;
 function live(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));const m=n.getHours()*60+n.getMinutes();return n.getDay()>0&&n.getDay()<6&&m>=535&&m<=820}
 if(location.protocol.startsWith('http')){poll();setInterval(()=>{if(live()||!D)poll()},60000)}else setTimeout(()=>location.reload(),60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
-function applyView(){const v=location.hash==='#heat';document.body.classList.toggle('vheat',v);document.getElementById('nv-heat').classList.toggle('on',v);document.getElementById('nv-intra').classList.toggle('on',!v);try{renderHeat()}catch(e){}}
+let instTimer=null,instLoading=false,instLoaded=false;
+function instNumber(v,dec){return typeof v==='number'&&Number.isFinite(v)?(v>=0?'+':'')+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):'—'}
+function instDate(v,full=false){return String(v||'').slice(full?0:5,10).replace(/-/g,'/')}
+function renderInst(d){
+ const esc=heatEscape,days=Array.isArray(d.days)?d.days:[],n=d.n_days??days.length,period=d.period||[];
+ document.getElementById('inst-period').textContent=`${instDate(period[0],true)}–${instDate(period[1])} ｜ ${n} 個交易日`;
+ document.getElementById('inst-days').textContent=days.map(v=>instDate(v)).join('、');
+ document.getElementById('inst-sort').textContent=`${d.sort_by==='main'?'依主力累計買超排序':'依外資＋投信累計買超排序'} ｜ 單位：${d.unit||'張'}`;
+ const rows=d.rows.slice(0,10);
+ document.getElementById('inst-rows').innerHTML=rows.map((r,i)=>`<tr tabindex="0" data-code="${esc(r.code)}" aria-label="${esc(r.code)} ${esc(r.name)}，開啟走勢"><td>${esc(r.rank??i+1)}</td><td><span class="inst-code">${esc(r.code)}</span><b>${esc(r.name)}</b></td><td class="inst-num">${instNumber(r.foreign,2)}</td><td class="inst-num">${instNumber(r.trust,2)}</td><td class="inst-num inst-main">${instNumber(r.main,0)}</td></tr>`).join('');
+ const sources=d.sources||{},sourceText=[['foreign_trust','外資／投信'],['main','主力'],['value','成交值']].filter(([key])=>sources[key]!=null).map(([key,label])=>`${label}：${Array.isArray(sources[key])?sources[key].join('、'):sources[key]}`).join('；');
+ const updated=new Date(d.updated),time=Number.isNaN(updated.getTime())?String(d.updated||'—'):updated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false})+'（台北時間）';
+ document.getElementById('inst-footer').innerHTML=[`三欄 ${n} 日累計皆為正。範圍為已核對的 ${d.candidates_n??'—'} 檔候選。`,d.rule||'',`來源：${sourceText||'—'}`,`更新：${time}`].map(v=>`<p>${esc(v)}</p>`).join('');
+ document.getElementById('inst-status').textContent=rows.length?'':'目前沒有符合條件的個股。';
+}
+async function loadInst(){
+ if(instLoading)return;
+ instLoading=true;
+ const status=document.getElementById('inst-status');
+ status.textContent=instLoaded?'更新中…':'載入中…';
+ try{
+  let data;
+  for(const url of ['https://raw.githubusercontent.com/Sukai0503/tw-intraday/data/inst_sync.json','inst_sync.json']){
+   try{
+    const response=await fetch(url+'?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(20000)});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    const candidate=await response.json();
+    if(!candidate||!Array.isArray(candidate.rows))throw new Error('Invalid rows');
+    data=candidate;break;
+   }catch(e){}
+  }
+  if(!data)throw new Error('No institution data');
+  renderInst(data);instLoaded=true;
+ }catch(e){status.textContent=instLoaded?'更新失敗，保留上次資料；稍後自動重試。':'暫時無法載入法人同步資料，稍後自動重試。'}
+ finally{instLoading=false}
+}
+const instRows=document.getElementById('inst-rows');
+instRows.addEventListener('click',e=>{const row=e.target.closest('tr[data-code]');if(row)showK(row.dataset.code)});
+instRows.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('tr[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
+function applyView(){
+ const heat=location.hash==='#heat',inst=location.hash==='#inst';
+ document.body.classList.toggle('vheat',heat);document.body.classList.toggle('vinst',inst);
+ document.getElementById('nv-heat').classList.toggle('on',heat);
+ document.getElementById('nv-inst').classList.toggle('on',inst);
+ document.getElementById('nv-intra').classList.toggle('on',!heat&&!inst);
+ if(inst){if(instTimer===null){loadInst();instTimer=setInterval(loadInst,600000)}}
+ else{clearInterval(instTimer);instTimer=null}
+ try{renderHeat()}catch(e){}
+}
 addEventListener('hashchange',applyView);applyView();
 </script></body></html>
