@@ -150,7 +150,7 @@ async function mount(el,cfg){addCss();await lw();const L=window.LightweightChart
    R.tt.innerHTML=h;R.tt.style.display='block';const w=R.tt.offsetWidth,bw=box.clientWidth;R.tt.style.left=(x>bw/2?Math.max(4,x-w-12):Math.min(bw-w-4,x+12))+'px'}
   R.show=show;chart.subscribeCrosshairMove(p=>{if(!p||!p.time||!p.point){if(!on)R.tt.style.display='none';return}show(p.time,p.point.x)});
  }
- R.cfg=cfg;const chart=R.chart;
+ R.cfg=cfg;R.padN=0;const chart=R.chart;
  // series (re)build
  R.series.forEach(x=>{try{chart.removeSeries(x.s)}catch(e){}});R.series=[];R.vals=[];
  cfg.series.forEach((s,i)=>{let ser;const common={priceLineVisible:false,lastValueVisible:s.last!==false,title:'',priceFormat:{type:'custom',formatter:s.fmt||fmt,minMove:0.01}};
@@ -160,13 +160,13 @@ async function mount(el,cfg){addCss();await lw();const L=window.LightweightChart
   const data=[];const vm=new Map();
   for(const p of s.data){const t=tkey(p[0],kind);const v=p[1];vm.set(keyOf(t),v);if(v==null)data.push({time:t});else{const o={time:t,value:v};if(s.colorFn)o.color=s.colorFn(v,p);data.push(o)}}
   data.sort((a,b)=>a.time<b.time?-1:a.time>b.time?1:0);
-  if(cfg.pad&&kind==='hm'){const end=tkey(cfg.pad[1],'hm'),st=tkey(cfg.pad[0],'hm'),have=new Map(data.map(d=>[d.time,d])),g=[],fT=data.length?data[0].time:1e18,lT=data.length?data.at(-1).time:0;let prev=null;for(let t=st;t<=end;t+=60){const d=have.get(t);if(d&&d.value!=null)prev=d;g.push(d||(prev&&t>fT&&t<lT?{time:t,value:prev.value,...(prev.color?{color:prev.color}:{})}:{time:t}))}for(const d of data)if(d.time<st||d.time>end||(d.time-st)%60)g.push(d);g.sort((x,y)=>x.time-y.time);data.length=0;data.push(...g)}
+  if(cfg.pad&&kind==='hm'){const end=tkey(cfg.pad[1],'hm'),st=tkey(cfg.pad[0],'hm'),have=new Map(data.map(d=>[d.time,d])),g=[],fT=data.length?data[0].time:1e18,lT=data.length?data.at(-1).time:0;let prev=null;for(let t=st;t<=end;t+=60){const d=have.get(t);if(d&&d.value!=null)prev=d;g.push(d||(prev&&t>fT&&t<lT?{time:t,value:prev.value,...(prev.color?{color:prev.color}:{})}:{time:t}))}for(const d of data)if(d.time<st||d.time>end||(d.time-st)%60)g.push(d);g.sort((x,y)=>x.time-y.time);data.length=0;data.push(...g);R.padN=Math.max(R.padN||0,g.length)}
   ser.setData(data);if(s.scale&&s.scale!=='right')chart.priceScale(s.scale).applyOptions({scaleMargins:s.margins||{top:.7,bottom:0},visible:false});
   R.series.push({s:ser});R.vals.push(vm)});
  if(cfg.series[0]&&cfg.hlines)cfg.hlines.forEach(h=>R.series[0].s.createPriceLine({price:h.v,color:h.color||'#6b7280',lineWidth:1,lineStyle:h.solid?L.LineStyle.Solid:L.LineStyle.Dashed,axisLabelVisible:h.axis!==false,title:h.title||''}));
  if(cfg.range&&R.series[0])R.series[0].s.applyOptions({autoscaleInfoProvider:()=>({priceRange:{minValue:cfg.range[0],maxValue:cfg.range[1]}})});
  if(cfg.minRange&&R.series[0])R.series[0].s.applyOptions({autoscaleInfoProvider:o=>{const r=o();if(!r)return r;return{priceRange:{minValue:Math.min(r.priceRange.minValue,cfg.minRange[0]),maxValue:Math.max(r.priceRange.maxValue,cfg.minRange[1])}}}});
- if(cfg.visible&&cfg.pan){const n=cfg.series[0].data.length;chart.timeScale().setVisibleLogicalRange({from:Math.max(0,n-cfg.visible),to:n-1})}else chart.timeScale().fitContent()}
+ if(cfg.visible&&cfg.pan){const n=cfg.series[0].data.length;chart.timeScale().setVisibleLogicalRange({from:Math.max(0,n-cfg.visible),to:n-1})}else if(cfg.pad&&kind==='hm'&&R.padN){const n=R.padN;requestAnimationFrame(()=>chart.timeScale().setVisibleLogicalRange({from:0,to:n-1}));chart.timeScale().setVisibleLogicalRange({from:0,to:n-1})}else chart.timeScale().fitContent()}
 SC.ts=(el,cfg)=>mount(el,cfg);
 SC.tsHTML=cfg=>{const id='tsc'+(++uid);let tries=0;const go=()=>{const el=document.getElementById(id);if(el)mount(el,cfg);else if(++tries<40)setTimeout(go,50)};setTimeout(go,0);return`<div id="${id}" style="min-height:${cfg.height||200}px"></div>`};
 })();
