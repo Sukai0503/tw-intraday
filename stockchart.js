@@ -1,4 +1,4 @@
-/* 共用個股彈窗：分時 / 江波 / 日K / 週K / 月K（lightweight-charts，十字線可拖曳）。用法：StockChart.open('2330') */
+/* 共用個股彈窗：分時 / 日K / 週K / 月K（lightweight-charts，十字線可拖曳）。用法：StockChart.open('2330') */
 (function(){
 const SRC=(document.currentScript&&document.currentScript.src)||location.href;
 const BASE=SRC.slice(0,SRC.lastIndexOf('/')+1);
@@ -25,7 +25,7 @@ const css=`.sc-m{position:fixed;inset:0;background:#000b;z-index:1000;display:no
 .sc-ma{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}.sc-ma button{background:#1a2131;border:1px solid #2a3447;color:#6b7380;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer}.sc-ma button.on{color:var(--c);border-color:var(--c);background:#141c2b}
 .sc-ch{width:100%;height:330px;touch-action:pan-y}.sc-msg{padding:40px 0;text-align:center;color:#8b929c}.sc-ld{background:#ffd400;color:#222;font-size:10px;border-radius:3px;padding:0 4px;margin-left:4px}`;
 function ensure(){if(document.getElementById('sc-m'))return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
- const m=document.createElement('div');m.id='sc-m';m.className='sc-m';m.innerHTML=`<div class="sc-p"><div class="sc-top"><div id="sc-h"></div><button class="sc-x" id="sc-x">✕</button></div><div class="sc-tabs" id="sc-tabs"><button data-v="intra">分時</button><button data-v="tick">江波</button><button data-v="day">日K</button><button data-v="week">週K</button><button data-v="month">月K</button></div><div class="sc-note" id="sc-note"></div><div class="sc-ma" id="sc-ma"></div><div class="sc-info" id="sc-info"></div><div class="sc-ch" id="sc-ch"></div></div>`;
+ const m=document.createElement('div');m.id='sc-m';m.className='sc-m';m.innerHTML=`<div class="sc-p"><div class="sc-top"><div id="sc-h"></div><button class="sc-x" id="sc-x">✕</button></div><div class="sc-tabs" id="sc-tabs"><button data-v="intra">分時</button><button data-v="day">日K</button><button data-v="week">週K</button><button data-v="month">月K</button></div><div class="sc-note" id="sc-note"></div><div class="sc-ma" id="sc-ma"></div><div class="sc-info" id="sc-info"></div><div class="sc-ch" id="sc-ch"></div></div>`;
  document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)close()});document.getElementById('sc-x').onclick=close;
  document.getElementById('sc-tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;draw()};
  document.getElementById('sc-ma').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;MAON[k]=!MAON[k];try{localStorage.setItem('sc_ma',JSON.stringify(MAON))}catch(err){}draw()};
