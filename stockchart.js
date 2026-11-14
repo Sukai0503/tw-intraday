@@ -1,4 +1,4 @@
-/* 共用個股彈窗：分時 / 日K（lightweight-charts，十字線可拖曳）。用法：StockChart.open('2330') */
+/* 共用個股彈窗：分時 / 江波 / 日K / 週K / 月K（lightweight-charts，十字線可拖曳）。用法：StockChart.open('2330') */
 (function(){
 const SRC=(document.currentScript&&document.currentScript.src)||location.href;
 const BASE=SRC.slice(0,SRC.lastIndexOf('/')+1);
@@ -6,6 +6,8 @@ const API='https://api.github.com/repos/Sukai0503/tw-intraday/contents/';
 const UP='#ff4d5e',DN='#16c79a',AVG='#ff9f43';
 let LWp=null,charts=[],cur=null,view='intra',rowProvider=null,groupName=null;
 const cache={};
+const MAS=[['ma5',5,'#f6c344','MA5'],['ma10',10,'#4fc3f7','MA10'],['ma20',20,'#ff9f43','MA20'],['ma60',60,'#b48cff','MA60'],['ma120',120,'#7bd88f','MA120']];
+let MAON={ma5:1,ma10:0,ma20:1,ma60:1,ma120:0,bb:0};try{Object.assign(MAON,JSON.parse(localStorage.getItem('sc_ma')||'{}'))}catch(e){}
 function loadLW(){if(window.LightweightCharts)return Promise.resolve();return LWp||(LWp=new Promise((res,rej)=>{const s=document.createElement('script');s.src=BASE+'vendor/lightweight-charts.standalone.production.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)}))}
 async function getJSON(name,maxAge,apiFirst){const c=cache[name];if(c&&Date.now()-c.t<maxAge)return c.v;let v=null;
  if(apiFirst){try{const r=await fetch(API+name+'?ref=data',{cache:'no-store',headers:{Accept:'application/vnd.github.raw'}});if(r.ok)v=await r.json()}catch(e){}}
@@ -20,11 +22,13 @@ const css=`.sc-m{position:fixed;inset:0;background:#000b;z-index:1000;display:no
 .sc-up{color:${UP}}.sc-dn{color:${DN}}.sc-note{font-size:11.5px;color:#8b929c;margin:2px 0 6px}
 .sc-tabs{display:flex;gap:6px;margin:6px 0}.sc-tabs button{flex:1;background:#232733;color:#8b929c;border:0;border-radius:8px;padding:7px 0;font-size:14px;cursor:pointer}.sc-tabs button.on{background:#3a4152;color:#fff}
 .sc-info{font-size:12px;color:#cfd3d8;min-height:34px;line-height:1.5;font-variant-numeric:tabular-nums}.sc-info span{margin-right:8px;white-space:nowrap}.sc-info i{font-style:normal;color:#8b929c}
+.sc-ma{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}.sc-ma button{background:#1a2131;border:1px solid #2a3447;color:#6b7380;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer}.sc-ma button.on{color:var(--c);border-color:var(--c);background:#141c2b}
 .sc-ch{width:100%;height:330px;touch-action:pan-y}.sc-msg{padding:40px 0;text-align:center;color:#8b929c}.sc-ld{background:#ffd400;color:#222;font-size:10px;border-radius:3px;padding:0 4px;margin-left:4px}`;
 function ensure(){if(document.getElementById('sc-m'))return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
- const m=document.createElement('div');m.id='sc-m';m.className='sc-m';m.innerHTML=`<div class="sc-p"><div class="sc-top"><div id="sc-h"></div><button class="sc-x" id="sc-x">✕</button></div><div class="sc-tabs" id="sc-tabs"><button data-v="intra">分時</button><button data-v="day">日K</button></div><div class="sc-note" id="sc-note"></div><div class="sc-info" id="sc-info"></div><div class="sc-ch" id="sc-ch"></div></div>`;
+ const m=document.createElement('div');m.id='sc-m';m.className='sc-m';m.innerHTML=`<div class="sc-p"><div class="sc-top"><div id="sc-h"></div><button class="sc-x" id="sc-x">✕</button></div><div class="sc-tabs" id="sc-tabs"><button data-v="intra">分時</button><button data-v="tick">江波</button><button data-v="day">日K</button><button data-v="week">週K</button><button data-v="month">月K</button></div><div class="sc-note" id="sc-note"></div><div class="sc-ma" id="sc-ma"></div><div class="sc-info" id="sc-info"></div><div class="sc-ch" id="sc-ch"></div></div>`;
  document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)close()});document.getElementById('sc-x').onclick=close;
  document.getElementById('sc-tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;draw()};
+ document.getElementById('sc-ma').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;MAON[k]=!MAON[k];try{localStorage.setItem('sc_ma',JSON.stringify(MAON))}catch(err){}draw()};
  addEventListener('keydown',e=>{if(e.key==='Escape')close()});let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(m.style.display==='flex')draw()},250)})}
 function close(){const m=document.getElementById('sc-m');if(m)m.style.display='none';destroy()}
 function destroy(){charts.forEach(c=>{try{c.remove()}catch(e){}});charts=[]}
@@ -56,7 +60,9 @@ async function draw(){const code=cur;destroy();const h=document.getElementById('
   h.innerHTML=`<div class="sc-nm"><b>${s[1]}</b> ${s[0]}${grp?'・'+grp:''}${s[13]?'<span class="sc-ld">龍頭</span>':''}</div><div class="sc-big ${c}">${live?'成交':'收盤'} ${f2(s[8])} ${up?'▲':dn?'▼':''} ${sg(+s[9].toFixed(2))} (${sg(s[4].toFixed(2))}%)<small>${date.slice(0,4)}/${date.slice(4,6)}/${date.slice(6)}${live&&R.asof?' '+R.asof:''}</small></div>`}
  else h.innerHTML=`<div class="sc-nm"><b>${code}</b></div>`;
  if(!lwOk){el.innerHTML='<div class="sc-msg">圖表元件載入失敗</div>';return}
- if(view==='intra')return drawIntra(code,s,date,el,info,note);return drawDay(code,s,date,el,info,note)}
+ const mb=document.getElementById('sc-ma');const kv=['day','week','month'].includes(view);mb.style.display=kv?'flex':'none';
+ if(kv)mb.innerHTML=[...MAS.map(m=>[m[0],m[3],m[2]]),['bb','布林','#9fb3c8']].map(([k,l,c])=>`<button data-k="${k}" class="${MAON[k]?'on':''}" style="--c:${c}">${l}</button>`).join('');
+ if(view==='intra')return drawIntra(code,s,date,el,info,note);if(view==='tick')return drawTick(code,s,date,el,info,note);return drawDay(code,s,date,el,info,note)}
 async function drawIntra(code,s,date,el,info,note){const L=window.LightweightCharts;
  note.textContent='分時：盤中約每 2 分鐘一點（早段可能為 5 分鐘回補）；均價線＝成交量加權均價（估算）；拖曳圖表看各時點';
  const I=await getJSON('intraday.json',110000,true);if(cur!==code||view!=='intra')return;
@@ -84,30 +90,67 @@ async function drawIntra(code,s,date,el,info,note){const L=window.LightweightCha
   info.innerHTML=`<span><i>時間</i> ${hmOf(tt)}</span><span class="${c}"><i>價</i> ${f2(d.p)}</span><span class="${c}">${chg>0?'▲':chg<0?'▼':''}${f2(Math.abs(chg))} (${sg(pc.toFixed(2))}%)</span><span style="color:${AVG}"><i>均價</i> ${f2(d.a)}</span><span><i>量</i> ${fv(d.v)} 張</span>`};
  show(null);ch.subscribeCrosshairMove(p=>show(p&&p.time));
  touchCrosshair(el,ch,base,t=>{const d=map.get(t);return d?d.p:null},show)}
-async function drawDay(code,s,date,el,info,note){const L=window.LightweightCharts;
- note.textContent='日K 近120日（Yahoo 日線，異常高低價已校正；今日為即時）；拖曳圖表看各日';
- const O=await getJSON('hist/'+code+'.json',3600000,false);if(cur!==code||view!=='day')return;
- if(!O){el.innerHTML='<div class="sc-msg">此檔暫無日K資料</div>';return}
+async function drawDay(code,s,date,el,info,note){const L=window.LightweightCharts;const kind=view;
+ const KN={day:'日K',week:'週K',month:'月K'}[kind];
+ note.textContent=KN+'（Yahoo 日線'+(kind==='day'?'':'合成')+'，異常高低價已校正；今日為即時）；布林＝20 期、2 倍標準差；拖曳圖表看更早';
+ const O0=await getJSON('hist/'+code+'.json',3600000,false);if(cur!==code||view!==kind)return;
+ const O=O0&&(kind==='day'?O0:O0[kind==='week'?'w':'m']);
+ if(!O||!O.d){el.innerHTML='<div class="sc-msg">'+(O0?'此檔'+KN+'資料更新中，請稍後再看':'此檔暫無日K資料')+'</div>';return}
  const d=O.d.slice(),o=O.o.slice(),hh=O.h.slice(),l=O.l.slice(),c=O.c.slice(),v=O.v.slice();
- if(s&&date&&date>d.at(-1)){d.push(date);o.push(s[14]||s[8]);hh.push(s[10]);l.push(s[11]);c.push(s[8]);v.push(s[15]||0)}
+ if(s&&date&&date>d.at(-1)){const tO=s[14]||s[8],tV=s[15]||0;
+  const pk=x=>{if(kind==='month')return x.slice(0,6);const dt=new Date(Date.UTC(+x.slice(0,4),+x.slice(4,6)-1,+x.slice(6)));const wd=(dt.getUTCDay()+6)%7;dt.setUTCDate(dt.getUTCDate()-wd);return dt.toISOString().slice(0,10)};
+  if(kind!=='day'&&pk(date)===pk(d.at(-1))){const i=d.length-1;d[i]=date;hh[i]=Math.max(hh[i],s[10]);l[i]=Math.min(l[i],s[11]);c[i]=s[8];v[i]+=tV}
+  else{d.push(date);o.push(tO);hh.push(s[10]);l.push(s[11]);c.push(s[8]);v.push(tV)}}
  const iso=x=>x.slice(0,4)+'-'+x.slice(4,6)+'-'+x.slice(6);
- const ma=n=>c.map((_,i)=>i<n-1?null:c.slice(i-n+1,i+1).reduce((a,b)=>a+b,0)/n),m5=ma(5),m20=ma(20),m60=ma(60);
- el.innerHTML='';const ch=L.createChart(el,{...baseOpts(el),localization:{locale:'zh-TW',dateFormat:"dd MMM 'yy"},
+ const ma=n=>c.map((_,i)=>i<n-1?null:c.slice(i-n+1,i+1).reduce((a,b)=>a+b,0)/n);
+ const M={};MAS.forEach(([k,n])=>M[k]=ma(n));
+ const sd=c.map((_,i)=>{if(i<19)return null;const w=c.slice(i-19,i+1),m=M.ma20[i];return Math.sqrt(w.reduce((a,b)=>a+(b-m)*(b-m),0)/20)});
+ const bu=c.map((_,i)=>sd[i]==null?null:M.ma20[i]+2*sd[i]),bl=c.map((_,i)=>sd[i]==null?null:M.ma20[i]-2*sd[i]);
+ el.innerHTML='';const ch=L.createChart(el,{...baseOpts(el),localization:{locale:'zh-TW',dateFormat:kind==='month'?"MMM 'yy":"dd MMM 'yy"},
   handleScroll:{mouseWheel:true,pressedMouseMove:true,horzTouchDrag:false,vertTouchDrag:false},handleScale:{mouseWheel:true,pinch:true,axisPressedMouseMove:false},
   leftPriceScale:{visible:true,borderColor:'#2a3447',scaleMargins:{top:0.8,bottom:0}},timeScale:{borderColor:'#2a3447',fixLeftEdge:true,fixRightEdge:true,rightOffset:2}});charts.push(ch);
  const cs=ch.addCandlestickSeries({upColor:UP,downColor:DN,wickUpColor:UP,wickDownColor:DN,borderVisible:false,priceLineVisible:true,priceLineStyle:L.LineStyle.Dotted,lastValueVisible:true});
  const bars=d.map((x,i)=>({time:iso(x),open:o[i],high:hh[i],low:l[i],close:c[i]}));cs.setData(bars);
- const line=(arr,col)=>{const s2=ch.addLineSeries({color:col,lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});s2.setData(arr.map((x,i)=>x==null?{time:iso(d[i])}:{time:iso(d[i]),value:x}));return s2};
- line(m5,'#f6c344');line(m20,'#ff9f43');line(m60,'#b48cff');
+ const line=(arr,col,dash)=>{const s2=ch.addLineSeries({color:col,lineWidth:1,lineStyle:dash?L.LineStyle.Dashed:L.LineStyle.Solid,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});s2.setData(arr.map((x,i)=>x==null?{time:iso(d[i])}:{time:iso(d[i]),value:x}));return s2};
+ MAS.forEach(([k,,col])=>{if(MAON[k])line(M[k],col)});
+ if(MAON.bb){line(bu,'#9fb3c8',1);line(bl,'#9fb3c8',1);if(!MAON.ma20)line(M.ma20,'#9fb3c888',1)}
  const vs=ch.addHistogramSeries({priceScaleId:'left',priceFormat:{type:'custom',formatter:fv,minMove:1},priceLineVisible:false,lastValueVisible:false});
  vs.setData(d.map((x,i)=>({time:iso(x),value:v[i],color:(c[i]>=o[i]?UP:DN)+'99'})));
- ch.priceScale('right').applyOptions({scaleMargins:{top:0.06,bottom:0.25}});ch.priceScale('left').applyOptions({scaleMargins:{top:0.8,bottom:0},visible:true,borderColor:'#2a3447'});ch.timeScale().fitContent();
+ ch.priceScale('right').applyOptions({scaleMargins:{top:0.06,bottom:0.25}});ch.priceScale('left').applyOptions({scaleMargins:{top:0.8,bottom:0},visible:true,borderColor:'#2a3447'});
+ const vis=kind==='month'?60:120;if(d.length>vis)ch.timeScale().setVisibleLogicalRange({from:d.length-vis,to:d.length+1});else ch.timeScale().fitContent();
  const idx=new Map(d.map((x,i)=>[iso(x),i]));
  const key=t=>typeof t==='string'?t:t&&t.year?`${t.year}-${String(t.month).padStart(2,'0')}-${String(t.day).padStart(2,'0')}`:null;
+ const dl=x=>kind==='month'?x.slice(0,4)+'/'+x.slice(4,6):(kind==='week'?'週 ':'')+x.slice(4,6)+'/'+x.slice(6);
  const show=t=>{let i=idx.get(key(t));if(i==null)i=d.length-1;const ch1=i>0?c[i]-c[i-1]:0,cl=ch1>0?'sc-up':ch1<0?'sc-dn':'';
-  info.innerHTML=`<span><i>${d[i].slice(4,6)}/${d[i].slice(6)}</i></span><span><i>開</i> ${f2(o[i])}</span><span class="sc-up"><i>高</i> ${f2(hh[i])}</span><span class="sc-dn"><i>低</i> ${f2(l[i])}</span><span class="${cl}"><i>收</i> ${f2(c[i])}${i>0?' ('+sg((ch1/c[i-1]*100).toFixed(2))+'%)':''}</span><span><i>量</i> ${fv(v[i])} 張</span><br><span style="color:#f6c344">MA5 ${f2(m5[i])}</span><span style="color:#ff9f43">MA20 ${f2(m20[i])}</span><span style="color:#b48cff">MA60 ${f2(m60[i])}</span>`};
+  const mas=MAS.filter(([k])=>MAON[k]).map(([k,,col,lab])=>`<span style="color:${col}">${lab} ${f2(M[k][i])}</span>`).join('');
+  const bb=MAON.bb?`<span style="color:#9fb3c8">布林 ${f2(bu[i])}／${f2(bl[i])}</span>`:'';
+  info.innerHTML=`<span><i>${dl(d[i])}</i></span><span><i>開</i> ${f2(o[i])}</span><span class="sc-up"><i>高</i> ${f2(hh[i])}</span><span class="sc-dn"><i>低</i> ${f2(l[i])}</span><span class="${cl}"><i>收</i> ${f2(c[i])}${i>0?' ('+sg((ch1/c[i-1]*100).toFixed(2))+'%)':''}</span><span><i>量</i> ${fv(v[i])} 張</span><br>${mas}${bb}`};
  show(null);ch.subscribeCrosshairMove(p=>show(p&&p.time));
  touchCrosshair(el,ch,cs,t=>{const i=idx.get(key(t));return i!=null?c[i]:null},show)}
+// 江波圖：依成交順序（不按時間）逐點排列；資料為分鐘級快照，非逐筆
+async function drawTick(code,s,date,el,info,note){const L=window.LightweightCharts;
+ note.textContent='江波圖：依成交先後逐點排列（橫軸是成交順序，不是時間）；資料為盤中分鐘快照，非逐筆成交';
+ const I=await getJSON('intraday.json',110000,true);if(cur!==code||view!=='tick')return;
+ if(!I||!I.p||!I.p[code]){el.innerHTML='<div class="sc-msg">此檔暫無盤中資料</div>';return}
+ const y=I.y[code]||(s?s[8]-s[9]:null);const T=I.t,P=I.p[code],V=(I.v&&I.v[code])||[];
+ const pts=[];let pv=0,pp=null;
+ for(let i=0;i<T.length;i++){const p=P[i];if(p==null)continue;const vv=V.length?Math.max(0,(V[i]||0)-pv):0;pv=V.length?(V[i]||pv):0;if(V.length&&vv===0&&p===pp)continue;pts.push({p,v:vv,hm:T[i],up:pp==null?p>=y:p>pp?1:p<pp?0:pts.length?pts.at(-1).up:1});pp=p}
+ if(!pts.length){el.innerHTML='<div class="sc-msg">此檔暫無盤中資料</div>';return}
+ const tt=i=>i+1;
+ el.innerHTML='';const ch=L.createChart(el,{...baseOpts(el,t=>pts[t-1]?pts[t-1].hm:''),handleScroll:false,handleScale:false,
+  timeScale:{borderColor:'#2a3447',timeVisible:true,fixLeftEdge:true,fixRightEdge:true,tickMarkFormatter:t=>pts[t-1]?pts[t-1].hm:''}});charts.push(ch);
+ const last=pts.at(-1).p;
+ const ln=ch.addLineSeries({color:'#e8eaed',lineWidth:1,lineType:1,priceLineVisible:true,priceLineColor:last>=y?UP:DN,priceLineStyle:L.LineStyle.Dotted,lastValueVisible:true,crosshairMarkerRadius:3,
+  autoscaleInfoProvider:orig=>{const r=orig();if(!r||!y)return r;const dev=Math.max(Math.abs(r.priceRange.maxValue-y),Math.abs(r.priceRange.minValue-y),y*0.006)*1.05;return{priceRange:{minValue:y-dev,maxValue:y+dev},margins:r.margins}}});
+ ln.setData(pts.map((x,i)=>({time:tt(i),value:x.p,color:x.p>y?UP:x.p<y?DN:'#e8eaed'})));
+ ln.createPriceLine({price:y,color:'#9aa4b2',lineWidth:1,lineStyle:L.LineStyle.Dotted,axisLabelVisible:true,title:'平盤 '+f2(y)});
+ const vs=ch.addHistogramSeries({priceScaleId:'vol',priceFormat:{type:'volume'},priceLineVisible:false,lastValueVisible:false});
+ vs.setData(pts.map((x,i)=>({time:tt(i),value:x.v,color:(x.up?UP:DN)+'99'})));
+ ch.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});ch.priceScale('right').applyOptions({scaleMargins:{top:0.06,bottom:0.24}});ch.timeScale().fitContent();
+ const show=t=>{const i=(t&&pts[t-1])?t-1:pts.length-1,x=pts[i],chg=x.p-y,pc=y?chg/y*100:0,c=chg>0?'sc-up':chg<0?'sc-dn':'';
+  info.innerHTML=`<span><i>第 ${i+1} 點</i> ${x.hm}</span><span class="${c}"><i>價</i> ${f2(x.p)}</span><span class="${c}">${sg(pc.toFixed(2))}%</span><span class="${x.up?'sc-up':'sc-dn'}"><i>量</i> ${fv(x.v)} 張 ${x.up?'外盤↑':'內盤↓'}</span>`};
+ show(null);ch.subscribeCrosshairMove(p=>show(p&&p.time));
+ touchCrosshair(el,ch,ln,t=>pts[t-1]?pts[t-1].p:null,show)}
 window.StockChart={open,close,setRowProvider:f=>{rowProvider=f},base:BASE};
 })();
 /* 通用時間序列圖（十字線＋浮動提示，可拖曳）。StockChart.ts(idOrEl,cfg) 直接掛載；StockChart.tsHTML(cfg) 回傳佔位 HTML 並稍後掛載 */
