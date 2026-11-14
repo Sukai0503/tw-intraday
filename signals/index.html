@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<!doctype html><html lang="zh-Hant"><head><script>try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')}catch(e){}</script><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>非常態訊號儀表板</title>
 <style>
@@ -47,8 +47,8 @@ details ul{margin:8px 0 2px;padding-left:18px;font-size:13px;color:#c9ced6}detai
 .foot{color:var(--mut);font-size:11px;padding:0 4px 24px}
 #err{display:none;background:#43191c;color:#ffb3b3;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px}
 a.stk{color:#33e1f0;text-decoration:none;border-bottom:1px dashed #33e1f088;cursor:pointer}
-</style><link rel="icon" href="../favicon.png?v=1"><link rel="apple-touch-icon" href="../icon-180.png?v=1"></head><body><div class="wrap">
-<div class="nav"><a href="../#intra">今日盤中</a><a href="../#heat">族群熱力</a><a class="on" href="./">非常態投資</a></div>
+html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.light img,html.light video{filter:invert(1) hue-rotate(180deg)}.thm{background:none;border:1px solid #2a2f39;color:#8b929c;border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;white-space:nowrap}</style><link rel="icon" href="../favicon.png?v=1"><link rel="apple-touch-icon" href="../icon-180.png?v=1"></head><body><div class="wrap">
+<div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><div class="nav"><a href="../#intra">今日盤中</a><a href="../#heat">族群熱力</a><a href="../#inst">法人同步</a><a class="on" href="./">非常態投資</a></div>
 <div id="err"></div>
 <h1>非常態訊號儀表板｜機會與風險判讀</h1>
 <div class="sub" id="sub">載入中…</div>
@@ -264,4 +264,4 @@ function render(J){
   try{render(J);loadSeries();arrChart('all')}catch(e){const el=document.getElementById('err');el.style.display='block';el.textContent='畫面產生失敗：'+e.message}
 })();
 document.addEventListener('click',e=>{const b=e.target.closest('#arrseg button');if(b){arrChart(b.dataset.m);return}const a=e.target.closest('a.stk');if(!a)return;e.preventDefault();if(window.StockChart)StockChart.open(a.dataset.code)});
-</script></body></html>
+</script><script>(function(){const b=document.getElementById('thm');if(!b)return;const set=()=>{b.textContent=document.documentElement.classList.contains('light')?'🌙 深色':'☀️ 淺色'};set();b.onclick=()=>{const l=document.documentElement.classList.toggle('light');try{localStorage.setItem('theme',l?'light':'dark')}catch(e){}set()}})()</script></body></html>
