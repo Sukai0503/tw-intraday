@@ -115,7 +115,7 @@ function fmt(t){if(t==null||t==='')return '';const out=[];
  String(t).replace(/([①-⑨])/g,'；$1').split(/(?<=。)/).forEach(par=>{par=par.trim();if(!par)return;
   const ls=par.split('；').map(x=>x.trim()).filter(Boolean);
   if(ls.length<=1)out.push(`<div class="fp">${esc(ls[0]||par)}</div>`);
-  else{const head=ls[0].match(/^(.{0,12}?[：:])$/)?ls.shift():null;out.push(`<div class="fp">${ls.map((x,i)=>i===0&&!head?`<span>${esc(x)}</span>`:`<span class="fl">${esc(x)}</span>`).join('')}</div>`.replace('<div class="fp"><span>','<div class="fp"><span style="display:block">'))}});
+  else{const head=ls[0].match(/^(.{0,12}?[：:])$/)?ls.shift():null;out.push(`<div class="fp">${head?`<b style="display:block;font-size:inherit;margin:0">${esc(head)}</b>`:''}${ls.map((x,i)=>i===0&&!head?`<span>${esc(x)}</span>`:`<span class="fl">${esc(x)}</span>`).join('')}</div>`.replace('<div class="fp"><span>','<div class="fp"><span style="display:block">'))}});
  return out.join('')}
 function cycleCard(C){
   if(!C||!C.taiex)return '';
