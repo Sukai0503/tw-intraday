@@ -64,6 +64,17 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 .inst-footer{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}.inst-footer p{margin:4px 0}
 @media(max-width:400px){.nav{gap:4px}.nav a{font-size:12px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
 .inst-win{display:flex;gap:6px;margin:8px 0 6px}.inst-win button{flex:1;background:#232733;color:#8b929c;border:0;border-radius:8px;padding:7px 0;font-size:14px;cursor:pointer}.inst-win button.on{background:#3a4152;color:#fff}
+#famtcard{display:none}#famtcard.on{display:block}
+.famt-total{margin:8px 0 4px;font-size:15px;font-weight:600}
+.famt-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.famt-cols h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.famt-cols ol{list-style:none;margin:0;padding:0}
+.famt-cols li{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 6px;background:#14233c;border-radius:8px;margin-bottom:6px;cursor:pointer}
+.famt-cols li:hover,.famt-cols li:focus-visible{background:#1c3150}
+.famt-cols .nm{min-width:0;color:#fff;font-weight:700;font-size:13px;line-height:1.3}
+.famt-cols .cd{display:block;color:#94a3b8;font-size:10px;font-weight:400}
+.famt-cols .amt{flex-shrink:0;font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:12px;text-align:right;line-height:1.3;white-space:nowrap}
+.famt-cols .sh{display:block;color:#94a3b8;font-size:10px;font-weight:400}
 html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.light img,html.light video{filter:invert(1) hue-rotate(180deg)}.thm{background:none;border:1px solid #2a2f39;color:#8b929c;border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;white-space:nowrap}</style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
 <div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
@@ -114,6 +125,16 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 <thead><tr><th scope="col">名次</th><th scope="col">個股</th><th scope="col">外資</th><th scope="col">投信</th><th scope="col">主力</th></tr></thead>
 <tbody id="inst-rows"></tbody></table></div>
 <footer class="inst-footer" id="inst-footer"></footer>
+</section>
+<section class="inst" id="famtcard" data-v="inst" aria-labelledby="famt-heading">
+<h2 id="famt-heading">外資買賣超金額<span>個股前 20 名</span></h2>
+<p class="famt-total" id="famt-total"></p>
+<p class="inst-days" id="famt-days"></p>
+<div class="famt-cols">
+<div><h3 class="up">買超</h3><ol id="famt-buy"></ol></div>
+<div><h3 class="dn">賣超</h3><ol id="famt-sell"></ol></div>
+</div>
+<footer class="inst-footer" id="famt-footer"></footer>
 </section>
 </div>
 <script src="stockchart.js?v=1113c"></script>
@@ -312,6 +333,28 @@ function renderInst(full){INST=full;const W=full.windows||{};if(!W[INSTW])INSTW=
  const updated=new Date(d.updated),time=Number.isNaN(updated.getTime())?String(d.updated||'—'):updated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false})+'（台北時間）';
  document.getElementById('inst-footer').innerHTML=[`三欄 ${n} 日累計皆為正。範圍為已核對的 ${d.candidates_n??'—'} 檔候選。`,d.rule||'',`來源：${sourceText||'—'}`,`更新：${time}`].map(v=>`<p>${esc(v)}</p>`).join('');
  document.getElementById('inst-status').textContent=rows.length?'':'目前沒有符合條件的個股。';
+ const fa=d.foreign_amt||{},card=document.getElementById('famtcard');
+ const hasFa=Array.isArray(fa.buy)||Array.isArray(fa.sell);
+ card.classList.toggle('on',hasFa);
+ if(hasFa){
+  const tot=fa.total,daysText=days.map(v=>instDate(v)).join('、');
+  let totHtml='';
+  if(typeof tot==='number'&&Number.isFinite(tot)){
+   const abs=Math.abs(tot).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+   const label=tot>0?`期間外資合計買超 ${abs} 億元`:tot<0?`期間外資合計賣超 ${abs} 億元`:`期間外資合計 0.0 億元`;
+   totHtml=`<span class="${tot>0?'up':tot<0?'dn':''}">${label}</span>`;
+  }
+  document.getElementById('famt-total').innerHTML=totHtml;
+  document.getElementById('famt-days').textContent=daysText;
+  const item=r=>{
+   const cls=r.amt>0?'up':r.amt<0?'dn':'';
+   return `<li tabindex="0" data-code="${esc(r.code)}" aria-label="${esc(r.code)} ${esc(r.name)}，開啟走勢"><span class="nm"><span class="cd">${esc(r.code)}</span>${esc(r.name)}</span><span class="amt ${cls}">${instNumber(r.amt,1)} 億<span class="sh">${instNumber(r.shares,0)} 張</span></span></li>`;
+  };
+  document.getElementById('famt-buy').innerHTML=(fa.buy||[]).map(item).join('')||'<li class="mut" style="cursor:default;background:transparent">目前沒有買超個股</li>';
+  document.getElementById('famt-sell').innerHTML=(fa.sell||[]).map(item).join('')||'<li class="mut" style="cursor:default;background:transparent">目前沒有賣超個股</li>';
+  const src=sources.foreign_amt?'來源：'+sources.foreign_amt:'金額＝各日外資（含外資自營商）買賣超股數×當日收盤價，期間加總，單位億元。與證交所公布之買賣超金額可能因均價不同而有差異。';
+  document.getElementById('famt-footer').innerHTML=`<p>${esc(src)}</p><p>點個股可看走勢。單位右側為同期外資買賣超張數。</p>`;
+ }
 }
 async function loadInst(){
  if(instLoading)return;
@@ -337,6 +380,9 @@ async function loadInst(){
 const instRows=document.getElementById('inst-rows');
 instRows.addEventListener('click',e=>{const row=e.target.closest('tr[data-code]');if(row)showK(row.dataset.code)});
 instRows.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('tr[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
+const famtCard=document.getElementById('famtcard');
+famtCard.addEventListener('click',e=>{const row=e.target.closest('li[data-code]');if(row)showK(row.dataset.code)});
+famtCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('li[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
 function applyView(){
  const heat=location.hash==='#heat',inst=location.hash==='#inst';
  document.body.classList.toggle('vheat',heat);document.body.classList.toggle('vinst',inst);
