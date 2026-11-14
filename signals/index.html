@@ -11,6 +11,9 @@ h1{font-size:19px;margin:4px 0 2px}.sub{color:var(--mut);font-size:12px;margin-b
 .card h2{font-size:15.5px;margin:0 0 2px;color:#dfe3e8;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .cap{color:var(--mut);font-size:11.5px;margin:0 0 8px}
 .mut{color:var(--mut);font-size:12px}
+.fp{margin:0 0 7px;line-height:1.7}.fp:last-child{margin-bottom:0}.fl{display:block;padding-left:.9em;text-indent:-.9em;margin:2px 0}.fl:before{content:'・';color:#8b929c}
+.kv{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:#c9ced6;margin:4px 0;line-height:1.6}.kv span{white-space:nowrap}.kv i{font-style:normal;color:#8b929c;margin-right:3px}
+.call,.lb,.cap{line-height:1.7}.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:2px 12px;margin:4px 0 8px;font-size:12.5px;color:#9aa4b2}
 .call{border-left:4px solid var(--bl);background:#1d2533;border-radius:8px;padding:9px 11px;margin:6px 0 10px;font-size:14px}
 .call b{display:block;margin-bottom:2px;font-size:15px}
 .call.warning{border-color:var(--warn);background:#2a2416}.call.warning b{color:var(--warn)}
@@ -106,16 +109,24 @@ function buyTable(){
 }
 
 
+
+// 長文字分段：句號分段、分號分行、①②③ 換行
+function fmt(t){if(t==null||t==='')return '';const out=[];
+ String(t).replace(/([①-⑨])/g,'；$1').split(/(?<=。)/).forEach(par=>{par=par.trim();if(!par)return;
+  const ls=par.split('；').map(x=>x.trim()).filter(Boolean);
+  if(ls.length<=1)out.push(`<div class="fp">${esc(ls[0]||par)}</div>`);
+  else{const head=ls[0].match(/^(.{0,12}?[：:])$/)?ls.shift():null;out.push(`<div class="fp">${ls.map((x,i)=>i===0&&!head?`<span>${esc(x)}</span>`:`<span class="fl">${esc(x)}</span>`).join('')}</div>`.replace('<div class="fp"><span>','<div class="fp"><span style="display:block">'))}});
+ return out.join('')}
 function cycleCard(C){
   if(!C||!C.taiex)return '';
   const N=C.note||{};
   const one=(k,name)=>{const a=C[k]||[];if(!a.length)return '';const r=a[a.length-1];
     const gap=(r.ma5/r.ma20-1)*100;const hist=a.slice(-5).map(x=>`${esc(x.date.slice(5))} 第${x.stage}`).join('　');
     return `<div class="log"><div class="lh"><b>${name}</b><span>第 ${r.stage} 階段｜${esc(r.desc)}</span><span class="mut">${esc(r.order)}</span></div>
-    <div class="lb">收 ${f(r.close,2)}｜5MA ${f(r.ma5,2)}｜20MA ${f(r.ma20,2)}（${r.ma20_slope>0?'上彎':r.ma20_slope<0?'下彎':'走平'} ${f(r.ma20_slope,2)}）｜60MA ${f(r.ma60,2)}｜5MA 距 20MA ${f(gap,1)}%</div>
-    ${N[k]?`<div class="lb">${esc(N[k])}</div>`:''}<div class="cap">近 5 日：${hist}</div></div>`;};
+    <div class="kv"><span><i>收</i>${f(r.close,2)}</span><span><i>5MA</i>${f(r.ma5,2)}</span><span><i>20MA</i>${f(r.ma20,2)}（${r.ma20_slope>0?'上彎':r.ma20_slope<0?'下彎':'走平'} ${f(r.ma20_slope,2)}）</span><span><i>60MA</i>${f(r.ma60,2)}</span><span><i>5MA 距 20MA</i>${f(gap,1)}%</span></div>
+    ${N[k]?`<div class="lb">${fmt(N[k])}</div>`:''}<div class="cap">近 5 日：${hist}</div></div>`;};
   return `<div class="card"><h2>均線循環階段（加權／櫃買） <span class="mut">${esc((C.taiex[C.taiex.length-1]||{}).date||'')}</span></h2>
-   <div class="cap">依 Wade〈價格趨勢／延續性〉六階段：1 多頭 5>20>60｜2 停頓 20>5>60｜3 熊市入口 20>60>5｜4 空頭 60>20>5｜5 熊市尾聲 60>5>20｜6 牛市起步 5>60>20｜均線是落後指標，非投資建議</div>
+   <div class="cap">依 Wade〈價格趨勢／延續性〉六階段（均線是落後指標，非投資建議）</div><div class="stg"><span>1 多頭 5>20>60</span><span>2 停頓 20>5>60</span><span>3 熊市入口 20>60>5</span><span>4 空頭 60>20>5</span><span>5 熊市尾聲 60>5>20</span><span>6 牛市起步 5>60>20</span></div>
    ${one('taiex','加權')}${one('tpex','櫃買')}</div>`;
 }
 
@@ -220,11 +231,11 @@ function render(J){
     <div class="met"><div class="v">${esc(today.trend)}</div><div class="l">vs 前一交易日</div><div class="d">${RISK.length>1?RISK[RISK.length-2].lit:'—'} → ${lit} 格</div></div>
     <div class="met warning"><div class="v">${sk.current} / ${sk.record}</div><div class="l">連續無觀察類股（日）</div><div class="d">紀錄 ${sk.record}（前紀錄 ${sk.prev_record}）</div></div>
    </div>
-   <div class="rows">${cells.map(c=>`<div class="row"><div class="t">${c.name}</div><div class="w">${esc(c.why)}</div><span class="pill ${ST[c.st].tone||''}">${ST[c.st].label}</span></div>`).join('')}</div>
+   <div class="rows">${cells.map(c=>`<div class="row"><div class="t">${c.name}</div><div class="w">${fmt(c.why)}</div><span class="pill ${ST[c.st].tone||''}">${ST[c.st].label}</span></div>`).join('')}</div>
    <dl class="props"><dt>觀察類股（${esc(last.date)}）</dt><dd>${pickL(last.watch)}</dd><dt>稍微觀察類股</dt><dd>${pickL(last.few)}</dd><dt>完全沒有觀察類股</dt><dd>${esc(D.no_watch.days.join('、'))}</dd></dl></div>`;
   h+=`<div class="card"><h2>操作方向</h2><div class="cap">${esc(A.disclaimer)}｜規則更新：${esc(A.rules_updated)}${A.as_of?`｜判讀日 ${esc(A.as_of)}`:''}</div>
    <dl class="props"><dt>階段</dt><dd>${esc(A.stage)}</dd><dt>左側／右側</dt><dd>${esc(A.side)}</dd><dt>部位</dt><dd>${esc(A.size)}</dd><dt>哪筆錢</dt><dd>${esc(A.money)}</dd></dl>
-   <div class="call warning"><b>今日對應</b>${esc(A.text)}</div></div>`;
+   <div class="call warning"><b style="display:block;margin-bottom:4px">今日對應</b>${fmt(A.text)}</div></div>`;
   h+=cycleCard(D.ma_cycle);
   h+=`<div class="card"><h2>關鍵訊號</h2>${tbl(['訊號','數值','日期','燈號'],sig.map(r=>tr([`<td class="k">${esc(r[0])}</td>`,esc(r[1]),`<td class="nw">${esc(/^\d{4}-\d\d-\d\d/.test(r[2])?md(r[2].slice(0,10))+r[2].slice(10).replace('（前一日）','（前日）'):r[2])}</td>`,`<td class="nw">${esc(r[3])}</td>`])))}</div>`;
   h+=`<div class="card"><h2>三大法人買賣超</h2><div class="cap">單位：億元｜紅＝買超、綠＝賣超｜資料日 ${esc(I.as_of)}${I.stale?'（前一日）':''}｜近一週＝5 個交易日、近一月＝20 個交易日</div><div class="grid2"><div>${instT('上市',I.twse)}</div><div>${instT('上櫃',I.tpex)}</div></div><div class="cap" style="margin-top:8px">逐日買賣超（億）：柱＝三大法人合計，線＝外資／投信／自營｜拖曳看各日</div><div class="grid2"><div><div class="mut">上市</div><div id="inst_twse" style="min-height:200px"></div></div><div><div class="mut">上櫃</div><div id="inst_tpex" style="min-height:200px"></div></div></div></div>`;
@@ -236,10 +247,10 @@ function render(J){
   h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%','上市')}${(M.tpex_series&&M.tpex_series.length)?`<div class="cap" style="margin-top:8px">上櫃（扣除ETF）</div>${lineChart(M.tpex_series,125,165,'%','上櫃')}`:''}</div>
    <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}<div class="cap" style="margin-top:8px">跌破年線／月線比例（上市櫃普通股，官方收盤自算）｜拖曳看各日</div><div id="breadth_ch" style="min-height:210px"></div></div></div>`;
   h+=arrCard(D.ma_arrangement);
-  h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
+  h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${fmt(r.note)}</div></div>`).join('')}</div>`;
   h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${pickL(d.watch)}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${pickL(d.few)}</div>`:''}</div>`).join('')}</div>`;
-  h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
-   <details><summary>操作規則</summary><ul>${(RU.ops||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details></details>`;
+  h+=`<details><summary>判讀規則</summary><div class="cap" style="margin-top:6px">${esc(RU.caption)}</div><ul>${(RU.judge||[]).map(x=>`<li>${fmt(x)}</li>`).join('')}</ul>
+   <details><summary>操作規則</summary><ul>${(RU.ops||[]).map(x=>`<li>${fmt(x)}</li>`).join('')}</ul></details></details>`;
   document.getElementById('app').innerHTML=h;
   buyTable();
   document.querySelectorAll('#bsort button').forEach(b=>b.onclick=()=>{BSORT=b.dataset.s;buyTable()});
