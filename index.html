@@ -63,6 +63,7 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 .inst-table b{color:#fff}.inst-num{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}.inst-main{color:#dbb866}
 .inst-footer{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}.inst-footer p{margin:4px 0}
 @media(max-width:400px){.nav{gap:4px}.nav a{font-size:12px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
+.inst-win{display:flex;gap:6px;margin:8px 0 6px}.inst-win button{flex:1;background:#232733;color:#8b929c;border:0;border-radius:8px;padding:7px 0;font-size:14px;cursor:pointer}.inst-win button.on{background:#3a4152;color:#fff}
 </style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
 <nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
@@ -104,6 +105,7 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 <div class="foot" id="foot"></div>
 <section class="inst" id="instcard" data-v="inst" aria-labelledby="inst-heading">
 <h2 id="inst-heading">外資・投信・主力<span>累計同步買超前 10 名</span></h2>
+<div class="inst-win" id="inst-win"><button data-w="1">1日</button><button data-w="3">3日</button><button data-w="5">5日</button></div>
 <p class="inst-period" id="inst-period"></p>
 <p class="inst-days" id="inst-days"></p>
 <p class="inst-sort" id="inst-sort"></p>
@@ -295,7 +297,11 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
 let instTimer=null,instLoading=false,instLoaded=false;
 function instNumber(v,dec){return typeof v==='number'&&Number.isFinite(v)?(v>=0?'+':'')+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):'—'}
 function instDate(v,full=false){return String(v||'').slice(full?0:5,10).replace(/-/g,'/')}
-function renderInst(d){
+let INST=null,INSTW=(()=>{try{return localStorage.getItem('inst_w')||'5'}catch(e){return '5'}})();
+document.addEventListener('click',e=>{const b=e.target.closest('#inst-win button');if(!b)return;INSTW=b.dataset.w;try{localStorage.setItem('inst_w',INSTW)}catch(err){}if(INST)renderInst(INST)});
+function renderInst(full){INST=full;const W=full.windows||{};if(!W[INSTW])INSTW=W['5']?'5':Object.keys(W)[0]||'5';
+ document.querySelectorAll('#inst-win button').forEach(b=>{b.classList.toggle('on',b.dataset.w===INSTW);b.style.display=(W[b.dataset.w]||(!full.windows&&b.dataset.w==='5'))?'':'none'});
+ const d={...full,...(W[INSTW]||{})};
  const esc=heatEscape,days=Array.isArray(d.days)?d.days:[],n=d.n_days??days.length,period=d.period||[];
  document.getElementById('inst-period').textContent=`${instDate(period[0],true)}–${instDate(period[1])} ｜ ${n} 個交易日`;
  document.getElementById('inst-days').textContent=days.map(v=>instDate(v)).join('、');
