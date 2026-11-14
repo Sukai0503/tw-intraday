@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<!doctype html><html lang="zh-Hant"><head><script>try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')}catch(e){}</script><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>今日盤中</title>
 <style>
@@ -64,9 +64,9 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 .inst-footer{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}.inst-footer p{margin:4px 0}
 @media(max-width:400px){.nav{gap:4px}.nav a{font-size:12px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
 .inst-win{display:flex;gap:6px;margin:8px 0 6px}.inst-win button{flex:1;background:#232733;color:#8b929c;border:0;border-radius:8px;padding:7px 0;font-size:14px;cursor:pointer}.inst-win button.on{background:#3a4152;color:#fff}
-</style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
+html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.light img,html.light video{filter:invert(1) hue-rotate(180deg)}.thm{background:none;border:1px solid #2a2f39;color:#8b929c;border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;white-space:nowrap}</style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
-<nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
+<div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
 <h1 id="ttl">今日盤中｜即時 --:--</h1>
 <div class="card" data-v="intra"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
@@ -348,4 +348,4 @@ function applyView(){
  try{renderHeat()}catch(e){}
 }
 addEventListener('hashchange',applyView);applyView();
-</script></body></html>
+</script><script>(function(){const b=document.getElementById('thm');if(!b)return;const set=()=>{b.textContent=document.documentElement.classList.contains('light')?'🌙 深色':'☀️ 淺色'};set();b.onclick=()=>{const l=document.documentElement.classList.toggle('light');try{localStorage.setItem('theme',l?'light':'dark')}catch(e){}set()}})()</script></body></html>
