@@ -48,6 +48,14 @@ function touchCrosshair(el,chart,series,valueAt,onMove){let on=false;
  el.addEventListener('touchstart',e=>{on=true;mv(e)},{passive:true});
  el.addEventListener('touchmove',e=>{if(!on)return;const t=e.touches[0];mv(e)},{passive:true});
  el.addEventListener('touchend',()=>{on=false},{passive:true});el.addEventListener('touchcancel',()=>{on=false},{passive:true})}
+// K線：單指拖曳＝平移、雙指＝縮放、長按＝十字線（長按後可滑動看數值）
+function longPressCrosshair(el,chart,series,valueAt,onMove){let tm=null,on=false,sx=0,sy=0;
+ const pos=t=>{const r=el.getBoundingClientRect(),x=t.clientX-r.left;const time=chart.timeScale().coordinateToTime(x);if(time==null)return;const v=valueAt(time);if(v!=null){try{chart.setCrosshairPosition(v,time,series)}catch(err){}onMove&&onMove(time)}};
+ const opt=b=>chart.applyOptions({handleScroll:{horzTouchDrag:b,pressedMouseMove:true,mouseWheel:true,vertTouchDrag:false},handleScale:{pinch:b,mouseWheel:true}});
+ el.addEventListener('touchstart',e=>{clearTimeout(tm);if(e.touches.length!==1){on=false;return}const t=e.touches[0];sx=t.clientX;sy=t.clientY;tm=setTimeout(()=>{on=true;opt(false);pos(t);if(navigator.vibrate)navigator.vibrate(10)},350)},{passive:true});
+ el.addEventListener('touchmove',e=>{const t=e.touches[0];if(!t)return;if(on){pos(t);return}if(Math.abs(t.clientX-sx)>8||Math.abs(t.clientY-sy)>8)clearTimeout(tm)},{passive:true});
+ const end=()=>{clearTimeout(tm);if(on){on=false;opt(true);try{chart.clearCrosshairPosition()}catch(err){}}};
+ el.addEventListener('touchend',end,{passive:true});el.addEventListener('touchcancel',end,{passive:true})}
 async function open(code,opts){ensure();cur=String(code).match(/\d{4,6}/)?String(code).match(/\d{4,6}/)[0]:String(code);view=(opts&&opts.view)||'intra';
  document.getElementById('sc-m').style.display='flex';await draw()}
 async function draw(){const code=cur;destroy();const h=document.getElementById('sc-h'),note=document.getElementById('sc-note'),info=document.getElementById('sc-info'),el=document.getElementById('sc-ch');
@@ -92,7 +100,7 @@ async function drawIntra(code,s,date,el,info,note){const L=window.LightweightCha
  touchCrosshair(el,ch,base,t=>{const d=map.get(t);return d?d.p:null},show)}
 async function drawDay(code,s,date,el,info,note){const L=window.LightweightCharts;const kind=view;
  const KN={day:'日K',week:'週K',month:'月K'}[kind];
- note.textContent=KN+'（Yahoo 日線'+(kind==='day'?'':'合成')+'，異常高低價已校正；今日為即時）；布林＝20 期、2 倍標準差；拖曳圖表看更早';
+ note.textContent=KN+'（Yahoo 日線'+(kind==='day'?'':'合成')+'，異常高低價已校正；今日為即時）；布林＝20 期、2 倍標準差；單指拖曳平移、雙指縮放、長按看數值';
  const O0=await getJSON('hist/'+code+'.json',3600000,false);if(cur!==code||view!==kind)return;
  const O=O0&&(kind==='day'?O0:O0[kind==='week'?'w':'m']);
  if(!O||!O.d){el.innerHTML='<div class="sc-msg">'+(O0?'此檔'+KN+'資料更新中，請稍後再看':'此檔暫無日K資料')+'</div>';return}
@@ -107,7 +115,7 @@ async function drawDay(code,s,date,el,info,note){const L=window.LightweightChart
  const sd=c.map((_,i)=>{if(i<19)return null;const w=c.slice(i-19,i+1),m=M.ma20[i];return Math.sqrt(w.reduce((a,b)=>a+(b-m)*(b-m),0)/20)});
  const bu=c.map((_,i)=>sd[i]==null?null:M.ma20[i]+2*sd[i]),bl=c.map((_,i)=>sd[i]==null?null:M.ma20[i]-2*sd[i]);
  el.innerHTML='';const ch=L.createChart(el,{...baseOpts(el),localization:{locale:'zh-TW',dateFormat:kind==='month'?"MMM 'yy":"dd MMM 'yy"},
-  handleScroll:{mouseWheel:true,pressedMouseMove:true,horzTouchDrag:false,vertTouchDrag:false},handleScale:{mouseWheel:true,pinch:true,axisPressedMouseMove:false},
+  handleScroll:{mouseWheel:true,pressedMouseMove:true,horzTouchDrag:true,vertTouchDrag:false},handleScale:{mouseWheel:true,pinch:true,axisPressedMouseMove:{time:true,price:false},axisDoubleClickReset:true},kineticScroll:{touch:true,mouse:false},
   leftPriceScale:{visible:true,borderColor:'#2a3447',scaleMargins:{top:0.8,bottom:0}},timeScale:{borderColor:'#2a3447',fixLeftEdge:true,fixRightEdge:true,rightOffset:2}});charts.push(ch);
  const cs=ch.addCandlestickSeries({upColor:UP,downColor:DN,wickUpColor:UP,wickDownColor:DN,borderVisible:false,priceLineVisible:true,priceLineStyle:L.LineStyle.Dotted,lastValueVisible:true});
  const bars=d.map((x,i)=>({time:iso(x),open:o[i],high:hh[i],low:l[i],close:c[i]}));cs.setData(bars);
@@ -126,7 +134,7 @@ async function drawDay(code,s,date,el,info,note){const L=window.LightweightChart
   const bb=MAON.bb?`<span style="color:#9fb3c8">布林 ${f2(bu[i])}／${f2(bl[i])}</span>`:'';
   info.innerHTML=`<span><i>${dl(d[i])}</i></span><span><i>開</i> ${f2(o[i])}</span><span class="sc-up"><i>高</i> ${f2(hh[i])}</span><span class="sc-dn"><i>低</i> ${f2(l[i])}</span><span class="${cl}"><i>收</i> ${f2(c[i])}${i>0?' ('+sg((ch1/c[i-1]*100).toFixed(2))+'%)':''}</span><span><i>量</i> ${fv(v[i])} 張</span><br>${mas}${bb}`};
  show(null);ch.subscribeCrosshairMove(p=>show(p&&p.time));
- touchCrosshair(el,ch,cs,t=>{const i=idx.get(key(t));return i!=null?c[i]:null},show)}
+ el.style.touchAction='none';longPressCrosshair(el,ch,cs,t=>{const i=idx.get(key(t));return i!=null?c[i]:null},show)}
 // 江波圖：依成交順序（不按時間）逐點排列；資料為分鐘級快照，非逐筆
 async function drawTick(code,s,date,el,info,note){const L=window.LightweightCharts;
  note.textContent='江波圖：依成交先後逐點排列（橫軸是成交順序，不是時間）；資料為盤中分鐘快照，非逐筆成交';
