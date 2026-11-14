@@ -44,10 +44,12 @@ svg{width:100%;height:auto;display:block}
 .tip .btn{margin-top:8px;display:flex;gap:8px}.tip .btn a{flex:1;text-align:center;background:#17c8d822;color:#33e1f0;border-radius:6px;padding:5px 0;text-decoration:none}
 @media (max-width:560px){.tip{left:8px!important;right:8px;bottom:8px;top:auto!important}}
 .kmodal{position:fixed;inset:0;background:#000a;z-index:30;display:none;align-items:center;justify-content:center;padding:10px}.kpanel{background:#0d1a2e;border:1px solid #17c8d8;border-radius:12px;padding:12px;width:min(560px,100%);max-height:92vh;overflow:auto}
-.nav{display:flex;gap:8px;margin:0 0 10px}.nav a{flex:1;text-align:center;padding:7px 0;border-radius:8px;background:#232733;color:#9fb3c8;text-decoration:none;font-size:14px}.nav a.on{background:#3a4152;color:#fff}
+.nav{display:flex;gap:5px;margin:0 0 10px}.nav a{flex:1;text-align:center;padding:7px 2px;border-radius:8px;background:#232733;color:#9fb3c8;text-decoration:none;font-size:13px;line-height:1.2}.nav a.on{background:#3a4152;color:#fff}
 body.vheat [data-v="intra"]{display:none!important}body:not(.vheat) [data-v="heat"]{display:none!important}
 body.vinst [data-v="intra"],body.vinst #ttl,body.vinst #demo,body.vinst #foot,body.vinst #tip{display:none!important}
 body:not(.vinst) [data-v="inst"]{display:none!important}
+body.vperf [data-v="intra"],body.vperf #ttl,body.vperf #demo,body.vperf #foot,body.vperf #tip{display:none!important}
+body:not(.vperf) [data-v="perf"]{display:none!important}
 .inst{max-width:720px;margin:0 auto 12px;padding:20px 12px;background:#0b1426;border-radius:14px}
 .inst:before{content:"";display:block;width:32px;height:4px;margin-bottom:12px;border-radius:2px;background:#dbb866}
 .inst h2{margin:0;color:#fff;font-size:22px;line-height:1.5}.inst h2 span{display:block;color:#dbb866;font-size:19px}
@@ -62,7 +64,7 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 .inst-table td:nth-child(2){text-align:left}.inst-table .inst-code{display:block;color:#94a3b8;font-size:11px}
 .inst-table b{color:#fff}.inst-num{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}.inst-main{color:#dbb866}
 .inst-footer{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8;overflow-wrap:anywhere}.inst-footer p{margin:4px 0}
-@media(max-width:400px){.nav{gap:4px}.nav a{font-size:12px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
+@media(max-width:480px){.nav{gap:3px}.nav a{font-size:11px;padding:6px 1px}.inst-table{font-size:11px}.inst-table th,.inst-table td{padding-left:4px;padding-right:4px}}
 .inst-win{display:flex;gap:6px;margin:8px 0 6px}.inst-win button{flex:1;background:#232733;color:#8b929c;border:0;border-radius:8px;padding:7px 0;font-size:14px;cursor:pointer}.inst-win button.on{background:#3a4152;color:#fff}
 #famtcard{display:none}#famtcard.on{display:block}
 .famt-total{margin:8px 0 4px;font-size:15px;font-weight:600}
@@ -75,9 +77,28 @@ body:not(.vinst) [data-v="inst"]{display:none!important}
 .famt-cols .cd{display:block;color:#94a3b8;font-size:10px;font-weight:400}
 .famt-cols .amt{flex-shrink:0;font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:12px;text-align:right;line-height:1.3;white-space:nowrap}
 .famt-cols .sh{display:block;color:#94a3b8;font-size:10px;font-weight:400}
+
+#perfcard .perf-note{margin:10px 0 6px;color:#e8eaed;font-size:14px;line-height:1.7}
+#perfcard .perf-period{margin:0 0 8px;color:#94a3b8;font-size:12px;line-height:1.6}
+.perf-list{margin-top:8px}
+.perf-row{background:#14233c;border-radius:10px;padding:10px 10px 8px;margin:0 0 8px;cursor:pointer}
+.perf-row:hover,.perf-row:focus-visible{background:#1c3150}
+.perf-row .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.perf-row .nm{color:#fff;font-weight:700;font-size:15px;line-height:1.3}
+.perf-row .cd{color:#94a3b8;font-size:11px;font-weight:400;margin-left:6px}
+.perf-row .ind{color:#94a3b8;font-size:11px;flex-shrink:0}
+.perf-bgs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 6px}
+.perf-bgs i{font-style:normal;font-size:11px;border-radius:999px;padding:2px 8px;background:#3a4152;color:#e8eaed}
+.perf-bgs i.a{background:#5a2a2a;color:#ffb4b4}
+.perf-bgs i.b{background:#3a2e14;color:#f6c344}
+.perf-bgs i.c{background:#143326;color:#7bd88f}
+.perf-row .kv{margin:0 0 4px;color:#cfd3d8;font-size:12.5px;line-height:1.65}
+.perf-row .kv b{color:#fff;font-weight:650}
+.perf-row .px{margin:4px 0 0;color:#94a3b8;font-size:12px;line-height:1.5}
+.perf-row .px .up{color:#ff5b5b}.perf-row .px .dn{color:#22c55e}
 html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.light img,html.light video{filter:invert(1) hue-rotate(180deg)}.thm{background:none;border:1px solid #2a2f39;color:#8b929c;border-radius:8px;padding:4px 9px;font-size:13px;cursor:pointer;white-space:nowrap}</style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
-<div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a href="signals/">非常態投資</a></nav>
+<div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a id="nv-perf" href="./#perf">個股業績</a><a href="signals/">非常態投資</a></nav>
 <h1 id="ttl">今日盤中｜即時 --:--</h1>
 <div class="card" data-v="intra"><h2>累計成交金額（億）<span class="mut">上市</span></h2>
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
@@ -135,6 +156,15 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 <div><h3 class="dn">賣超</h3><ol id="famt-sell"></ol></div>
 </div>
 <footer class="inst-footer" id="famt-footer"></footer>
+</section>
+<section class="inst" id="perfcard" data-v="perf" aria-labelledby="perf-heading">
+<h2 id="perf-heading">個股業績<span>符合營收突破、三率三升或獲利超越去年</span></h2>
+<p class="perf-note">業績只用來篩選觀察名單，進場仍看價量型態確認。</p>
+<p class="perf-period" id="perf-period"></p>
+<div class="inst-win" id="perf-win"><button data-f="all" class="on">全部</button><button data-f="A">營收突破</button><button data-f="B">三率三升</button><button data-f="C">獲利超越去年</button></div>
+<p class="mut" id="perf-status" role="status" aria-live="polite">載入中…</p>
+<div class="perf-list" id="perf-rows"></div>
+<footer class="inst-footer" id="perf-footer"></footer>
 </section>
 </div>
 <script src="stockchart.js?v=1113c"></script>
@@ -383,14 +413,84 @@ instRows.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r
 const famtCard=document.getElementById('famtcard');
 famtCard.addEventListener('click',e=>{const row=e.target.closest('li[data-code]');if(row)showK(row.dataset.code)});
 famtCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('li[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
+let PERF=null,PERFF='all',perfLoaded=false,perfLoading=false;
+function fmtYi(v){if(v==null||v==='')return'—';const n=Number(v);const s=(Math.abs(n)>=10?n.toFixed(1):n.toFixed(2));return (n>0?'+':'')+s+' 億'.replace('+','');}
+function fmtYiAbs(v){if(v==null||v==='')return'—';const n=Number(v);return (Math.abs(n)>=10?n.toFixed(1):n.toFixed(2))+' 億';}
+function fmtPct(v,pos){if(v==null||v==='')return'—';const n=Number(v);const s=(n>0?'+':'')+n.toFixed(1)+'%';return s;}
+function clsPct(v){if(v==null)return'';return v>0?'up':v<0?'dn':'';}
+function renderPerf(data){
+ PERF=data;const rows=data.rows||[];
+ const f=PERFF;
+ const shown=rows.filter(r=>f==='all'||(f==='A'&&r.badges.includes('營收突破'))||(f==='B'&&r.badges.includes('三率三升'))||(f==='C'&&r.badges.includes('獲利超越去年')));
+ document.querySelectorAll('#perf-win button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));
+ const c=data.counts||{}; const p=data.periods||{};
+ const upd=(data.updated||'').replace('T',' ').replace('+08:00','');
+ document.getElementById('perf-period').textContent=`資料期：${p.revenue||'—'}營收、${p.income||'—'}｜符合 ${c.listed||0} 家（營收突破 ${c.A||0}、三率三升 ${c.B||0}、獲利超越去年 ${c.C||0}）${upd?'｜更新 '+upd:''}`;
+ const st=document.getElementById('perf-status');
+ st.textContent=shown.length?`目前顯示 ${shown.length} 家。`: '目前沒有符合條件的個股。';
+ const bgClass={ '營收突破':'a','三率三升':'b','獲利超越去年':'c' };
+ document.getElementById('perf-rows').innerHTML=shown.map(r=>{
+  const bgs=(r.badges||[]).map(b=>`<i class="${bgClass[b]||''}">${b}</i>`).join('');
+  const rv=r.rev||{}; const mg=r.margins||{}; const pf=r.profit||{}; const px=r.px||null;
+  let body='';
+  if(rv.ym_label){
+    const flags=(rv.flags&&rv.flags.length)?'（'+rv.flags.join('、')+'）':'';
+    body+=`<p class="kv">${rv.ym_label}營收 <b>${fmtYiAbs(rv.value_yi)}</b>，月增 <b class="${clsPct(rv.mom)}">${fmtPct(rv.mom)}</b>，年增 <b class="${clsPct(rv.yoy)}">${fmtPct(rv.yoy)}</b>${flags}。</p>`;
+  }
+  if(mg.period){
+    const yoy=mg.yoy_all===true?'，三率亦高於去年同季':(mg.ly?'，與去年同季比較見各率':'');
+    body+=`<p class="kv">${mg.period} 單季毛利率 <b>${mg.gm.toFixed(1)}%</b>（上季 ${mg.gm_prev.toFixed(1)}%）、營益率 <b>${mg.om.toFixed(1)}%</b>（上季 ${mg.om_prev.toFixed(1)}%）、稅後淨利率 <b>${mg.nm.toFixed(1)}%</b>（上季 ${mg.nm_prev.toFixed(1)}%）${yoy}。</p>`;
+  }
+  if(pf.period){
+    const last=pf.last_ni_yi!=null?`，去年全年 ${fmtYiAbs(pf.last_ni_yi)}`+(pf.exceed_pct!=null?`（${fmtPct(pf.exceed_pct)}）`:''):'';
+    const eps=pf.cum_eps!=null?`累計 EPS <b>${pf.cum_eps.toFixed(2)}</b> 元；`:'';
+    body+=`<p class="kv">${eps}${pf.period}稅後純益 <b>${fmtYiAbs(pf.cum_ni_yi)}</b>${last}。</p>`;
+  }
+  let pxline='';
+  if(px){
+    const arr=String(px.order||'').split('>').map(x=>x+'MA').join('＞');
+    const stg=px.stage?`第 ${px.stage} 階段（${px.stage_name||''}）`:'';
+    const ab=px.above60?'收盤在 60MA 之上':'收盤在 60MA 之下';
+    pxline=`<p class="px">收 <b style="color:#fff">${px.close}</b>　均線 ${arr}　${stg}　${ab}</p>`;
+  }
+  return `<article class="perf-row" data-code="${r.code}" tabindex="0"><div class="hd"><div class="nm">${r.name||''}<span class="cd">${r.code}</span></div><div class="ind">${r.industry||''}</div></div><div class="perf-bgs">${bgs}</div>${body}${pxline}</article>`;
+ }).join('');
+ document.getElementById('perf-footer').innerHTML=(data.gaps||[]).map(g=>`<p>${g}</p>`).join('')+`<p>來源：證交所／櫃買 OpenAPI 月營收與最新財報；歷史季報取自公開資訊觀測站綜合損益表彙總。非投資建議。</p>`;
+}
+async function loadPerf(){
+ if(perfLoading)return;
+ perfLoading=true;
+ const status=document.getElementById('perf-status');
+ status.textContent=perfLoaded?'更新中…':'載入中…';
+ try{
+  let data;
+  for(const url of ['https://raw.githubusercontent.com/Sukai0503/tw-intraday/data/perf.json','perf.json']){
+   try{
+    const response=await fetch(url+'?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(20000)});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    const candidate=await response.json();
+    if(!candidate||!Array.isArray(candidate.rows))throw new Error('Invalid rows');
+    data=candidate;break;
+   }catch(e){}
+  }
+  if(!data)throw new Error('No perf data');
+  renderPerf(data);perfLoaded=true;
+ }catch(e){status.textContent=perfLoaded?'更新失敗，保留上次資料。':'暫時無法載入個股業績資料，稍後再試。'}
+ finally{perfLoading=false}
+}
+document.getElementById('perf-win').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PERFF=b.dataset.f;if(PERF)renderPerf(PERF)});
+document.getElementById('perf-rows').addEventListener('click',e=>{const row=e.target.closest('[data-code]');if(row)showK(row.dataset.code)});
+document.getElementById('perf-rows').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
 function applyView(){
- const heat=location.hash==='#heat',inst=location.hash==='#inst';
- document.body.classList.toggle('vheat',heat);document.body.classList.toggle('vinst',inst);
+ const heat=location.hash==='#heat',inst=location.hash==='#inst',perf=location.hash==='#perf';
+ document.body.classList.toggle('vheat',heat);document.body.classList.toggle('vinst',inst);document.body.classList.toggle('vperf',perf);
  document.getElementById('nv-heat').classList.toggle('on',heat);
  document.getElementById('nv-inst').classList.toggle('on',inst);
- document.getElementById('nv-intra').classList.toggle('on',!heat&&!inst);
+ document.getElementById('nv-perf').classList.toggle('on',perf);
+ document.getElementById('nv-intra').classList.toggle('on',!heat&&!inst&&!perf);
  if(inst){if(instTimer===null){loadInst();instTimer=setInterval(loadInst,600000)}}
  else{clearInterval(instTimer);instTimer=null}
+ if(perf)loadPerf();
  try{renderHeat()}catch(e){}
 }
 addEventListener('hashchange',applyView);applyView();
