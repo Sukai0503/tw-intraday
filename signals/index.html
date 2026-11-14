@@ -106,6 +106,19 @@ function buyTable(){
 }
 
 
+function cycleCard(C){
+  if(!C||!C.taiex)return '';
+  const N=C.note||{};
+  const one=(k,name)=>{const a=C[k]||[];if(!a.length)return '';const r=a[a.length-1];
+    const gap=(r.ma5/r.ma20-1)*100;const hist=a.slice(-5).map(x=>`${esc(x.date.slice(5))} 第${x.stage}`).join('　');
+    return `<div class="log"><div class="lh"><b>${name}</b><span>第 ${r.stage} 階段｜${esc(r.desc)}</span><span class="mut">${esc(r.order)}</span></div>
+    <div class="lb">收 ${f(r.close,2)}｜5MA ${f(r.ma5,2)}｜20MA ${f(r.ma20,2)}（${r.ma20_slope>0?'上彎':r.ma20_slope<0?'下彎':'走平'} ${f(r.ma20_slope,2)}）｜60MA ${f(r.ma60,2)}｜5MA 距 20MA ${f(gap,1)}%</div>
+    ${N[k]?`<div class="lb">${esc(N[k])}</div>`:''}<div class="cap">近 5 日：${hist}</div></div>`;};
+  return `<div class="card"><h2>均線循環階段（加權／櫃買） <span class="mut">${esc((C.taiex[C.taiex.length-1]||{}).date||'')}</span></h2>
+   <div class="cap">依 Wade〈價格趨勢／延續性〉六階段：1 多頭 5>20>60｜2 停頓 20>5>60｜3 熊市入口 20>60>5｜4 空頭 60>20>5｜5 熊市尾聲 60>5>20｜6 牛市起步 5>60>20｜均線是落後指標，非投資建議</div>
+   ${one('taiex','加權')}${one('tpex','櫃買')}</div>`;
+}
+
 function arrCard(A){
   if(!A||!A.markets)return '';
   const keys=[['short_bull','短均多頭'],['short_bear','短均空頭'],['long_bull','長均多頭'],['long_bear','長均空頭']];
@@ -221,6 +234,7 @@ function render(J){
    <div class="call info">只當觀察項：家數暴增代表恐慌加深；個股庫藏股+現金充足+位階基本面＝左側輔助參考，非單獨買進理由（Wade 11/9）</div></div>`;
   h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%','上市')}${(M.tpex_series&&M.tpex_series.length)?`<div class="cap" style="margin-top:8px">上櫃（扣除ETF）</div>${lineChart(M.tpex_series,125,165,'%','上櫃')}`:''}</div>
    <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}<div class="cap" style="margin-top:8px">跌破年線／月線比例（上市櫃普通股，官方收盤自算）｜拖曳看各日</div><div id="breadth_ch" style="min-height:210px"></div></div></div>`;
+  h+=cycleCard(D.ma_cycle);
   h+=arrCard(D.ma_arrangement);
   h+=`<div class="card"><h2>每日風險紀錄</h2><div class="cap">新到舊</div>${[...RISK].reverse().map(r=>`<div class="log"><div class="lh"><b>${esc(r.date)}</b><span>${esc(r.verdict)}</span><span>亮 ${r.lit} / 5</span><span class="mut">${esc(r.trend)}</span></div><div class="lb">${esc(r.note)}</div></div>`).join('')}</div>`;
   h+=`<div class="card"><h2>每日觀察類股紀錄</h2><div class="cap">KAI 提供，盤面觀察，非買賣建議｜新到舊</div>${[...DAILY].reverse().map(d=>`<div class="log"><div class="lh"><b>${esc(d.date)}</b>${d.note?`<span class="mut">${esc(d.note)}</span>`:''}</div><div class="lb">觀察類股：${pickL(d.watch)}</div>${(d.few&&d.few.length)?`<div class="lb">稍微觀察：${pickL(d.few)}</div>`:''}</div>`).join('')}</div>`;
