@@ -81,6 +81,16 @@ body:not(.vperf) [data-v="perf"]{display:none!important}
 #perfcard .perf-note{margin:10px 0 6px;color:#e8eaed;font-size:14px;line-height:1.7}
 #perfcard .perf-period{margin:0 0 8px;color:#94a3b8;font-size:12px;line-height:1.6}
 .perf-list{margin-top:8px}
+.perf-lbl{margin:8px 0 4px;color:#94a3b8;font-size:12px}
+.perf-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.perf-chips button{border:1px solid #3a4152;background:transparent;color:#cfd3d8;border-radius:999px;padding:4px 10px;font-size:12.5px;cursor:pointer}
+.perf-chips button.on{background:#2563eb;border-color:#2563eb;color:#fff}
+.perf-chips button small{opacity:.75;margin-left:3px}
+.perf-ind{margin:6px 0 4px}
+.perf-ind summary{cursor:pointer;color:#e8eaed;font-size:13px;padding:6px 0}
+.perf-ind[open] summary{margin-bottom:6px}
+.perf-grp{margin:14px 0 6px;color:#f6c344;font-size:14px;font-weight:700;border-bottom:1px solid #2a3446;padding-bottom:4px}
+.perf-grp span{color:#94a3b8;font-size:12px;font-weight:400;margin-left:6px}
 .perf-row{background:#14233c;border-radius:10px;padding:10px 10px 8px;margin:0 0 8px;cursor:pointer}
 .perf-row:hover,.perf-row:focus-visible{background:#1c3150}
 .perf-row .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
@@ -160,9 +170,11 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 <section class="inst" id="perfcard" data-v="perf" aria-labelledby="perf-heading">
 <h2 id="perf-heading">個股業績<span>符合營收突破、三率三升或獲利超越去年</span></h2>
 <p class="perf-note">業績只用來篩選觀察名單，進場仍看價量型態確認。</p>
-<p class="perf-period">已排除生技醫療類股</p>
+<p class="perf-period" id="perf-excl"></p>
 <p class="perf-period" id="perf-period"></p>
-<div class="inst-win" id="perf-win"><button data-f="all" class="on">全部</button><button data-f="A">營收突破</button><button data-f="B">三率三升</button><button data-f="C">獲利超越去年</button></div>
+<p class="perf-lbl">條件（可複選，選多個＝同時符合）</p>
+<div class="perf-chips" id="perf-win"><button data-f="all">全部</button><button data-f="A">營收突破</button><button data-f="B">三率三升</button><button data-f="C">獲利超越去年</button></div>
+<details class="perf-ind" id="perf-ind"><summary>族群：<span id="perf-ind-sum">全部</span></summary><div class="perf-chips" id="perf-inds"></div></details>
 <p class="mut" id="perf-status" role="status" aria-live="polite">載入中…</p>
 <div class="perf-list" id="perf-rows"></div>
 <footer class="inst-footer" id="perf-footer"></footer>
@@ -414,23 +426,36 @@ instRows.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r
 const famtCard=document.getElementById('famtcard');
 famtCard.addEventListener('click',e=>{const row=e.target.closest('li[data-code]');if(row)showK(row.dataset.code)});
 famtCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('li[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
-let PERF=null,PERFF='all',perfLoaded=false,perfLoading=false;
+let PERF=null,perfLoaded=false,perfLoading=false;
+let PERFC=(()=>{try{return JSON.parse(localStorage.getItem('perfConds')||'[]')}catch(e){return[]}})();
+let PERFI=(()=>{try{return JSON.parse(localStorage.getItem('perfInds')||'[]')}catch(e){return[]}})();
+const PERF_BADGE={A:'營收突破',B:'三率三升',C:'獲利超越去年'};
+function perfInd(r){let s=(r.industry||'').trim();if(!s)return'其他';if(/^金融/.test(s))return'金融保險業';return s;}
+function perfSave(){try{localStorage.setItem('perfConds',JSON.stringify(PERFC));localStorage.setItem('perfInds',JSON.stringify(PERFI))}catch(e){}}
 function fmtYi(v){if(v==null||v==='')return'—';const n=Number(v);const s=(Math.abs(n)>=10?n.toFixed(1):n.toFixed(2));return (n>0?'+':'')+s+' 億'.replace('+','');}
 function fmtYiAbs(v){if(v==null||v==='')return'—';const n=Number(v);return (Math.abs(n)>=10?n.toFixed(1):n.toFixed(2))+' 億';}
 function fmtPct(v,pos){if(v==null||v==='')return'—';const n=Number(v);const s=(n>0?'+':'')+n.toFixed(1)+'%';return s;}
 function clsPct(v){if(v==null)return'';return v>0?'up':v<0?'dn':'';}
 function renderPerf(data){
  PERF=data;const rows=data.rows||[];
- const f=PERFF;
- const shown=rows.filter(r=>f==='all'||(f==='A'&&r.badges.includes('營收突破'))||(f==='B'&&r.badges.includes('三率三升'))||(f==='C'&&r.badges.includes('獲利超越去年')));
- document.querySelectorAll('#perf-win button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));
+ const byCond=rows.filter(r=>PERFC.every(k=>(r.badges||[]).includes(PERF_BADGE[k])));
+ const indCnt={};byCond.forEach(r=>{const k=perfInd(r);indCnt[k]=(indCnt[k]||0)+1});
+ const allInds=[...new Set(rows.map(perfInd))].sort((a,b)=>(indCnt[b]||0)-(indCnt[a]||0)||a.localeCompare(b,'zh-Hant'));
+ PERFI=PERFI.filter(k=>allInds.includes(k));
+ const shown=byCond.filter(r=>!PERFI.length||PERFI.includes(perfInd(r)));
+ document.querySelectorAll('#perf-win button').forEach(b=>b.classList.toggle('on',b.dataset.f==='all'?!PERFC.length:PERFC.includes(b.dataset.f)));
+ document.getElementById('perf-inds').innerHTML=`<button data-i="__all" class="${PERFI.length?'':'on'}">全部</button>`+allInds.map(k=>`<button data-i="${k}" class="${PERFI.includes(k)?'on':''}">${k}<small>${indCnt[k]||0}</small></button>`).join('');
+ document.getElementById('perf-ind-sum').textContent=PERFI.length?PERFI.join('、'):'全部';
+ document.getElementById('perf-excl').textContent=data.exclude_note||'';
  const c=data.counts||{}; const p=data.periods||{};
  const upd=(data.updated||'').replace('T',' ').replace('+08:00','');
  document.getElementById('perf-period').textContent=`資料期：${p.revenue||'—'}營收、${p.income||'—'}｜符合 ${c.listed||0} 家（營收突破 ${c.A||0}、三率三升 ${c.B||0}、獲利超越去年 ${c.C||0}）${upd?'｜更新 '+upd:''}`;
  const st=document.getElementById('perf-status');
  st.textContent=shown.length?`目前顯示 ${shown.length} 家。`: '目前沒有符合條件的個股。';
  const bgClass={ '營收突破':'a','三率三升':'b','獲利超越去年':'c' };
- document.getElementById('perf-rows').innerHTML=shown.map(r=>{
+ const groups={};shown.forEach(r=>{(groups[perfInd(r)]=groups[perfInd(r)]||[]).push(r)});
+ const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length||a.localeCompare(b,'zh-Hant'));
+ const card=r=>{
   const bgs=(r.badges||[]).map(b=>`<i class="${bgClass[b]||''}">${b}</i>`).join('');
   const rv=r.rev||{}; const mg=r.margins||{}; const pf=r.profit||{}; const px=r.px||null;
   let body='';
@@ -455,7 +480,8 @@ function renderPerf(data){
     pxline=`<p class="px">收 <b style="color:#fff">${px.close}</b>　均線 ${arr}　${stg}　${ab}</p>`;
   }
   return `<article class="perf-row" data-code="${r.code}" tabindex="0"><div class="hd"><div class="nm">${r.name||''}<span class="cd">${r.code}</span></div><div class="ind">${r.industry||''}</div></div><div class="perf-bgs">${bgs}</div>${body}${pxline}</article>`;
- }).join('');
+ };
+ document.getElementById('perf-rows').innerHTML=order.map(k=>`<h3 class="perf-grp">${k}<span>${groups[k].length} 家</span></h3>`+groups[k].map(card).join('')).join('');
  document.getElementById('perf-footer').innerHTML=(data.gaps||[]).map(g=>`<p>${g}</p>`).join('')+`<p>來源：證交所／櫃買 OpenAPI 月營收與最新財報；歷史季報取自公開資訊觀測站綜合損益表彙總。非投資建議。</p>`;
 }
 async function loadPerf(){
@@ -479,7 +505,8 @@ async function loadPerf(){
  }catch(e){status.textContent=perfLoaded?'更新失敗，保留上次資料。':'暫時無法載入個股業績資料，稍後再試。'}
  finally{perfLoading=false}
 }
-document.getElementById('perf-win').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PERFF=b.dataset.f;if(PERF)renderPerf(PERF)});
+document.getElementById('perf-win').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const f=b.dataset.f;if(f==='all')PERFC=[];else PERFC=PERFC.includes(f)?PERFC.filter(x=>x!==f):[...PERFC,f];perfSave();if(PERF)renderPerf(PERF)});
+document.getElementById('perf-inds').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.i;if(k==='__all')PERFI=[];else PERFI=PERFI.includes(k)?PERFI.filter(x=>x!==k):[...PERFI,k];perfSave();if(PERF)renderPerf(PERF)});
 document.getElementById('perf-rows').addEventListener('click',e=>{const row=e.target.closest('[data-code]');if(row)showK(row.dataset.code)});
 document.getElementById('perf-rows').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
 function applyView(){
