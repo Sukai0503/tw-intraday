@@ -174,6 +174,8 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 <p class="perf-period" id="perf-period"></p>
 <p class="perf-lbl">條件（可複選，選多個＝同時符合）</p>
 <div class="perf-chips" id="perf-win"><button data-f="all">全部</button><button data-f="A">營收突破</button><button data-f="B">三率三升</button><button data-f="C">獲利超越去年</button></div>
+<p class="perf-lbl">均線循環階段（可複選，符合任一即可）</p>
+<div class="perf-chips" id="perf-stg"><button data-s="all">全部</button><button data-s="1">1 多頭</button><button data-s="2">2 短期停頓</button><button data-s="5">5 熊市尾聲</button><button data-s="6">6 牛市起步</button></div>
 <details class="perf-ind" id="perf-ind"><summary>族群：<span id="perf-ind-sum">全部</span></summary><div class="perf-chips" id="perf-inds"></div></details>
 <p class="mut" id="perf-status" role="status" aria-live="polite">載入中…</p>
 <div class="perf-list" id="perf-rows"></div>
@@ -429,16 +431,18 @@ famtCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r
 let PERF=null,perfLoaded=false,perfLoading=false;
 let PERFC=(()=>{try{return JSON.parse(localStorage.getItem('perfConds')||'[]')}catch(e){return[]}})();
 let PERFI=(()=>{try{return JSON.parse(localStorage.getItem('perfInds')||'[]')}catch(e){return[]}})();
+let PERFS=(()=>{try{return JSON.parse(localStorage.getItem('perfStages')||'[]')}catch(e){return[]}})();
 const PERF_BADGE={A:'營收突破',B:'三率三升',C:'獲利超越去年'};
 function perfInd(r){let s=(r.industry||'').trim();if(!s)return'其他';if(/^金融/.test(s))return'金融保險業';return s;}
-function perfSave(){try{localStorage.setItem('perfConds',JSON.stringify(PERFC));localStorage.setItem('perfInds',JSON.stringify(PERFI))}catch(e){}}
+function perfSave(){try{localStorage.setItem('perfConds',JSON.stringify(PERFC));localStorage.setItem('perfInds',JSON.stringify(PERFI));localStorage.setItem('perfStages',JSON.stringify(PERFS))}catch(e){}}
 function fmtYi(v){if(v==null||v==='')return'—';const n=Number(v);const s=(Math.abs(n)>=10?n.toFixed(1):n.toFixed(2));return (n>0?'+':'')+s+' 億'.replace('+','');}
 function fmtYiAbs(v){if(v==null||v==='')return'—';const n=Number(v);return (Math.abs(n)>=10?n.toFixed(1):n.toFixed(2))+' 億';}
 function fmtPct(v,pos){if(v==null||v==='')return'—';const n=Number(v);const s=(n>0?'+':'')+n.toFixed(1)+'%';return s;}
 function clsPct(v){if(v==null)return'';return v>0?'up':v<0?'dn':'';}
 function renderPerf(data){
  PERF=data;const rows=data.rows||[];
- const byCond=rows.filter(r=>PERFC.every(k=>(r.badges||[]).includes(PERF_BADGE[k])));
+ const byCond=rows.filter(r=>PERFC.every(k=>(r.badges||[]).includes(PERF_BADGE[k]))&&(!PERFS.length||(r.px&&PERFS.includes(String(r.px.stage)))));
+ document.querySelectorAll('#perf-stg button').forEach(b=>b.classList.toggle('on',b.dataset.s==='all'?!PERFS.length:PERFS.includes(b.dataset.s)));
  const indCnt={};byCond.forEach(r=>{const k=perfInd(r);indCnt[k]=(indCnt[k]||0)+1});
  const allInds=[...new Set(rows.map(perfInd))].sort((a,b)=>(indCnt[b]||0)-(indCnt[a]||0)||a.localeCompare(b,'zh-Hant'));
  PERFI=PERFI.filter(k=>allInds.includes(k));
@@ -506,6 +510,7 @@ async function loadPerf(){
  finally{perfLoading=false}
 }
 document.getElementById('perf-win').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const f=b.dataset.f;if(f==='all')PERFC=[];else PERFC=PERFC.includes(f)?PERFC.filter(x=>x!==f):[...PERFC,f];perfSave();if(PERF)renderPerf(PERF)});
+document.getElementById('perf-stg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.s;if(k==='all')PERFS=[];else PERFS=PERFS.includes(k)?PERFS.filter(x=>x!==k):[...PERFS,k];perfSave();if(PERF)renderPerf(PERF)});
 document.getElementById('perf-inds').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.i;if(k==='__all')PERFI=[];else PERFI=PERFI.includes(k)?PERFI.filter(x=>x!==k):[...PERFI,k];perfSave();if(PERF)renderPerf(PERF)});
 document.getElementById('perf-rows').addEventListener('click',e=>{const row=e.target.closest('[data-code]');if(row)showK(row.dataset.code)});
 document.getElementById('perf-rows').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const row=e.target.closest('[data-code]');if(row){e.preventDefault();showK(row.dataset.code)}}});
