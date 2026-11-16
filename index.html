@@ -118,6 +118,11 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 <div class="kpi"><span>站上20MA <b id="b20" style="color:var(--or)">-</b></span><span>站上均價線 <b id="bvw" style="color:var(--bl)">-</b></span></div>
 <div class="leg"><span><i style="background:var(--or)"></i>站上20MA %</span><span><i style="background:var(--bl)"></i>站上均價線 %</span></div>
 <div id="c2"></div></div>
+<div class="card" data-v="intra" id="twdcard" style="display:none"><h2>台幣走勢 <span class="mut">USD/TWD</span> <span class="mut" id="twdt"></span></h2>
+<div class="kpi"><span>目前 <b id="twdc">-</b></span><span>漲跌 <b id="twdd">-</b></span><span class="mut" id="twds"></span></div>
+<div class="leg"><span><i style="background:#ff5b5b"></i>低於前收＝台幣升值</span><span><i style="background:#22c55e"></i>高於前收＝台幣貶值</span><span><i style="background:#9aa4b2"></i>前收 <span id="twdp">-</span></span></div>
+<div id="c_twd"></div>
+<div class="mut">USD/TWD 數字越大＝台幣越貶；資料：Yahoo Finance TWD=X（國際報價，約每分鐘更新，可能與台北外匯經紀收盤略有差異），非投資建議</div></div>
 <div class="card" data-v="intra" id="arrcard" style="display:none">
 <h2>多空頭排列比例 <span class="mut" id="arrstat"></span></h2>
 <div class="seg" id="arrseg"><button data-m="all" class="on">上市櫃</button><button data-m="twse">上市</button><button data-m="tpex">上櫃</button></div>
@@ -193,6 +198,15 @@ for(const t of['09:00','10:00','11:00','12:00','13:00','13:30']){g+=`<text x="${
 function path(pts,ymin,ymax,col,w){if(!pts.length)return'';const Y=v=>T+(1-(v-ymin)/(ymax-ymin))*(H-T-B);return`<polyline fill="none" stroke="${col}" stroke-width="${w}" stroke-linejoin="round" points="${pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')}"/>`}
 function nice(m){const e=Math.pow(10,Math.floor(Math.log10(m/5)));for(const k of[1,2,2.5,5,10])if(k*e*5>=m)return k*e;return 10*e}
 
+function renderTwd(){const X=D&&D.twd,card=document.getElementById('twdcard');if(!card)return;if(!X||!X.pts||!X.pts.length){card.style.display='none';return}
+card.style.display='block';const pv=X.prev,cur=X.cur;const cls=(pv==null||cur===pv)?'':(cur>pv?'dn':'up');
+const ce=document.getElementById('twdc');ce.textContent=cur.toFixed(3);ce.className=cls;
+const de=document.getElementById('twdd');de.className=cls;de.textContent=X.chg==null?'-':((X.chg>0?'+':'')+X.chg.toFixed(3)+'（'+(X.pct>0?'+':'')+X.pct.toFixed(2)+'%）');
+document.getElementById('twds').textContent=pv==null||cur===pv?'持平':(cur>pv?'台幣貶值':'台幣升值');
+document.getElementById('twdp').textContent=pv==null?'-':pv.toFixed(3);document.getElementById('twdt').textContent=X.t?('更新 '+X.t):'';
+const pts=X.pts.filter(p=>p[0]>='09:00'&&p[0]<='13:30');const data=pts.length?pts:X.pts;
+StockChart.ts('c_twd',{kind:'hm',height:180,pad:['09:00','13:30'],dec:3,minRange:pv!=null?[pv-0.005,pv+0.005]:undefined,hlines:pv!=null?[{v:pv,color:'#9aa4b2',title:'前收'}]:[],
+ series:[{name:'USD/TWD',color:'#4ea1ff',data,colorFn:pv!=null?(v=>v>pv?'#22c55e':v<pv?'#ff5b5b':'#9aa4b2'):undefined}]});}
 let ARRM='all';
 function arrPct(x){return (x&&typeof x.pct==='number')?x.pct.toFixed(1)+'%':'-'}
 function renderArr(){
@@ -236,6 +250,7 @@ g+=`<text x="${W-R-2}" y="${Y(70)-3}" fill="var(--up)" font-size="10" text-ancho
 g+=path(br.map(b=>[b[0],b[1]]),0,100,'var(--or)',2.2)+path(br.map(b=>[b[0],b[2]]),0,100,'var(--bl)',2.2);
 StockChart.ts('c2',{kind:'hm',height:210,pad:['09:00','13:30'],range:[0,100],unit:'%',dec:1,hlines:[{v:70,color:'#ff5b5b',title:'買盤強'},{v:50,color:'#9aa4b2',title:''},{v:30,color:'#22c55e',title:'賣壓重'}],series:[{name:'站上20MA',color:'#ff9f43',data:br.map(b=>[b[0],b[1]])},{name:'站上均價線',color:'#4ea1ff',data:br.map(b=>[b[0],b[2]])}]});try{renderHeat()}catch(e){console.error(e)}
 try{renderArr()}catch(e){console.error(e)}
+try{renderTwd()}catch(e){console.error(e)}
 document.getElementById('foot').innerHTML=D.demo?'示範資料，非真實行情。資料來源接上後會每分鐘自動更新。<br>僅供盤面觀察，非投資建議。':`${D.date.slice(0,4)}/${D.date.slice(4,6)}/${D.date.slice(6)}　前一交易日 ${D.prev_date?D.prev_date.slice(4,6)+'/'+D.prev_date.slice(6):'-'}　更新 ${D.updated_full}<br>成交金額約每分鐘更新（證交所 MIS），頁面每 60 秒自動重抓；廣度約每 1 分鐘，全上市櫃普通股約 ${D.universe||'-'} 檔。族群＝證交所／櫃買中心官方產業別。20MA 含即時價；均價線為依成交量增量估算的當日 VWAP${D.notes?'（'+D.notes+'）':''}。多空頭排列比例：短均 5／10／20（反應較快）、長均 10／20／60（中期趨勢），盤中以即時價＋先前收盤自算，僅觀察項，無固定門檻。<br>僅供盤面觀察，非投資建議。`;}
 let HK='d1',HZ=null,HIST=null,HM=null,HCLOSE=null;
 const LIM={d1:5,d3:10,d10:20};
