@@ -1,0 +1,18 @@
+name: reach-test
+on: workflow_dispatch
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          UA='Mozilla/5.0 (intraday-dashboard; personal use; low-rate)'
+          for u in "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw|otc_o00.tw|tse_2330.tw|otc_8299.tw&json=1&delay=0" \
+                   "https://mis.twse.com.tw/stock/data/mis_ohlc_TSE.txt" \
+                   "https://www.twse.com.tw/rwd/zh/afterTrading/MI_5MINS?date=20261116&response=json" \
+                   "https://openapi.twse.com.tw/v1/opendata/t187ap03_L" \
+                   "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O" \
+                   "https://query1.finance.yahoo.com/v8/finance/chart/2330.TW?interval=5m&range=1d" \
+                   "https://query1.finance.yahoo.com/v8/finance/chart/TWD=X?interval=1m&range=1d" \
+                   "https://rate.bot.com.tw/xrt/flcsv/0/day" ; do
+            echo "=== $u"; curl -sS -m 25 -A "$UA" -o /tmp/o -w 'HTTP %{http_code} size %{size_download} t %{time_total}\n' "$u"; head -c 300 /tmp/o; echo; sleep 1
+          done
