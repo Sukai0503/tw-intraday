@@ -1,0 +1,49 @@
+name: intraday
+# 盤中板 / 族群熱力：交易日 08:45 起在 GitHub 雲端跑一整天（約每分鐘發布到 data 分支），13:36 後收尾結束。
+# 備援排程若遇到當天已在跑會排隊，等前一個結束後因已過 13:36 直接退出。
+on:
+  schedule:
+    - cron: '45 0 * * 1-5'   # 08:45 台北
+    - cron: '5 1 * * 1-5'    # 09:05 備援
+    - cron: '30 1 * * 1-5'   # 09:30 備援
+    - cron: '30 2 * * 1-5'   # 10:30 備援
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: intraday
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      TZ: Asia/Taipei
+      GHA: "1"
+    steps:
+      - name: Skip if outside today's window
+        id: gate
+        run: |
+          H=$(date +%H%M); D=$(date +%u)
+          if [ "$D" -ge 6 ] || [ "$H" -gt 1336 ]; then echo "skip=1" >> $GITHUB_OUTPUT; echo "outside window ($H)"; fi
+      - name: Set up workspace
+        if: steps.gate.outputs.skip != '1'
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          R="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          sudo mkdir -p /workspace && sudo chown "$USER" /workspace
+          git clone -q --depth 1 -b inputs "$R" "$RUNNER_TEMP/inputs"
+          cp -r "$RUNNER_TEMP/inputs/intraday" "$RUNNER_TEMP/inputs/market-signals" /workspace/
+          git clone -q --depth 1 -b data "$R" "$RUNNER_TEMP/site-data"
+          git clone -q --depth 1 -b main "$R" "$RUNNER_TEMP/site-main"
+          for d in site-data site-main; do git -C "$RUNNER_TEMP/$d" config user.name "github-actions[bot]"; git -C "$RUNNER_TEMP/$d" config user.email "41898282+github-actions[bot]@users.noreply.github.com"; done
+          python3 -m venv /workspace/market-signals/.venv
+          /workspace/market-signals/.venv/bin/pip install -q requests yfinance pandas
+      - name: Run intraday (until 13:36)
+        if: steps.gate.outputs.skip != '1'
+        working-directory: /workspace/intraday
+        run: /workspace/market-signals/.venv/bin/python intraday.py --gha
+      - name: Log tail
+        if: always() && steps.gate.outputs.skip != '1'
+        run: tail -n 80 /workspace/intraday/intraday.log || true
