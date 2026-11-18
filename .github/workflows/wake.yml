@@ -1,0 +1,200 @@
+name: wake
+# 每天盤中跑完後由 intraday.yml 觸發：在雲端排隊等到下一個平日 08:46（台北），再啟動 intraday.yml。
+# 不依賴 GitHub 定時排程（會漏），每個 job 最多睡約 5.75 小時，12 個 job 可跨週末。
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'epoch seconds to wake (optional)'
+        required: false
+permissions:
+  actions: write
+concurrency:
+  group: wake
+  cancel-in-progress: true
+env:
+  TZ: Asia/Taipei
+jobs:
+  w1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ inputs.target }}"
+          if [ -z "$T" ]; then
+            T=$(date -d "today 08:46" +%s); [ "$(date +%s)" -ge "$T" ] && T=$(date -d "tomorrow 08:46" +%s)
+            while [ "$(date -d @$T +%u)" -ge 6 ]; do T=$((T+86400)); done
+          fi
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w2:
+    needs: w1
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w1.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w3:
+    needs: w2
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w2.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w4:
+    needs: w3
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w3.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w5:
+    needs: w4
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w4.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w6:
+    needs: w5
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w5.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w7:
+    needs: w6
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w6.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w8:
+    needs: w7
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w7.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w9:
+    needs: w8
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w8.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w10:
+    needs: w9
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w9.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w11:
+    needs: w10
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w10.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  w12:
+    needs: w11
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      t: ${{ steps.s.outputs.t }}
+    steps:
+      - id: s
+        run: |
+          T="${{ needs.w11.outputs.t }}"
+          echo "t=$T" >> $GITHUB_OUTPUT
+          echo "target $(date -d @$T)"
+          R=$(( T - $(date +%s) )); [ $R -gt 20700 ] && R=20700
+          if [ $R -gt 0 ]; then sleep $R; fi
+  fire:
+    needs: w12
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          H=$(date +%H%M); D=$(date +%u)
+          if [ "$D" -ge 6 ] || [ "$H" -gt 1330 ]; then echo "outside window"; exit 0; fi
+          A=$(gh run list -R "$GITHUB_REPOSITORY" -w intraday.yml -L 5 --json status -q '[.[]|select(.status=="in_progress" or .status=="queued")]|length')
+          if [ "$A" -gt 0 ]; then echo "intraday already running"; exit 0; fi
+          gh workflow run intraday.yml -R "$GITHUB_REPOSITORY" --ref main
