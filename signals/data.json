@@ -1,18 +1,18 @@
 {
  "DATA": {
-  "trade_date": "2026-11-18",
-  "updated_at": "2026-11-18 21:44（台北時間）",
+  "trade_date": "2026-11-19",
+  "updated_at": "2026-11-19 16:47（台北時間）",
   "taiex": {
    "close": {
-    "v": 40194.91,
-    "as_of": "2026-11-18",
+    "v": 38426.89,
+    "as_of": "2026-11-19",
     "src": "證交所"
    },
-   "pct": 0.26,
-   "vs_year": 2.22,
-   "vs_2y": 26.24,
-   "vs_5y": 72.28,
-   "dd": -19.32,
+   "pct": -4.4,
+   "vs_year": -2.39,
+   "vs_2y": 20.97,
+   "vs_5y": 64.91,
+   "dd": -22.87,
    "ma_dir": [
     "down",
     "down",
@@ -21,19 +21,19 @@
   },
   "tpex": {
    "close": {
-    "v": 307.55,
-    "as_of": "2026-11-18",
+    "v": 285.33,
+    "as_of": "2026-11-19",
     "src": "櫃買中心"
    },
-   "pct": 0.31,
-   "vs_year": -14.17,
-   "vs_2y": 1.75,
-   "vs_5y": 21.12,
-   "dd": -32.18,
+   "pct": -7.22,
+   "vs_year": -20.4,
+   "vs_2y": -5.31,
+   "vs_5y": 12.53,
+   "dd": -37.08,
    "ma_dir": [
     "down",
     "down",
-    "up"
+    "down"
    ]
   },
   "margin_ex_etf": {
@@ -203,35 +203,38 @@
    "keep_rate": {
     "v": 163.16,
     "as_of": "2026-11-18",
-    "src": "證交所"
+    "src": "證交所",
+    "stale": true
    },
    "below130": {
     "v": 719,
     "as_of": "2026-11-18",
-    "src": "證交所"
+    "src": "證交所",
+    "stale": true
    },
    "call_accounts": {
     "v": 204,
     "as_of": "2026-11-18",
-    "src": "證交所"
+    "src": "證交所",
+    "stale": true
    }
   },
   "breadth": {
    "below_year": {
-    "v": 1558,
-    "as_of": "2026-11-18",
+    "v": 1692,
+    "as_of": "2026-11-19",
     "src": "官方收盤自算"
    },
-   "year_n": 1970,
+   "year_n": 1974,
    "below_month": {
-    "v": 1698,
-    "as_of": "2026-11-18",
+    "v": 1823,
+    "as_of": "2026-11-19",
     "src": "官方收盤自算"
    },
-   "month_n": 1970,
+   "month_n": 1974,
    "new_60d_low": {
-    "v": 537,
-    "as_of": "2026-11-18",
+    "v": 1243,
+    "as_of": "2026-11-19",
     "src": "官方收盤自算"
    }
   },
@@ -261,124 +264,135 @@
   },
   "foreign": {
    "spot": {
-    "v": -765.64,
-    "as_of": "2026-11-18",
+    "v": -243.12,
+    "as_of": "2026-11-19",
     "src": "證交所 BFI82U"
    },
    "spot_5d": {
-    "v": -1566.94,
-    "as_of": "2026-11-18",
+    "v": -1803.22,
+    "as_of": "2026-11-19",
     "src": "證交所 BFI82U"
    },
    "fut_net_short": {
-    "v": 97896,
-    "as_of": "2026-11-17",
+    "v": 99438,
+    "as_of": "2026-11-18",
     "src": "期交所",
     "stale": true
    }
   },
   "institutional": {
-   "as_of": "2026-11-18",
+   "as_of": "2026-11-19",
    "stale": false,
    "src": "證交所 BFI82U／櫃買三大法人買賣金額彙總",
    "twse": {
     "foreign": {
-     "d1": -765.64,
-     "d3": -1848.47,
-     "d5": -1566.94,
-     "d20": -11382.58
+     "d1": -243.12,
+     "d3": -1389.7,
+     "d5": -1803.22,
+     "d20": -10830.3
     },
     "trust": {
-     "d1": 166.12,
-     "d3": -55.11,
-     "d5": 165.96,
-     "d20": 3417.79
+     "d1": 15.13,
+     "d3": 143.03,
+     "d5": 55.41,
+     "d20": 3245.33
     },
     "dealer": {
-     "d1": -42.01,
-     "d3": -458.01,
-     "d5": -454.49,
-     "d20": -4524.43
+     "d1": -233.03,
+     "d3": -432.01,
+     "d5": -622.11,
+     "d20": -4401.67
     },
     "total": {
-     "d1": -641.53,
-     "d3": -2361.58,
-     "d5": -1855.48,
-     "d20": -12489.21
+     "d1": -461.03,
+     "d3": -1678.67,
+     "d5": -2369.93,
+     "d20": -11986.64
     }
    },
    "tpex": {
     "foreign": {
-     "d1": 13.59,
-     "d3": 91.74,
-     "d5": 136.27,
-     "d20": -210.25
+     "d1": 11.85,
+     "d3": 84.47,
+     "d5": 141.49,
+     "d20": -98.91
     },
     "trust": {
-     "d1": -46.58,
-     "d3": -91.28,
-     "d5": -86.05,
-     "d20": 44.72
+     "d1": -8.77,
+     "d3": -85.18,
+     "d5": -109.02,
+     "d20": 33.05
     },
     "dealer": {
-     "d1": -2.64,
-     "d3": -15.73,
-     "d5": -20.97,
-     "d20": -102.56
+     "d1": -21.9,
+     "d3": -22.21,
+     "d5": -28.98,
+     "d20": -110.64
     },
     "total": {
-     "d1": -35.63,
-     "d3": -15.27,
-     "d5": 29.25,
-     "d20": -268.09
+     "d1": -18.83,
+     "d3": -22.91,
+     "d5": 3.49,
+     "d20": -176.49
     }
    }
   },
   "vix": {
-   "v": 24.53,
+   "v": 24.56,
    "as_of": "2026-11-18",
-   "src": "Yahoo"
+   "src": "Yahoo",
+   "stale": true
   },
   "intl": {
-   "sox_vs_year": null,
-   "kospi_vs_year": null,
-   "nikkei_vs_year": null,
-   "as_of": ""
+   "sox_vs_year": -6.7,
+   "kospi_vs_year": -16.58,
+   "nikkei_vs_year": -1.57,
+   "as_of": "2026-11-18／11-19"
   },
   "top100": {
-   "as_of": "2026-11-18",
+   "as_of": "2026-11-19",
    "twse": {
-    "above_year": 52,
-    "below_5y": 14,
-    "w5y": 10,
-    "below_10y": 10,
+    "above_year": 44,
+    "below_5y": 15,
+    "w5y": 9,
+    "below_10y": 11,
     "w10y": 5
    },
    "tpex": {
-    "above_year": 19,
-    "below_5y": 28,
-    "w5y": 15,
-    "below_10y": 13,
-    "w10y": 10
+    "above_year": 12,
+    "below_5y": 31,
+    "w5y": 12,
+    "below_10y": 14,
+    "w10y": 13
    }
   },
   "buybacks": {
-   "as_of": "2026-11-18",
-   "coverage_start": "2026-07-11",
+   "as_of": "2026-11-19",
+   "coverage_start": "2026-07-12",
    "counts": {
-    "d1": 0,
-    "d5": 7,
-    "d20": 36,
-    "mtd": 34
+    "d1": 1,
+    "d5": 5,
+    "d20": 37,
+    "mtd": 35
    },
    "monthly": {
     "2026-07": 11,
     "2026-08": 28,
     "2026-09": 10,
     "2026-10": 4,
-    "2026-11": 34
+    "2026-11": 35
    },
    "list": [
+    {
+     "date": "2026-11-19",
+     "market": "上櫃",
+     "code": "5009",
+     "name": "榮剛",
+     "lots": 10000,
+     "price": "19.67～47.88",
+     "purpose": "轉讓員工",
+     "done": false
+    },
     {
      "date": "2026-11-13",
      "market": "上市",
@@ -746,34 +760,35 @@
    "note": "11/6 宣布第 10 次"
   },
   "no_watch": {
-   "month_count": 4,
+   "month_count": 5,
    "days": [
     "11/03",
     "11/05",
     "11/06",
-    "11/16"
+    "11/16",
+    "11/19"
    ]
   },
   "no_watch_streak": {
-   "current": 22,
+   "current": 24,
    "record": 18,
    "prev_record": 11,
    "since": "2026-10-15"
   },
   "action": {
-   "as_of": "2026-11-18",
-   "stage": "非常態（亮3格，小幅反彈、風險降溫）",
-   "side": "明天右側停手；左側不動，等完全沒有第5次／維持率130%／VIX30／年線",
-   "size": "持股不動、不攤平不搶反彈；不用融資",
-   "money": "現金與有效資金等待，禁止新增融資；定期定額加權×1（櫃買標的在年線下×2）",
-   "text": "明天：右側停手。今日尚未收到觀察類股，連續無觀察類股天數暫不更新（仍為22日）。要等真正出現觀察類股（結束連續22日那天的名單特別看）才恢復小量試單；僅有稍微觀察也不當進場。左側明天原則不動：本月完全沒有仍4次（11/3、11/5、11/6、11/16），不是第5次；月底（約11/30）可開始指數小量分批。下一觸發點＝完全沒有第5次（若為連續下跌日，依規則當天配置）、扣除ETF維持率上市跌破130%（沿用11/17的134.24%，11/18玩股網尚未公布；已破140%是壓力不是進場點）、VIX≥30（今24.53）、加權回測年線約39,322（距今約-2.2%）。今天小幅反彈，規則46急跌較早投入的緊迫稍緩，仍按觸發點分批。部位不動、不融資。盯盤：①若維持率<130%且急跌續行或觸及年線，左側第一批小量 ②若明天出現完全沒有＝第5次，且為連續下跌日，依規則當天指數配置一批 ③若出現觀察類股，只用已實現獲利小量跟。依據：加權+0.26%（40,194.91，年線上2.2%）、櫃買+0.31%（年線下14.2%、兩年線上1.75%）；公式亮3格（壓力、情緒、外部）；破年線79.1%、破月線86.2%；外資現貨-766億。",
+   "as_of": "2026-11-19",
+   "stage": "非常態（亮4格，情緒轉極端、位置轉亮）",
+   "side": "明天右側停手；左側可小量分批配置一批指數，並看其他訊號",
+   "size": "持股不動、不攤平不搶反彈；左側僅小量分批指數；不用融資",
+   "money": "現金與有效資金等待，禁止新增融資；定期定額加權×2（已破年線）、櫃買標的×5（已破兩年線）",
+   "text": "明天：右側停手。今天完全沒有觀察類股，連續無觀察類股24日再創新紀錄（超越原紀錄18日）；要等真正出現觀察類股（結束連續紀錄那天的名單特別看）才恢復小量試單，僅有稍微觀察也不當進場。左側可依規則開始配置一批指數（小量、分批），並看其他訊號：本月完全沒有第5次（11/3、11/5、11/6、11/16、11/19），依規則50屬極端恐慌、可當日配置的節奏（指今日收盤）；這是左側指數配置，不是右側追價理由。加權已跌破年線（38,426.89，年線下2.39%，年線約39,368），櫃買已跌破兩年線（285.33，年線下20.4%、兩年線下5.31%）。規則46短時間跌到年線、兩年線，投入可以早一點，仍按小量分批。扣除ETF維持率沿用11/17的134.24%（11/19玩股網尚未公布，今晚再補；已破140%是壓力不是進場點，跌破130%再看下一批），VIX沿用11/18收盤24.56（今日美股尚未收盤，未達30）。部位：持股不動、不攤平不搶反彈；左側僅小量分批指數；不融資。盯盤：①若維持率跌破130%且急跌續行，再看下一批 ②若出現觀察類股，只用已實現獲利小量跟 ③不要把今天急跌當成右側進場。依據：加權-4.40%（38,426.89，年線下2.39%）、櫃買-7.22%（年線下20.4%、兩年線下5.31%）；公式亮4格（位置、壓力、情緒極端、外部）；破年線85.7%、破月線92.4%；外資現貨-243億。融資維持率待晚上補。",
    "disclaimer": "依課程、文章與 Podcast 規則推論，非 Wade 本人針對今日盤勢的發言，不構成投資建議",
    "rules_updated": "2026-11-16（納入 EP345–355 投資癮 podcast，並保留 11/12 得來速既有規則）"
   },
   "ma_arrangement": {
    "title": "多空頭排列比例",
-   "as_of": "2026-11-18",
-   "updated": "2026-11-18T21:44:20+08:00",
+   "as_of": "2026-11-19",
+   "updated": "2026-11-19T16:47:33+08:00",
    "unit": "%",
    "definition": {
     "short": [
@@ -795,118 +810,91 @@
     "all": {
      "name": "上市櫃",
      "short_bull": {
-      "n": 172,
-      "universe": 1985,
-      "pct": 8.66
+      "n": 165,
+      "universe": 1984,
+      "pct": 8.32
      },
      "short_bear": {
-      "n": 1282,
-      "universe": 1985,
-      "pct": 64.58
+      "n": 1447,
+      "universe": 1984,
+      "pct": 72.93
      },
      "long_bull": {
-      "n": 134,
-      "universe": 1983,
-      "pct": 6.76
+      "n": 130,
+      "universe": 1982,
+      "pct": 6.56
      },
      "long_bear": {
-      "n": 1533,
-      "universe": 1983,
-      "pct": 77.31
+      "n": 1552,
+      "universe": 1982,
+      "pct": 78.3
      }
     },
     "twse": {
      "name": "上市",
      "short_bull": {
-      "n": 88,
-      "universe": 1091,
-      "pct": 8.07
+      "n": 84,
+      "universe": 1090,
+      "pct": 7.71
      },
      "short_bear": {
-      "n": 711,
-      "universe": 1091,
-      "pct": 65.17
+      "n": 792,
+      "universe": 1090,
+      "pct": 72.66
      },
      "long_bull": {
       "n": 69,
-      "universe": 1091,
-      "pct": 6.32
+      "universe": 1090,
+      "pct": 6.33
      },
      "long_bear": {
-      "n": 857,
-      "universe": 1091,
-      "pct": 78.55
+      "n": 873,
+      "universe": 1090,
+      "pct": 80.09
      }
     },
     "tpex": {
      "name": "上櫃",
      "short_bull": {
-      "n": 84,
+      "n": 81,
       "universe": 894,
-      "pct": 9.4
+      "pct": 9.06
      },
      "short_bear": {
-      "n": 571,
+      "n": 655,
       "universe": 894,
-      "pct": 63.87
+      "pct": 73.27
      },
      "long_bull": {
-      "n": 65,
+      "n": 61,
       "universe": 892,
-      "pct": 7.29
+      "pct": 6.84
      },
      "long_bear": {
-      "n": 676,
+      "n": 679,
       "universe": 892,
-      "pct": 75.78
+      "pct": 76.12
      }
     }
    },
    "history": [
     {
-     "date": "2026-10-20",
-     "all": {
-      "short_bull": 23.78,
-      "short_bear": 43.53,
-      "long_bull": 31.79,
-      "long_bear": 33.05,
-      "short_n": 1985,
-      "long_n": 1982
-     },
-     "twse": {
-      "short_bull": 27.41,
-      "short_bear": 38.59,
-      "long_bull": 34.04,
-      "long_bear": 32.66,
-      "short_n": 1091,
-      "long_n": 1090
-     },
-     "tpex": {
-      "short_bull": 19.35,
-      "short_bear": 49.55,
-      "long_bull": 29.04,
-      "long_bear": 33.52,
-      "short_n": 894,
-      "long_n": 892
-     }
-    },
-    {
      "date": "2026-10-21",
      "all": {
-      "short_bull": 18.94,
-      "short_bear": 47.86,
-      "long_bull": 30.17,
-      "long_bear": 33.4,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bull": 18.95,
+      "short_bear": 47.88,
+      "long_bull": 30.19,
+      "long_bear": 33.42,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 21.72,
-      "short_bear": 43.45,
-      "long_bull": 33.03,
-      "long_bear": 32.39,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 21.74,
+      "short_bear": 43.49,
+      "long_bull": 33.06,
+      "long_bear": 32.42,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 15.55,
@@ -920,20 +908,20 @@
     {
      "date": "2026-10-22",
      "all": {
-      "short_bull": 17.08,
-      "short_bear": 50.58,
-      "long_bull": 27.75,
-      "long_bear": 35.27,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bull": 17.09,
+      "short_bear": 50.6,
+      "long_bull": 27.76,
+      "long_bear": 35.29,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 18.52,
-      "short_bear": 46.29,
-      "long_bull": 30.83,
-      "long_bear": 33.67,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 18.53,
+      "short_bear": 46.33,
+      "long_bull": 30.85,
+      "long_bear": 33.7,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 15.32,
@@ -948,19 +936,19 @@
      "date": "2026-10-27",
      "all": {
       "short_bull": 14.26,
-      "short_bear": 54.91,
-      "long_bull": 24.82,
-      "long_bear": 37.03,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bear": 54.94,
+      "long_bull": 24.84,
+      "long_bear": 37.05,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 14.85,
-      "short_bear": 50.87,
-      "long_bull": 27.43,
-      "long_bear": 35.41,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 14.86,
+      "short_bear": 50.92,
+      "long_bull": 27.46,
+      "long_bear": 35.45,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 13.53,
@@ -975,19 +963,19 @@
      "date": "2026-10-28",
      "all": {
       "short_bull": 14.31,
-      "short_bear": 55.72,
-      "long_bull": 22.75,
-      "long_bear": 38.7,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bear": 55.75,
+      "long_bull": 22.77,
+      "long_bear": 38.72,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 15.03,
-      "short_bear": 52.25,
-      "long_bull": 24.77,
-      "long_bear": 36.7,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 15.05,
+      "short_bear": 52.29,
+      "long_bull": 24.79,
+      "long_bear": 36.73,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 13.42,
@@ -1001,20 +989,20 @@
     {
      "date": "2026-10-29",
      "all": {
-      "short_bull": 13.85,
-      "short_bear": 56.83,
-      "long_bull": 21.75,
-      "long_bear": 41.57,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bull": 13.86,
+      "short_bear": 56.85,
+      "long_bull": 21.76,
+      "long_bear": 41.6,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 14.85,
-      "short_bear": 53.71,
-      "long_bull": 23.03,
-      "long_bear": 38.53,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 14.86,
+      "short_bear": 53.76,
+      "long_bull": 23.05,
+      "long_bear": 38.57,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 12.64,
@@ -1028,20 +1016,20 @@
     {
      "date": "2026-10-30",
      "all": {
-      "short_bull": 13.55,
-      "short_bear": 62.92,
+      "short_bull": 13.56,
+      "short_bear": 62.95,
       "long_bull": 18.37,
-      "long_bear": 45.21,
-      "short_n": 1985,
-      "long_n": 1982
+      "long_bear": 45.23,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 14.94,
-      "short_bear": 61.14,
-      "long_bull": 19.08,
-      "long_bear": 42.66,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 14.95,
+      "short_bear": 61.19,
+      "long_bull": 19.1,
+      "long_bear": 42.7,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 11.86,
@@ -1055,20 +1043,20 @@
     {
      "date": "2026-11-02",
      "all": {
-      "short_bull": 13.8,
-      "short_bear": 63.98,
+      "short_bull": 13.81,
+      "short_bear": 64.01,
       "long_bull": 17.36,
-      "long_bear": 46.37,
-      "short_n": 1985,
-      "long_n": 1982
+      "long_bear": 46.39,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 15.22,
-      "short_bear": 61.5,
-      "long_bull": 18.26,
-      "long_bear": 44.31,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 15.23,
+      "short_bear": 61.56,
+      "long_bull": 18.27,
+      "long_bear": 44.35,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 12.08,
@@ -1083,19 +1071,19 @@
      "date": "2026-11-03",
      "all": {
       "short_bull": 11.44,
-      "short_bear": 69.77,
-      "long_bull": 14.23,
-      "long_bear": 50.35,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bear": 69.81,
+      "long_bull": 14.24,
+      "long_bear": 50.38,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 12.65,
-      "short_bear": 68.01,
-      "long_bull": 15.23,
-      "long_bear": 47.8,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 12.66,
+      "short_bear": 68.07,
+      "long_bull": 15.24,
+      "long_bear": 47.84,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 9.96,
@@ -1110,19 +1098,19 @@
      "date": "2026-11-04",
      "all": {
       "short_bull": 9.32,
-      "short_bear": 75.57,
-      "long_bull": 13.32,
-      "long_bear": 53.33,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bear": 75.6,
+      "long_bull": 13.33,
+      "long_bear": 53.36,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 8.71,
-      "short_bear": 74.89,
-      "long_bull": 14.13,
-      "long_bear": 51.28,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 8.72,
+      "short_bear": 74.95,
+      "long_bull": 14.14,
+      "long_bear": 51.33,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 10.07,
@@ -1137,19 +1125,19 @@
      "date": "2026-11-05",
      "all": {
       "short_bull": 6.7,
-      "short_bear": 79.75,
+      "short_bear": 79.79,
       "long_bull": 11.86,
-      "long_bear": 57.77,
-      "short_n": 1985,
-      "long_n": 1982
+      "long_bear": 57.8,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
-      "short_bull": 6.14,
-      "short_bear": 79.56,
-      "long_bull": 12.57,
-      "long_bear": 55.32,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bull": 6.15,
+      "short_bear": 79.63,
+      "long_bull": 12.58,
+      "long_bear": 55.37,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 7.38,
@@ -1164,19 +1152,19 @@
      "date": "2026-11-06",
      "all": {
       "short_bull": 5.34,
-      "short_bear": 82.77,
-      "long_bull": 10.14,
-      "long_bear": 62.21,
-      "short_n": 1985,
-      "long_n": 1982
+      "short_bear": 82.81,
+      "long_bull": 10.15,
+      "long_bear": 62.24,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
       "short_bull": 4.77,
-      "short_bear": 83.13,
-      "long_bull": 10.46,
-      "long_bear": 60.55,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bear": 83.21,
+      "long_bull": 10.47,
+      "long_bear": 60.61,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 6.04,
@@ -1190,20 +1178,20 @@
     {
      "date": "2026-11-09",
      "all": {
-      "short_bull": 4.43,
-      "short_bear": 84.89,
+      "short_bull": 4.44,
+      "short_bear": 84.93,
       "long_bull": 8.83,
-      "long_bear": 65.49,
-      "short_n": 1985,
-      "long_n": 1982
+      "long_bear": 65.52,
+      "short_n": 1984,
+      "long_n": 1981
      },
      "twse": {
       "short_bull": 3.94,
-      "short_bear": 85.52,
-      "long_bull": 8.81,
-      "long_bear": 63.94,
-      "short_n": 1091,
-      "long_n": 1090
+      "short_bear": 85.6,
+      "long_bull": 8.82,
+      "long_bear": 64.0,
+      "short_n": 1090,
+      "long_n": 1089
      },
      "tpex": {
       "short_bull": 5.03,
@@ -1217,20 +1205,20 @@
     {
      "date": "2026-11-10",
      "all": {
-      "short_bull": 4.63,
-      "short_bear": 84.94,
+      "short_bull": 4.64,
+      "short_bear": 84.98,
       "long_bull": 7.92,
-      "long_bear": 67.88,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 67.91,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
-      "short_bull": 4.03,
-      "short_bear": 86.16,
-      "long_bull": 7.33,
-      "long_bear": 66.64,
-      "short_n": 1091,
-      "long_n": 1091
+      "short_bull": 4.04,
+      "short_bear": 86.24,
+      "long_bull": 7.34,
+      "long_bear": 66.7,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 5.37,
@@ -1244,20 +1232,20 @@
     {
      "date": "2026-11-11",
      "all": {
-      "short_bull": 4.58,
-      "short_bear": 84.28,
+      "short_bull": 4.59,
+      "short_bear": 84.32,
       "long_bull": 6.91,
-      "long_bear": 70.25,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 70.28,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
-      "short_bull": 4.03,
-      "short_bear": 86.34,
-      "long_bull": 6.32,
-      "long_bear": 69.29,
-      "short_n": 1091,
-      "long_n": 1091
+      "short_bull": 4.04,
+      "short_bear": 86.42,
+      "long_bull": 6.33,
+      "long_bear": 69.36,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 5.26,
@@ -1272,19 +1260,19 @@
      "date": "2026-11-12",
      "all": {
       "short_bull": 5.39,
-      "short_bear": 79.65,
+      "short_bear": 79.69,
       "long_bull": 6.51,
-      "long_bear": 72.21,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 72.25,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
-      "short_bull": 4.67,
-      "short_bear": 83.23,
-      "long_bull": 5.59,
-      "long_bear": 71.68,
-      "short_n": 1091,
-      "long_n": 1091
+      "short_bull": 4.68,
+      "short_bear": 83.3,
+      "long_bull": 5.6,
+      "long_bear": 71.74,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 6.26,
@@ -1298,20 +1286,20 @@
     {
      "date": "2026-11-13",
      "all": {
-      "short_bull": 7.25,
-      "short_bear": 63.32,
+      "short_bull": 7.26,
+      "short_bear": 63.36,
       "long_bull": 6.91,
-      "long_bear": 73.83,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 73.86,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
       "short_bull": 5.87,
-      "short_bear": 68.1,
+      "short_bear": 68.17,
       "long_bull": 5.96,
-      "long_bear": 73.6,
-      "short_n": 1091,
-      "long_n": 1091
+      "long_bear": 73.67,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 8.95,
@@ -1326,19 +1314,19 @@
      "date": "2026-11-16",
      "all": {
       "short_bull": 7.61,
-      "short_bear": 56.02,
+      "short_bear": 56.05,
       "long_bull": 6.86,
-      "long_bear": 75.39,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 75.43,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
-      "short_bull": 6.23,
-      "short_bear": 59.58,
+      "short_bull": 6.24,
+      "short_bear": 59.63,
       "long_bull": 5.96,
-      "long_bear": 75.8,
-      "short_n": 1091,
-      "long_n": 1091
+      "long_bear": 75.87,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 9.28,
@@ -1352,20 +1340,20 @@
     {
      "date": "2026-11-17",
      "all": {
-      "short_bull": 8.51,
-      "short_bear": 58.94,
+      "short_bull": 8.52,
+      "short_bear": 58.97,
       "long_bull": 6.96,
-      "long_bear": 76.2,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 76.24,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
-      "short_bull": 7.15,
-      "short_bear": 61.5,
-      "long_bull": 6.23,
-      "long_bear": 76.9,
-      "short_n": 1091,
-      "long_n": 1091
+      "short_bull": 7.16,
+      "short_bear": 61.56,
+      "long_bull": 6.24,
+      "long_bear": 76.97,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 10.18,
@@ -1379,20 +1367,20 @@
     {
      "date": "2026-11-18",
      "all": {
-      "short_bull": 8.66,
-      "short_bear": 64.58,
+      "short_bull": 8.67,
+      "short_bear": 64.62,
       "long_bull": 6.76,
-      "long_bear": 77.31,
-      "short_n": 1985,
-      "long_n": 1983
+      "long_bear": 77.35,
+      "short_n": 1984,
+      "long_n": 1982
      },
      "twse": {
       "short_bull": 8.07,
-      "short_bear": 65.17,
-      "long_bull": 6.32,
-      "long_bear": 78.55,
-      "short_n": 1091,
-      "long_n": 1091
+      "short_bear": 65.23,
+      "long_bull": 6.33,
+      "long_bear": 78.62,
+      "short_n": 1090,
+      "long_n": 1090
      },
      "tpex": {
       "short_bull": 9.4,
@@ -1402,22 +1390,38 @@
       "short_n": 894,
       "long_n": 892
      }
+    },
+    {
+     "date": "2026-11-19",
+     "all": {
+      "short_bull": 8.32,
+      "short_bear": 72.93,
+      "long_bull": 6.56,
+      "long_bear": 78.3,
+      "short_n": 1984,
+      "long_n": 1982
+     },
+     "twse": {
+      "short_bull": 7.71,
+      "short_bear": 72.66,
+      "long_bull": 6.33,
+      "long_bear": 80.09,
+      "short_n": 1090,
+      "long_n": 1090
+     },
+     "tpex": {
+      "short_bull": 9.06,
+      "short_bear": 73.27,
+      "long_bull": 6.84,
+      "long_bear": 76.12,
+      "short_n": 894,
+      "long_n": 892
+     }
     }
    ]
   },
   "ma_cycle": {
    "taiex": [
-    {
-     "date": "2026-11-05",
-     "close": 41574.72,
-     "ma5": 43592.63,
-     "ma20": 46640.0,
-     "ma60": 46490.63,
-     "ma20_slope": -406.87,
-     "order": "20MA>60MA>5MA",
-     "stage": 3,
-     "desc": "熊市入口"
-    },
     {
      "date": "2026-11-06",
      "close": 39701.64,
@@ -1516,20 +1520,20 @@
      "order": "60MA>20MA>5MA",
      "stage": 4,
      "desc": "空頭排列，下跌段"
-    }
-   ],
-   "tpex": [
+    },
     {
-     "date": "2026-11-05",
-     "close": 321.47,
-     "ma5": 350.0,
-     "ma20": 390.89,
-     "ma60": 398.63,
-     "ma20_slope": -5.55,
+     "date": "2026-11-19",
+     "close": 38426.89,
+     "ma5": 40685.82,
+     "ma20": 43262.29,
+     "ma60": 45864.1,
+     "ma20_slope": -393.3,
      "order": "60MA>20MA>5MA",
      "stage": 4,
      "desc": "空頭排列，下跌段"
-    },
+    }
+   ],
+   "tpex": [
     {
      "date": "2026-11-06",
      "close": 304.02,
@@ -1628,11 +1632,22 @@
      "order": "60MA>20MA>5MA",
      "stage": 4,
      "desc": "空頭排列，下跌段"
+    },
+    {
+     "date": "2026-11-19",
+     "close": 285.33,
+     "ma5": 312.2,
+     "ma20": 344.41,
+     "ma60": 386.29,
+     "ma20_slope": -5.13,
+     "order": "60MA>20MA>5MA",
+     "stage": 4,
+     "desc": "空頭排列，下跌段"
     }
    ],
    "note": {
-    "taiex": "第四階段空頭排列；今天小幅反彈但 5MA 續降、距 20MA 約 -4.7%（昨約 -3.5%），20MA 仍下彎（-331點/日，較昨 -351 稍緩）；要等 5MA 越過 20MA、20MA 走平才進第五階段，距離仍遠。",
-    "tpex": "第四階段空頭排列，5MA 距 20MA 約 -7.8%（昨約 -6.9%），比加權更弱；20MA 下彎稍緩（約 -4.3），離第五階段還遠。"
+    "taiex": "第四階段空頭排列；今天急跌跌破年線，5MA 距 20MA 約 -6.0%（昨約 -4.7%），20MA 下彎加快（-393點/日，昨 -331）；要等 5MA 越過 20MA、20MA 走平才進第五階段，距離仍遠。",
+    "tpex": "第四階段空頭排列，今天跌破兩年線，5MA 距 20MA 約 -9.4%（昨約 -7.8%），比加權更弱；20MA 下彎加快（約 -5.1），離第五階段還遠。"
    }
   }
  },
@@ -1917,8 +1932,43 @@
   {
    "date": "2026/11/18",
    "watch": [],
+   "few": [
+    {
+     "code": "3665",
+     "name": "貿聯-KY",
+     "note": "已漲停"
+    },
+    {
+     "code": "6190",
+     "name": "萬泰科",
+     "note": "已漲停"
+    },
+    {
+     "code": "4977",
+     "name": "眾達-KY",
+     "note": "已漲停"
+    },
+    {
+     "code": "6285",
+     "name": "啟碁",
+     "note": "已漲停"
+    },
+    {
+     "code": "6416",
+     "name": "瑞祺電通"
+    },
+    {
+     "code": "3491",
+     "name": "昇達科"
+    }
+   ],
+   "note": "11/19補報"
+  },
+  {
+   "date": "2026/11/19",
+   "watch": [],
    "few": [],
-   "note": "今日尚未收到觀察類股"
+   "note": "完全沒有觀察類股"
   }
  ],
  "RISK_LOG": [
@@ -1976,7 +2026,14 @@
    "verdict": "非常態",
    "lit": 3,
    "trend": "降溫",
-   "note": "加權+0.26%（40,194.91，年線上2.2%）、櫃買+0.31%（年線下14.2%、兩年線上1.75%）；扣除ETF維持率 上市沿用134.24%（11/17，11/18玩股網尚未公布）、上櫃沿用177.59%（11/12，玩股網11/13起顯示異常未採用）；VIX 24.53；破年線79.1%、破月線86.2%、創60日低537家（昨787）；跌停上市4、上櫃9家（昨30／43）；連續無觀察類股暫不更新（仍22日）、本月完全沒有仍4次（今日尚未收到觀察類股）；外資現貨-766億、三大法人合計-642億；上市融資餘額5,080億（-7億，10/12高點6,533億）；追繳戶204、整戶<130% 719戶（昨792／1,118）；庫藏股單日0、近5日7家、近20日36家、本月34家"
+   "note": "加權+0.26%（40,194.91，年線上2.2%）、櫃買+0.31%（年線下14.2%、兩年線上1.75%）；扣除ETF維持率 上市沿用134.24%（11/17，11/18玩股網尚未公布）、上櫃沿用177.59%（11/12，玩股網11/13起顯示異常未採用）；VIX 24.53；破年線79.1%、破月線86.2%、創60日低537家（昨787）；跌停上市4、上櫃9家（昨30／43）；連續無觀察類股23日再創紀錄、本月完全沒有仍4次（11/19補報有稍微觀察）；外資現貨-766億、三大法人合計-642億；上市融資餘額5,080億（-7億，10/12高點6,533億）；追繳戶204、整戶<130% 719戶（昨792／1,118）；庫藏股單日0、近5日7家、近20日36家、本月34家"
+  },
+  {
+   "date": "2026/11/19",
+   "verdict": "非常態",
+   "lit": 4,
+   "trend": "升溫",
+   "note": "加權-4.40%（38,426.89，年線下2.39%）、櫃買-7.22%（年線下20.4%、兩年線下5.31%）；扣除ETF維持率 上市沿用134.24%（11/17，11/19玩股網尚未公布）、上櫃沿用177.59%（11/12，玩股網11/13起顯示異常未採用）；VIX沿用11/18收盤24.56（今日美股尚未收盤）；破年線85.7%、破月線92.4%、創60日低1,243家（昨537）；跌停上市128、上櫃156家（昨4／9）；連續無觀察類股24日再創紀錄、本月完全沒有第5次；外資現貨-243億、三大法人合計-461億；上市融資餘額沿用11/18的5,080億（今日尚未公布，10/12高點6,533億）；追繳戶與整戶<130%沿用11/18的204／719戶；庫藏股單日1家（榮剛，轉讓員工）、近5日5家、近20日37家、本月35家"
   }
  ],
  "RULES": {
@@ -2027,5 +2084,5 @@
    "急跌相對好處理、緩跌更難；反彈後可用數量停損等方式把回檔部位調回舒適水位，但 EP355 未展開公式，不能從該集直接套用細節（EP355）"
   ]
  },
- "generated_at": "2026-11-18T21:44:20+08:00"
+ "generated_at": "2026-11-19T16:47:43+08:00"
 }
