@@ -164,6 +164,7 @@ html{background:#0f1115}html.light{filter:invert(1) hue-rotate(180deg)}html.ligh
 </section>
 <section class="inst" id="famtcard" data-v="inst" aria-labelledby="famt-heading">
 <h2 id="famt-heading">外資買賣超金額<span>個股前 20 名</span></h2>
+<div class="inst-win"><button data-w="1">1日</button><button data-w="3">3日</button><button data-w="5">5日</button></div>
 <p class="famt-total" id="famt-total"></p>
 <p class="inst-days" id="famt-days"></p>
 <div class="famt-cols">
@@ -379,9 +380,9 @@ let instTimer=null,instLoading=false,instLoaded=false;
 function instNumber(v,dec){return typeof v==='number'&&Number.isFinite(v)?(v>=0?'+':'')+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):'—'}
 function instDate(v,full=false){return String(v||'').slice(full?0:5,10).replace(/-/g,'/')}
 let INST=null,INSTW=(()=>{try{return localStorage.getItem('inst_w')||'5'}catch(e){return '5'}})();
-document.addEventListener('click',e=>{const b=e.target.closest('#inst-win button');if(!b)return;INSTW=b.dataset.w;try{localStorage.setItem('inst_w',INSTW)}catch(err){}if(INST)renderInst(INST)});
+document.addEventListener('click',e=>{const b=e.target.closest('.inst-win button');if(!b)return;INSTW=b.dataset.w;try{localStorage.setItem('inst_w',INSTW)}catch(err){}if(INST)renderInst(INST)});
 function renderInst(full){INST=full;const W=full.windows||{};if(!W[INSTW])INSTW=W['5']?'5':Object.keys(W)[0]||'5';
- document.querySelectorAll('#inst-win button').forEach(b=>{b.classList.toggle('on',b.dataset.w===INSTW);b.style.display=(W[b.dataset.w]||(!full.windows&&b.dataset.w==='5'))?'':'none'});
+ document.querySelectorAll('.inst-win button').forEach(b=>{b.classList.toggle('on',b.dataset.w===INSTW);b.style.display=(W[b.dataset.w]||(!full.windows&&b.dataset.w==='5'))?'':'none'});
  const d={...full,...(W[INSTW]||{})};
  const esc=heatEscape,days=Array.isArray(d.days)?d.days:[],n=d.n_days??days.length,period=d.period||[];
  document.getElementById('inst-period').textContent=`${instDate(period[0],true)}–${instDate(period[1])} ｜ ${n} 個交易日`;
