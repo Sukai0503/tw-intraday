@@ -1,0 +1,78 @@
+name: sinopac-test
+# 手動測試：永豐 Shioaji 只讀行情登入（不下單、不訂閱成交回報），只印非機密結果
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Taipei
+    steps:
+      - name: Install shioaji
+        run: python3 -m pip install -q shioaji
+      - name: Quote-only login + snapshots
+        env:
+          BROKER_API_KEY: ${{ secrets.BROKER_API_KEY }}
+          BROKER_SECRET_KEY: ${{ secrets.BROKER_SECRET_KEY }}
+        run: |
+          cat > /tmp/t.py <<'PY'
+          import os, sys, io, json, contextlib
+          res = {}
+          log = open("/tmp/sdk.log", "w")
+          try:
+              import shioaji as sj
+              res["shioaji"] = sj.__version__
+              api = sj.Shioaji()
+              with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                  accts = api.login(api_key=os.environ["BROKER_API_KEY"], secret_key=os.environ["BROKER_SECRET_KEY"], subscribe_trade=False)
+              res["login"] = "ok"
+              res["account_types"] = sorted({type(a).__name__ for a in (accts or [])})
+          except Exception as e:
+              res["login"] = "fail: " + type(e).__name__ + ": " + str(e)[:200]
+          if res.get("login") == "ok":
+              try:
+                  with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                      api.fetch_contracts()
+                  res["contracts"] = "ok"
+              except Exception as e:
+                  res["contracts"] = "err " + type(e).__name__ + ": " + str(e)[:200]
+              try:
+                  u = api.usage()
+                  res["usage"] = str(u)[:300]
+              except Exception as e:
+                  res["usage"] = "err " + str(e)[:200]
+              cs = {}
+              for name, get in (("TXFR1", lambda: api.Contracts.Futures.TXF.TXFR1), ("MXFR1", lambda: api.Contracts.Futures.MXF.MXFR1),
+                                ("0050", lambda: api.Contracts.Stocks["0050"]), ("00981A", lambda: api.Contracts.Stocks["00981A"]), ("2330", lambda: api.Contracts.Stocks["2330"])):
+                  try:
+                      c = get()
+                      if c is None: res["missing_" + name] = True
+                      else: cs[name] = c
+                  except Exception as e:
+                      res["missing_" + name] = type(e).__name__ + ": " + str(e)[:120]
+              res["contract_codes"] = {k: getattr(v, "code", None) for k, v in cs.items()}
+              try:
+                  with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                      snaps = api.snapshots(list(cs.values()))
+                  res["snapshots"] = [{"code": getattr(s, "code", None), "close": getattr(s, "close", None), "change": getattr(s, "change_price", None),
+                                       "ts": getattr(s, "ts", None), "volume": getattr(s, "total_volume", None)} for s in snaps]
+              except Exception as e:
+                  res["snapshots"] = "err " + type(e).__name__ + ": " + str(e)[:200]
+              try:
+                  with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                      api.logout()
+                  res["logout"] = "ok"
+              except Exception as e:
+                  res["logout"] = "err " + str(e)[:100]
+          s = json.dumps(res, ensure_ascii=False, default=str, indent=1)
+          for k in ("BROKER_API_KEY", "BROKER_SECRET_KEY"):
+              v = os.environ.get(k)
+              if v: s = s.replace(v, "***")
+          print(s)
+          PY
+          python3 /tmp/t.py
+          echo "--- SDK log lines (errors only, truncated) ---"
+          grep -E "ERROR|error" /tmp/sdk.log | cut -c1-160 | head -5 || true
