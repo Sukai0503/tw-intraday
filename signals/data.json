@@ -1,7 +1,7 @@
 {
  "DATA": {
   "trade_date": "2026-11-23",
-  "updated_at": "2026-11-23 22:03（台北時間）",
+  "updated_at": "2026-11-24 10:37（台北時間）",
   "taiex": {
    "close": {
     "v": 36811.89,
@@ -401,6 +401,9 @@
      "code": "6913",
      "name": "鴻呈",
      "lots": 1000,
+     "pct": 2.28,
+     "issued_total": 43848863.0,
+     "issued_lots": 43849,
      "price": "72～130",
      "purpose": "轉讓員工",
      "done": false
@@ -411,6 +414,9 @@
      "code": "6680",
      "name": "鑫創電子",
      "lots": 200,
+     "pct": 0.8,
+     "issued_total": 25071427.0,
+     "issued_lots": 25071,
      "price": "40～70",
      "purpose": "轉讓員工",
      "done": false
@@ -421,6 +427,9 @@
      "code": "6667",
      "name": "信紘科",
      "lots": 2000,
+     "pct": 3.74,
+     "issued_total": 53478878.0,
+     "issued_lots": 53479,
      "price": "142～371",
      "purpose": "轉讓員工",
      "done": false
@@ -431,6 +440,9 @@
      "code": "6584",
      "name": "南俊國際",
      "lots": 1000,
+     "pct": 1.4,
+     "issued_total": 71379810.0,
+     "issued_lots": 71380,
      "price": "157.5～586",
      "purpose": "轉讓員工",
      "done": false
@@ -441,6 +453,9 @@
      "code": "6165",
      "name": "浪凡",
      "lots": 3600,
+     "pct": 4.63,
+     "issued_total": 77752623.0,
+     "issued_lots": 77753,
      "price": "22～64",
      "purpose": "轉讓員工",
      "done": false
@@ -451,6 +466,9 @@
      "code": "6126",
      "name": "信音",
      "lots": 2000,
+     "pct": 1.53,
+     "issued_total": 130621689.0,
+     "issued_lots": 130622,
      "price": "16～30",
      "purpose": "轉讓員工",
      "done": false
@@ -461,6 +479,9 @@
      "code": "4109",
      "name": "加捷生醫",
      "lots": 3000,
+     "pct": 2.53,
+     "issued_total": 118736681.0,
+     "issued_lots": 118737,
      "price": "5.64～15.8",
      "purpose": "轉讓員工",
      "done": false
@@ -471,6 +492,9 @@
      "code": "3680",
      "name": "家登",
      "lots": 3000,
+     "pct": 3.12,
+     "issued_total": 96211690.0,
+     "issued_lots": 96212,
      "price": "240～450",
      "purpose": "轉讓員工",
      "done": false
@@ -481,6 +505,9 @@
      "code": "3675",
      "name": "德微",
      "lots": 1400,
+     "pct": 2.64,
+     "issued_total": 53057923.0,
+     "issued_lots": 53058,
      "price": "150～210",
      "purpose": "維護信用",
      "done": false
@@ -491,6 +518,9 @@
      "code": "2732",
      "name": "六角",
      "lots": 1000,
+     "pct": 2.15,
+     "issued_total": 46518570.0,
+     "issued_lots": 46519,
      "price": "40～90",
      "purpose": "轉讓員工",
      "done": false
@@ -501,6 +531,9 @@
      "code": "1598",
      "name": "岱宇",
      "lots": 2200,
+     "pct": 1.23,
+     "issued_total": 179142092.0,
+     "issued_lots": 179142,
      "price": "16～25",
      "purpose": "轉讓員工",
      "done": false
@@ -511,6 +544,9 @@
      "code": "2486",
      "name": "一詮",
      "lots": 1500,
+     "pct": 0.62,
+     "issued_total": 240768410.0,
+     "issued_lots": 240768,
      "price": "100～200",
      "purpose": "轉讓員工",
      "done": false
@@ -521,6 +557,9 @@
      "code": "5009",
      "name": "榮剛",
      "lots": 10000,
+     "pct": 1.66,
+     "issued_total": 602471197.0,
+     "issued_lots": 602471,
      "price": "19.67～47.88",
      "purpose": "轉讓員工",
      "done": false
@@ -531,6 +570,9 @@
      "code": "7689",
      "name": "大鵬科CLMX",
      "lots": 2000,
+     "pct": 3.42,
+     "issued_total": 58507250.0,
+     "issued_lots": 58507,
      "price": "68～182",
      "purpose": "轉讓員工",
      "done": false
@@ -541,6 +583,9 @@
      "code": "3543",
      "name": "州巧",
      "lots": 1000,
+     "pct": 0.68,
+     "issued_total": 146263150.0,
+     "issued_lots": 146263,
      "price": "33～75",
      "purpose": "轉讓員工",
      "done": false
@@ -551,6 +596,9 @@
      "code": "2474",
      "name": "可成",
      "lots": 20000,
+     "pct": 3.71,
+     "issued_total": 538821068.0,
+     "issued_lots": 538821,
      "price": "137～293",
      "purpose": "維護信用",
      "done": false
@@ -561,6 +609,9 @@
      "code": "1909",
      "name": "榮成",
      "lots": 10000,
+     "pct": 0.75,
+     "issued_total": 1327685727.0,
+     "issued_lots": 1327686,
      "price": "6.29～10",
      "purpose": "轉讓員工",
      "done": false
@@ -571,6 +622,9 @@
      "code": "6821",
      "name": "聯寶",
      "lots": 500,
+     "pct": 1.39,
+     "issued_total": 35913193.0,
+     "issued_lots": 35913,
      "price": "26～62",
      "purpose": "轉讓員工",
      "done": false
@@ -581,6 +635,9 @@
      "code": "4148",
      "name": "全宇生技-KY",
      "lots": 2500,
+     "pct": 3.72,
+     "issued_total": 67235701.0,
+     "issued_lots": 67236,
      "price": "21～46",
      "purpose": "維護信用",
      "done": false
@@ -591,6 +648,9 @@
      "code": "1784",
      "name": "訊聯",
      "lots": 600,
+     "pct": 1.13,
+     "issued_total": 53121191.0,
+     "issued_lots": 53121,
      "price": "40～80",
      "purpose": "轉讓員工",
      "done": false
@@ -601,6 +661,9 @@
      "code": "7760",
      "name": "享溫馨",
      "lots": 2000,
+     "pct": 3.1,
+     "issued_total": 64548000.0,
+     "issued_lots": 64548,
      "price": "23～48",
      "purpose": "維護信用",
      "done": false
@@ -611,6 +674,9 @@
      "code": "6843",
      "name": "進典",
      "lots": 3000,
+     "pct": 9.01,
+     "issued_total": 33304000.0,
+     "issued_lots": 33304,
      "price": "27～56.5",
      "purpose": "轉讓員工",
      "done": false
@@ -621,6 +687,9 @@
      "code": "6835",
      "name": "圓裕",
      "lots": 1000,
+     "pct": 1.51,
+     "issued_total": 66172297.0,
+     "issued_lots": 66172,
      "price": "21.35～47",
      "purpose": "轉讓員工",
      "done": false
@@ -631,6 +700,9 @@
      "code": "6703",
      "name": "軒郁",
      "lots": 200,
+     "pct": 0.55,
+     "issued_total": 36607210.0,
+     "issued_lots": 36607,
      "price": "70～140",
      "purpose": "轉讓員工",
      "done": false
@@ -641,6 +713,9 @@
      "code": "6612",
      "name": "奈米醫材",
      "lots": 300,
+     "pct": 0.57,
+     "issued_total": 52266043.0,
+     "issued_lots": 52266,
      "price": "49～106",
      "purpose": "轉讓員工",
      "done": false
@@ -651,6 +726,9 @@
      "code": "6516",
      "name": "勤崴國際",
      "lots": 800,
+     "pct": 1.42,
+     "issued_total": 56336935.0,
+     "issued_lots": 56337,
      "price": "40～80",
      "purpose": "轉讓員工",
      "done": false
@@ -661,6 +739,9 @@
      "code": "6134",
      "name": "萬旭",
      "lots": 2000,
+     "pct": 2.44,
+     "issued_total": 81882117.0,
+     "issued_lots": 81882,
      "price": "14.88～38.77",
      "purpose": "轉讓員工",
      "done": false
@@ -671,6 +752,9 @@
      "code": "5201",
      "name": "凱衛",
      "lots": 1000,
+     "pct": 2.59,
+     "issued_total": 38674600.0,
+     "issued_lots": 38675,
      "price": "25～32",
      "purpose": "轉讓員工",
      "done": false
@@ -681,6 +765,9 @@
      "code": "1464",
      "name": "得力",
      "lots": 10000,
+     "pct": 2.35,
+     "issued_total": 425575733.0,
+     "issued_lots": 425576,
      "price": "8～12",
      "purpose": "維護信用",
      "done": false
@@ -691,6 +778,9 @@
      "code": "7828",
      "name": "創新服務",
      "lots": 200,
+     "pct": 0.49,
+     "issued_total": 40531911.0,
+     "issued_lots": 40532,
      "price": "809～2,366",
      "purpose": "轉讓員工",
      "done": false
@@ -701,6 +791,9 @@
      "code": "6651",
      "name": "全宇昕",
      "lots": 1100,
+     "pct": 3.18,
+     "issued_total": 34601541.0,
+     "issued_lots": 34602,
      "price": "115～175",
      "purpose": "轉讓員工",
      "done": false
@@ -711,6 +804,9 @@
      "code": "5548",
      "name": "安倉",
      "lots": 2000,
+     "pct": 3.14,
+     "issued_total": 63723065.0,
+     "issued_lots": 63723,
      "price": "13.5～29.8",
      "purpose": "轉讓員工",
      "done": false
@@ -721,6 +817,9 @@
      "code": "6465",
      "name": "威潤",
      "lots": 3000,
+     "pct": 5.08,
+     "issued_total": 59073685.0,
+     "issued_lots": 59074,
      "price": "21.9～61.5",
      "purpose": "轉讓員工",
      "done": false
@@ -731,6 +830,9 @@
      "code": "4549",
      "name": "桓達",
      "lots": 400,
+     "pct": 0.69,
+     "issued_total": 58142493.0,
+     "issued_lots": 58142,
      "price": "60～140",
      "purpose": "轉讓員工",
      "done": false
@@ -741,6 +843,9 @@
      "code": "9951",
      "name": "皇田",
      "lots": 1000,
+     "pct": 1.38,
+     "issued_total": 72300000.0,
+     "issued_lots": 72300,
      "price": "42～60",
      "purpose": "維護信用",
      "done": false
@@ -751,6 +856,9 @@
      "code": "8930",
      "name": "青鋼",
      "lots": 2000,
+     "pct": 2.44,
+     "issued_total": 81809406.0,
+     "issued_lots": 81809,
      "price": "20～40",
      "purpose": "轉讓員工",
      "done": false
@@ -761,6 +869,9 @@
      "code": "8299",
      "name": "群聯",
      "lots": 2000,
+     "pct": 0.9,
+     "issued_total": 221165247.0,
+     "issued_lots": 221165,
      "price": "1,680～2,280",
      "purpose": "轉讓員工",
      "done": false
@@ -771,6 +882,9 @@
      "code": "7769",
      "name": "鴻勁",
      "lots": 2000,
+     "pct": 1.11,
+     "issued_total": 179930000.0,
+     "issued_lots": 179930,
      "price": "2,575～5,000",
      "purpose": "轉讓員工",
      "done": false
@@ -781,6 +895,9 @@
      "code": "6919",
      "name": "康霈*",
      "lots": 3000,
+     "pct": 0.19,
+     "issued_total": 1560448860.0,
+     "issued_lots": 1560449,
      "price": "60～112",
      "purpose": "轉讓員工",
      "done": false
@@ -791,6 +908,9 @@
      "code": "3587",
      "name": "閎康",
      "lots": 700,
+     "pct": 0.98,
+     "issued_total": 71684696.0,
+     "issued_lots": 71685,
      "price": "135～300",
      "purpose": "轉讓員工",
      "done": false
@@ -801,6 +921,9 @@
      "code": "3059",
      "name": "華晶科",
      "lots": 8000,
+     "pct": 2.6,
+     "issued_total": 307668025.0,
+     "issued_lots": 307668,
      "price": "30～38",
      "purpose": "轉讓員工",
      "done": false
@@ -811,6 +934,9 @@
      "code": "6873",
      "name": "泓德能源",
      "lots": 8000,
+     "pct": 5.61,
+     "issued_total": 142649099.0,
+     "issued_lots": 142649,
      "price": "33～93",
      "purpose": "轉讓員工",
      "done": false
@@ -821,6 +947,9 @@
      "code": "5469",
      "name": "瀚宇博",
      "lots": 1000,
+     "pct": 0.21,
+     "issued_total": 486166000.0,
+     "issued_lots": 486166,
      "price": "65～80",
      "purpose": "轉讓員工",
      "done": true
@@ -831,6 +960,9 @@
      "code": "1558",
      "name": "伸興",
      "lots": 2000,
+     "pct": 3.01,
+     "issued_total": 66535631.0,
+     "issued_lots": 66536,
      "price": "90～130",
      "purpose": "轉讓員工",
      "done": false
@@ -841,6 +973,9 @@
      "code": "6180",
      "name": "橘子",
      "lots": 2000,
+     "pct": 1.14,
+     "issued_total": 175493573.0,
+     "issued_lots": 175494,
      "price": "30～55",
      "purpose": "轉讓員工",
      "done": false
@@ -851,6 +986,9 @@
      "code": "3131",
      "name": "弘塑",
      "lots": 500,
+     "pct": 1.68,
+     "issued_total": 29831623.0,
+     "issued_lots": 29832,
      "price": "1,225～3,400",
      "purpose": "轉讓員工",
      "done": false
@@ -861,6 +999,9 @@
      "code": "2528",
      "name": "皇普",
      "lots": 5000,
+     "pct": 0.99,
+     "issued_total": 503294982.0,
+     "issued_lots": 503295,
      "price": "11.9～27.85",
      "purpose": "轉讓員工",
      "done": false
@@ -871,11 +1012,15 @@
      "code": "6720",
      "name": "久昌",
      "lots": 500,
+     "pct": 1.65,
+     "issued_total": 30225741.0,
+     "issued_lots": 30226,
      "price": "90～120",
      "purpose": "轉讓員工",
      "done": false
     }
-   ]
+   ],
+   "pct_note": "占發行股%＝預定買回股數÷已發行股份總數（已發行普通股數＋特別股）。來源：證交所 OpenAPI t187ap03_L、櫃買 OpenAPI mopsfin_t187ap03_O 的已發行股數，不用股本÷面額。此分母不是扣除既有庫藏股後的在外流通股數；公開資訊觀測站庫藏股統計彙總表（t35sc09）本身沒有此比率欄。"
   },
   "nsf": {
    "state": "announced",
@@ -3245,5 +3390,5 @@
    "左側股票策略（菱形、三角形）與右側極短線（他說資金已轉到帳戶，下週開始用期選做極端操作、打爆擊）要分開規劃，不要混用同一套節奏（EP356）。與原規則「先切割帳戶與周期，勿混淆資金用途與投資週期」一致"
   ]
  },
- "generated_at": "2026-11-23T22:03:29+08:00"
+ "generated_at": "2026-11-24T10:37:42+08:00"
 }
