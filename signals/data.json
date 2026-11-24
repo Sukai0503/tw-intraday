@@ -1,7 +1,7 @@
 {
  "DATA": {
   "trade_date": "2026-11-23",
-  "updated_at": "2026-11-24 10:37（台北時間）",
+  "updated_at": "2026-11-24 11:00（台北時間）",
   "taiex": {
    "close": {
     "v": 36811.89,
@@ -381,6 +381,7 @@
   "buybacks": {
    "as_of": "2026-11-23",
    "coverage_start": "2026-07-16",
+   "hist_lookback_from": "2016",
    "counts": {
     "d1": 11,
     "d5": 13,
@@ -406,7 +407,18 @@
      "issued_lots": 43849,
      "price": "72～130",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 53.6,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-16",
+       "planned_lots": 500,
+       "actual_lots": 268,
+       "exec_pct": 53.6
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -419,7 +431,18 @@
      "issued_lots": 25071,
      "price": "40～70",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 60.4,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2020-03-20",
+       "planned_lots": 250,
+       "actual_lots": 151,
+       "exec_pct": 60.4
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -432,7 +455,11 @@
      "issued_lots": 53479,
      "price": "142～371",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -445,7 +472,18 @@
      "issued_lots": 71380,
      "price": "157.5～586",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 1.8,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-10",
+       "planned_lots": 1300,
+       "actual_lots": 23,
+       "exec_pct": 1.8
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -458,7 +496,42 @@
      "issued_lots": 77753,
      "price": "22～64",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 96.1,
+     "hist_exec_count": 5,
+     "hist_exec_recent": [
+      {
+       "date": "2026-01-02",
+       "planned_lots": 1000,
+       "actual_lots": 1000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-11-21",
+       "planned_lots": 1500,
+       "actual_lots": 1500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-11-06",
+       "planned_lots": 1500,
+       "actual_lots": 1500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-04-11",
+       "planned_lots": 1500,
+       "actual_lots": 1482,
+       "exec_pct": 98.8
+      },
+      {
+       "date": "2025-01-20",
+       "planned_lots": 2000,
+       "actual_lots": 1638,
+       "exec_pct": 81.9
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -471,7 +544,42 @@
      "issued_lots": 130622,
      "price": "16～30",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 85.0,
+     "hist_exec_count": 9,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-14",
+       "planned_lots": 2000,
+       "actual_lots": 1230,
+       "exec_pct": 61.5
+      },
+      {
+       "date": "2022-08-05",
+       "planned_lots": 3000,
+       "actual_lots": 2497,
+       "exec_pct": 83.2
+      },
+      {
+       "date": "2022-05-06",
+       "planned_lots": 3000,
+       "actual_lots": 3000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2021-08-06",
+       "planned_lots": 5000,
+       "actual_lots": 4077,
+       "exec_pct": 81.5
+      },
+      {
+       "date": "2020-02-05",
+       "planned_lots": 5000,
+       "actual_lots": 5000,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -484,7 +592,18 @@
      "issued_lots": 118737,
      "price": "5.64～15.8",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 0.0,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2020-03-18",
+       "planned_lots": 800,
+       "actual_lots": 0,
+       "exec_pct": 0.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -497,7 +616,24 @@
      "issued_lots": 96212,
      "price": "240～450",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 42.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2019-03-23",
+       "planned_lots": 3000,
+       "actual_lots": 1500,
+       "exec_pct": 50.0
+      },
+      {
+       "date": "2018-10-11",
+       "planned_lots": 4000,
+       "actual_lots": 1362,
+       "exec_pct": 34.1
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -510,7 +646,18 @@
      "issued_lots": 53058,
      "price": "150～210",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 54.9,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-10",
+       "planned_lots": 3000,
+       "actual_lots": 1646,
+       "exec_pct": 54.9
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -523,7 +670,24 @@
      "issued_lots": 46519,
      "price": "40～90",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 76.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-10",
+       "planned_lots": 1500,
+       "actual_lots": 905,
+       "exec_pct": 60.3
+      },
+      {
+       "date": "2022-01-24",
+       "planned_lots": 1000,
+       "actual_lots": 918,
+       "exec_pct": 91.8
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-23",
@@ -536,7 +700,42 @@
      "issued_lots": 179142,
      "price": "16～25",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 83.9,
+     "hist_exec_count": 8,
+     "hist_exec_recent": [
+      {
+       "date": "2026-03-10",
+       "planned_lots": 3000,
+       "actual_lots": 2880,
+       "exec_pct": 96.0
+      },
+      {
+       "date": "2025-09-18",
+       "planned_lots": 4000,
+       "actual_lots": 4000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-06-04",
+       "planned_lots": 4000,
+       "actual_lots": 4000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2022-05-11",
+       "planned_lots": 3000,
+       "actual_lots": 2338,
+       "exec_pct": 77.9
+      },
+      {
+       "date": "2021-09-29",
+       "planned_lots": 4000,
+       "actual_lots": 2488,
+       "exec_pct": 62.2
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-20",
@@ -549,7 +748,30 @@
      "issued_lots": 240768,
      "price": "100～200",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 94.5,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-10",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2022-11-09",
+       "planned_lots": 4000,
+       "actual_lots": 4000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2016-05-16",
+       "planned_lots": 10000,
+       "actual_lots": 8338,
+       "exec_pct": 83.4
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-19",
@@ -562,7 +784,42 @@
      "issued_lots": 602471,
      "price": "19.67～47.88",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 80.1,
+     "hist_exec_count": 5,
+     "hist_exec_recent": [
+      {
+       "date": "2025-11-17",
+       "planned_lots": 15000,
+       "actual_lots": 12754,
+       "exec_pct": 85.0
+      },
+      {
+       "date": "2025-10-30",
+       "planned_lots": 10000,
+       "actual_lots": 10000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-07-01",
+       "planned_lots": 10000,
+       "actual_lots": 5238,
+       "exec_pct": 52.4
+      },
+      {
+       "date": "2020-03-20",
+       "planned_lots": 10000,
+       "actual_lots": 6329,
+       "exec_pct": 63.3
+      },
+      {
+       "date": "2018-05-07",
+       "planned_lots": 10000,
+       "actual_lots": 10000,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-13",
@@ -575,7 +832,11 @@
      "issued_lots": 58507,
      "price": "68～182",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-13",
@@ -588,7 +849,24 @@
      "issued_lots": 146263,
      "price": "33～75",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 75.5,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2023-12-22",
+       "planned_lots": 1000,
+       "actual_lots": 1000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2020-10-08",
+       "planned_lots": 1500,
+       "actual_lots": 765,
+       "exec_pct": 51.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-13",
@@ -601,7 +879,42 @@
      "issued_lots": 538821,
      "price": "137～293",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 78.6,
+     "hist_exec_count": 11,
+     "hist_exec_recent": [
+      {
+       "date": "2026-08-07",
+       "planned_lots": 33000,
+       "actual_lots": 32145,
+       "exec_pct": 97.4
+      },
+      {
+       "date": "2026-03-11",
+       "planned_lots": 28400,
+       "actual_lots": 22548,
+       "exec_pct": 79.4
+      },
+      {
+       "date": "2025-12-23",
+       "planned_lots": 30800,
+       "actual_lots": 30800,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-10-17",
+       "planned_lots": 31500,
+       "actual_lots": 31500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-04-16",
+       "planned_lots": 33000,
+       "actual_lots": 25476,
+       "exec_pct": 77.2
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-13",
@@ -614,7 +927,42 @@
      "issued_lots": 1327686,
      "price": "6.29～10",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 57.2,
+     "hist_exec_count": 8,
+     "hist_exec_recent": [
+      {
+       "date": "2026-05-28",
+       "planned_lots": 10000,
+       "actual_lots": 1042,
+       "exec_pct": 10.4
+      },
+      {
+       "date": "2026-05-11",
+       "planned_lots": 8000,
+       "actual_lots": 8000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2026-03-06",
+       "planned_lots": 8000,
+       "actual_lots": 6370,
+       "exec_pct": 79.6
+      },
+      {
+       "date": "2025-09-24",
+       "planned_lots": 8000,
+       "actual_lots": 5888,
+       "exec_pct": 73.6
+      },
+      {
+       "date": "2025-07-17",
+       "planned_lots": 10000,
+       "actual_lots": 2498,
+       "exec_pct": 25.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-12",
@@ -627,7 +975,24 @@
      "issued_lots": 35913,
      "price": "26～62",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 67.8,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2025-11-12",
+       "planned_lots": 500,
+       "actual_lots": 500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-04-14",
+       "planned_lots": 1000,
+       "actual_lots": 355,
+       "exec_pct": 35.5
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-12",
@@ -640,7 +1005,11 @@
      "issued_lots": 67236,
      "price": "21～46",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-12",
@@ -653,7 +1022,42 @@
      "issued_lots": 53121,
      "price": "40～80",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 75.0,
+     "hist_exec_count": 5,
+     "hist_exec_recent": [
+      {
+       "date": "2026-05-08",
+       "planned_lots": 600,
+       "actual_lots": 512,
+       "exec_pct": 85.3
+      },
+      {
+       "date": "2025-06-17",
+       "planned_lots": 500,
+       "actual_lots": 432,
+       "exec_pct": 86.4
+      },
+      {
+       "date": "2025-01-06",
+       "planned_lots": 500,
+       "actual_lots": 220,
+       "exec_pct": 44.0
+      },
+      {
+       "date": "2022-03-25",
+       "planned_lots": 1000,
+       "actual_lots": 704,
+       "exec_pct": 70.4
+      },
+      {
+       "date": "2018-11-09",
+       "planned_lots": 700,
+       "actual_lots": 621,
+       "exec_pct": 88.7
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -666,7 +1070,18 @@
      "issued_lots": 64548,
      "price": "23～48",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2026-06-15",
+       "planned_lots": 1500,
+       "actual_lots": 1500,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -679,7 +1094,11 @@
      "issued_lots": 33304,
      "price": "27～56.5",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -692,7 +1111,18 @@
      "issued_lots": 66172,
      "price": "21.35～47",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 88.8,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-05-12",
+       "planned_lots": 500,
+       "actual_lots": 444,
+       "exec_pct": 88.8
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -705,7 +1135,24 @@
      "issued_lots": 36607,
      "price": "70～140",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2024-11-13",
+       "planned_lots": 200,
+       "actual_lots": 200,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2022-03-24",
+       "planned_lots": 200,
+       "actual_lots": 200,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -718,7 +1165,30 @@
      "issued_lots": 52266,
      "price": "49～106",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 63.0,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2026-08-11",
+       "planned_lots": 200,
+       "actual_lots": 136,
+       "exec_pct": 68.0
+      },
+      {
+       "date": "2026-05-12",
+       "planned_lots": 300,
+       "actual_lots": 189,
+       "exec_pct": 63.0
+      },
+      {
+       "date": "2026-01-14",
+       "planned_lots": 300,
+       "actual_lots": 174,
+       "exec_pct": 58.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -731,7 +1201,24 @@
      "issued_lots": 56337,
      "price": "40～80",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-10",
+       "planned_lots": 500,
+       "actual_lots": 500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2019-12-24",
+       "planned_lots": 350,
+       "actual_lots": 350,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -744,7 +1231,11 @@
      "issued_lots": 81882,
      "price": "14.88～38.77",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -757,7 +1248,11 @@
      "issued_lots": 38675,
      "price": "25～32",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-11",
@@ -770,7 +1265,11 @@
      "issued_lots": 425576,
      "price": "8～12",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-10",
@@ -783,7 +1282,11 @@
      "issued_lots": 40532,
      "price": "809～2,366",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-10",
@@ -796,7 +1299,11 @@
      "issued_lots": 34602,
      "price": "115～175",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-10",
@@ -809,7 +1316,11 @@
      "issued_lots": 63723,
      "price": "13.5～29.8",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-09",
@@ -822,7 +1333,30 @@
      "issued_lots": 59074,
      "price": "21.9～61.5",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 98.3,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2019-11-12",
+       "planned_lots": 500,
+       "actual_lots": 500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2016-11-09",
+       "planned_lots": 800,
+       "actual_lots": 760,
+       "exec_pct": 95.0
+      },
+      {
+       "date": "2016-02-02",
+       "planned_lots": 800,
+       "actual_lots": 800,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-09",
@@ -835,7 +1369,18 @@
      "issued_lots": 58142,
      "price": "60～140",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2018-09-25",
+       "planned_lots": 500,
+       "actual_lots": 500,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -848,7 +1393,30 @@
      "issued_lots": 72300,
      "price": "42～60",
      "purpose": "維護信用",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 72.0,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2026-05-07",
+       "planned_lots": 1000,
+       "actual_lots": 1000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-08-11",
+       "planned_lots": 2000,
+       "actual_lots": 1600,
+       "exec_pct": 80.0
+      },
+      {
+       "date": "2025-04-21",
+       "planned_lots": 1500,
+       "actual_lots": 540,
+       "exec_pct": 36.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -861,7 +1429,30 @@
      "issued_lots": 81809,
      "price": "20～40",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 56.3,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2025-11-07",
+       "planned_lots": 3000,
+       "actual_lots": 1522,
+       "exec_pct": 50.7
+      },
+      {
+       "date": "2020-03-25",
+       "planned_lots": 2000,
+       "actual_lots": 1300,
+       "exec_pct": 65.0
+      },
+      {
+       "date": "2018-11-06",
+       "planned_lots": 3000,
+       "actual_lots": 1594,
+       "exec_pct": 53.1
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -874,7 +1465,24 @@
      "issued_lots": 221165,
      "price": "1,680～2,280",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 36.3,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2022-07-15",
+       "planned_lots": 10000,
+       "actual_lots": 6860,
+       "exec_pct": 68.6
+      },
+      {
+       "date": "2016-08-08",
+       "planned_lots": 7500,
+       "actual_lots": 300,
+       "exec_pct": 4.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -887,7 +1495,18 @@
      "issued_lots": 179930,
      "price": "2,575～5,000",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 0.8,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-21",
+       "planned_lots": 3500,
+       "actual_lots": 27,
+       "exec_pct": 0.8
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -900,7 +1519,18 @@
      "issued_lots": 1560449,
      "price": "60～112",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 50.1,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2025-10-13",
+       "planned_lots": 1800,
+       "actual_lots": 901,
+       "exec_pct": 50.1
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -913,7 +1543,24 @@
      "issued_lots": 71685,
      "price": "135～300",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 71.8,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2022-05-10",
+       "planned_lots": 1000,
+       "actual_lots": 582,
+       "exec_pct": 58.2
+      },
+      {
+       "date": "2021-02-05",
+       "planned_lots": 1000,
+       "actual_lots": 855,
+       "exec_pct": 85.5
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-06",
@@ -926,7 +1573,30 @@
      "issued_lots": 307668,
      "price": "30～38",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 46.2,
+     "hist_exec_count": 3,
+     "hist_exec_recent": [
+      {
+       "date": "2025-04-08",
+       "planned_lots": 8000,
+       "actual_lots": 100,
+       "exec_pct": 1.2
+      },
+      {
+       "date": "2020-03-20",
+       "planned_lots": 8000,
+       "actual_lots": 3000,
+       "exec_pct": 37.5
+      },
+      {
+       "date": "2020-01-31",
+       "planned_lots": 8000,
+       "actual_lots": 8000,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-05",
@@ -939,7 +1609,18 @@
      "issued_lots": 142649,
      "price": "33～93",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 96.2,
+     "hist_exec_count": 1,
+     "hist_exec_recent": [
+      {
+       "date": "2026-04-07",
+       "planned_lots": 3000,
+       "actual_lots": 2886,
+       "exec_pct": 96.2
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-05",
@@ -952,7 +1633,42 @@
      "issued_lots": 486166,
      "price": "65～80",
      "purpose": "轉讓員工",
-     "done": true
+     "done": true,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 6,
+     "hist_exec_recent": [
+      {
+       "date": "2026-07-30",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-09-16",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-05-02",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2024-03-27",
+       "planned_lots": 3000,
+       "actual_lots": 3000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2021-01-26",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-05",
@@ -965,7 +1681,24 @@
      "issued_lots": 66536,
      "price": "90～130",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 50.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2025-11-06",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2020-03-26",
+       "planned_lots": 1200,
+       "actual_lots": 0,
+       "exec_pct": 0.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-04",
@@ -978,7 +1711,42 @@
      "issued_lots": 175494,
      "price": "30～55",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 62.7,
+     "hist_exec_count": 7,
+     "hist_exec_recent": [
+      {
+       "date": "2026-07-08",
+       "planned_lots": 2000,
+       "actual_lots": 2000,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2026-05-06",
+       "planned_lots": 2500,
+       "actual_lots": 2500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2026-03-12",
+       "planned_lots": 1500,
+       "actual_lots": 1500,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2020-03-12",
+       "planned_lots": 3000,
+       "actual_lots": 2241,
+       "exec_pct": 74.7
+      },
+      {
+       "date": "2018-11-08",
+       "planned_lots": 14000,
+       "actual_lots": 0,
+       "exec_pct": 0.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-03",
@@ -991,7 +1759,24 @@
      "issued_lots": 29832,
      "price": "1,225～3,400",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 100.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2026-05-25",
+       "planned_lots": 600,
+       "actual_lots": 600,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-12-08",
+       "planned_lots": 500,
+       "actual_lots": 500,
+       "exec_pct": 100.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-11-03",
@@ -1004,7 +1789,11 @@
      "issued_lots": 503295,
      "price": "11.9～27.85",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": null,
+     "hist_exec_count": 0,
+     "hist_exec_recent": [],
+     "hist_lookback_from": "2016"
     },
     {
      "date": "2026-10-27",
@@ -1017,10 +1806,28 @@
      "issued_lots": 30226,
      "price": "90～120",
      "purpose": "轉讓員工",
-     "done": false
+     "done": false,
+     "hist_exec_avg": 75.0,
+     "hist_exec_count": 2,
+     "hist_exec_recent": [
+      {
+       "date": "2026-06-02",
+       "planned_lots": 300,
+       "actual_lots": 300,
+       "exec_pct": 100.0
+      },
+      {
+       "date": "2025-07-31",
+       "planned_lots": 500,
+       "actual_lots": 250,
+       "exec_pct": 50.0
+      }
+     ],
+     "hist_lookback_from": "2016"
     }
    ],
-   "pct_note": "占發行股%＝預定買回股數÷已發行股份總數（已發行普通股數＋特別股）。來源：證交所 OpenAPI t187ap03_L、櫃買 OpenAPI mopsfin_t187ap03_O 的已發行股數，不用股本÷面額。此分母不是扣除既有庫藏股後的在外流通股數；公開資訊觀測站庫藏股統計彙總表（t35sc09）本身沒有此比率欄。"
+   "pct_note": "占發行股%＝預定買回股數÷已發行股份總數（已發行普通股數＋特別股）。來源：證交所 OpenAPI t187ap03_L、櫃買 OpenAPI mopsfin_t187ap03_O 的已發行股數，不用股本÷面額。此分母不是扣除既有庫藏股後的在外流通股數；公開資訊觀測站庫藏股統計彙總表（t35sc09）本身沒有此比率欄。",
+   "hist_note": "過往執行率＝該公司自2016年起，過去已結束／屆滿／終止之庫藏股（實際買回股數÷預定買回股數）之平均，不含本次進行中案件。0%代表期間屆滿或終止但未買回；無紀錄代表查詢期間內沒有已結束案件。"
   },
   "nsf": {
    "state": "announced",
@@ -3390,5 +4197,5 @@
    "左側股票策略（菱形、三角形）與右側極短線（他說資金已轉到帳戶，下週開始用期選做極端操作、打爆擊）要分開規劃，不要混用同一套節奏（EP356）。與原規則「先切割帳戶與周期，勿混淆資金用途與投資週期」一致"
   ]
  },
- "generated_at": "2026-11-24T10:37:42+08:00"
+ "generated_at": "2026-11-24T11:00:44+08:00"
 }
