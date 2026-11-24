@@ -124,9 +124,16 @@ let BB=null,BSORT='date';
 function buyTable(){
   const list=[...BB.list].sort((a,b)=>{
     if(BSORT==='lots')return (b.lots??0)-(a.lots??0)||b.date.localeCompare(a.date);
+    if(BSORT==='pct')return (b.pct??-1)-(a.pct??-1)||b.date.localeCompare(a.date);
     if(BSORT==='purpose'){const rk=p=>p==='維護信用'?0:p==='轉讓員工'?1:2;return rk(a.purpose)-rk(b.purpose)||b.date.localeCompare(a.date)||a.code.localeCompare(b.code)}
     return b.date.localeCompare(a.date)||(Number(b.purpose==='維護信用')-Number(a.purpose==='維護信用'))||a.code.localeCompare(b.code)});
-  document.getElementById('bbt').innerHTML=tbl(['日期','市場','代號名稱','張數','價格區間','目的'],list.map(r=>tr([md(r.date),esc(r.market),`<td class="nw">${esc(r.code+r.name)}</td>`,`<td class="n">${r.lots==null?'—':f(r.lots)}</td>`,`<td class="nw">${esc(r.price)}</td>`,`<td class="nw">${esc(r.purpose)}${r.done?' <span class="mut">已完成</span>':''}</td>`],r.purpose==='維護信用'?'hl':'')),[3]);
+  const pctCell=r=>{
+    if(r.pct==null||isNaN(r.pct))return '<td class="n">—</td>';
+    const den=r.issued_lots!=null?`${f(r.issued_lots)} 張`: (r.issued_total!=null?`${f(Math.round(r.issued_total/1000))} 張`:'');
+    const tip=den?`預定 ${r.lots==null?'—':f(r.lots)} 張 ÷ 已發行 ${den}`:'已發行股數為已發行普通股數＋特別股，非扣除庫藏股的在外流通股數';
+    return `<td class="n" title="${esc(tip)}">${f(r.pct,2)}%</td>`;
+  };
+  document.getElementById('bbt').innerHTML=tbl(['日期','市場','代號名稱','張數','占發行股%','價格區間','目的'],list.map(r=>tr([md(r.date),esc(r.market),`<td class="nw">${esc(r.code+r.name)}</td>`,`<td class="n">${r.lots==null?'—':f(r.lots)}</td>`,pctCell(r),`<td class="nw">${esc(r.price)}</td>`,`<td class="nw">${esc(r.purpose)}${r.done?' <span class="mut">已完成</span>':''}</td>`],r.purpose==='維護信用'?'hl':'')),[3,4]);
   document.querySelectorAll('#bsort button').forEach(b=>b.classList.toggle('on',b.dataset.s===BSORT));
 }
 
@@ -262,9 +269,9 @@ function render(J){
   h+=`<div class="card"><h2>關鍵訊號</h2>${tbl(['訊號','數值','日期','燈號'],sig.map(r=>tr([`<td class="k">${esc(r[0])}</td>`,esc(r[1]),`<td class="nw">${esc(/^\d{4}-\d\d-\d\d/.test(r[2])?md(r[2].slice(0,10))+r[2].slice(10).replace('（前一日）','（前日）'):r[2])}</td>`,`<td class="nw">${esc(r[3])}</td>`])))}</div>`;
   h+=`<div class="card"><h2>三大法人買賣超</h2><div class="cap">單位：億元｜紅＝買超、綠＝賣超｜資料日 ${esc(I.as_of)}${I.stale?'（前一日）':''}｜近一週＝5 個交易日、近一月＝20 個交易日</div><div class="grid2"><div>${instT('上市',I.twse)}</div><div>${instT('上櫃',I.tpex)}</div></div><div class="cap" style="margin-top:8px">逐日買賣超（億）：柱＝三大法人合計，線＝外資／投信／自營｜拖曳看各日</div><div class="grid2"><div><div class="mut">上市</div><div id="inst_twse" style="min-height:200px"></div></div><div><div class="mut">上櫃</div><div id="inst_tpex" style="min-height:200px"></div></div></div></div>`;
   h+=`<div class="card"><h2>庫藏股（董事會決議買回）</h2>
-   <div class="cap">公開資訊觀測站 t35sc09｜資料日 ${esc(B.as_of)}｜查詢自 ${esc(B.coverage_start)} 起（7 月可能未含 7/4 前）｜黃底＝維護信用</div>
+   <div class="cap">公開資訊觀測站 t35sc09｜資料日 ${esc(B.as_of)}｜查詢自 ${esc(B.coverage_start)} 起（7 月可能未含 7/4 前）｜黃底＝維護信用｜${esc(B.pct_note||'占發行股%＝預定買回股數÷已發行股份總數（已發行普通股數＋特別股；證交所/櫃買基本資料，非扣除庫藏股的在外流通股數）')}</div>
    <div class="mets">${[['單日','d1'],['近5日','d5'],['近20日','d20'],['本月','mtd']].map(([l,k])=>`<div class="met"><div class="v">${f(B.counts[k])}</div><div class="l">${l}</div><div class="d">家</div></div>`).join('')}</div>
-   ${columns(months)}<div class="seg" id="bsort" style="margin:6px 0"><span class="mut" style="align-self:center">排序</span><button data-s="date">日期</button><button data-s="lots">張數</button><button data-s="purpose">目的</button></div><div id="bbt"></div>
+   ${columns(months)}<div class="seg" id="bsort" style="margin:6px 0"><span class="mut" style="align-self:center">排序</span><button data-s="date">日期</button><button data-s="lots">張數</button><button data-s="pct">占發行股%</button><button data-s="purpose">目的</button></div><div id="bbt"></div>
    <div class="call info">只當觀察項：家數暴增代表恐慌加深；個股庫藏股+現金充足+位階基本面＝左側輔助參考，非單獨買進理由（Wade 11/9）</div></div>`;
   h+=`<div class="grid2"><div class="card"><h2>融資維持率（上市，扣除ETF）</h2><div class="cap">玩股網｜融資餘額 ${f(n(M.balance_yi),2)} 億（${ts(M.balance_yi)}）</div>${lineChart(M.series||[],125,165,'%','上市')}${(M.tpex_series&&M.tpex_series.length)?`<div class="cap" style="margin-top:8px">上櫃（扣除ETF）</div>${lineChart(M.tpex_series,125,165,'%','上櫃')}`:''}</div>
    <div class="card"><h2>市場廣度（indusmapk）</h2><div class="cap">${esc(D.indusmapk.market)}｜${esc(D.indusmapk.as_of)}</div>${tbl(['均線','站上比例','站上／在下','新高／新低'],D.indusmapk.rows.map(r=>tr(r.map(esc))))}<div class="cap" style="margin-top:8px">跌破年線／月線比例（上市櫃普通股，官方收盤自算）｜拖曳看各日</div><div id="breadth_ch" style="min-height:210px"></div></div></div>`;
