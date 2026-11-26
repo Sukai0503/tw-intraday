@@ -1,0 +1,52 @@
+name: us-px
+# 美股收盤後更新 us_px.json（含 USD/TWD）。cron 為 UTC：
+#   21:30 UTC 一至五 = 台北 05:30 二至六（對應美股週一至週五收盤）
+#   22:30 UTC 一至五 = 台北 06:30 備援
+# 另於 box 的 publish.sh 每次發布時一併更新。
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'
+    - cron: '30 22 * * 1-5'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: us-px
+  cancel-in-progress: true
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Taipei
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch US prices and FX
+        run: python3 scripts/us_px.py --force
+      - name: Publish us_px.json to data and main
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ ! -f us_px.json ]; then echo "us_px.json missing"; exit 1; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add us_px.json
+          if ! git diff --cached --quiet; then
+            git commit -m "us_px $(date '+%F %T')"
+            git push origin HEAD:main
+          else
+            echo "main us_px no change"
+          fi
+          R="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git clone -q --depth 1 -b data "$R" "$RUNNER_TEMP/site-data"
+          cp us_px.json "$RUNNER_TEMP/site-data/us_px.json"
+          git -C "$RUNNER_TEMP/site-data" config user.name "github-actions[bot]"
+          git -C "$RUNNER_TEMP/site-data" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$RUNNER_TEMP/site-data" add us_px.json
+          if ! git -C "$RUNNER_TEMP/site-data" diff --cached --quiet; then
+            git -C "$RUNNER_TEMP/site-data" commit -m "us_px $(date '+%F %T')"
+            git -C "$RUNNER_TEMP/site-data" push
+          else
+            echo "data us_px no change"
+          fi
