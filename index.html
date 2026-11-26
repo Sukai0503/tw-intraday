@@ -164,10 +164,19 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 <h2>多空頭排列比例 <span class="mut" id="arrstat"></span></h2>
 <div class="seg" id="arrseg"><button data-m="all" class="on">上市櫃</button><button data-m="twse">上市</button><button data-m="tpex">上櫃</button></div>
 <div class="kpi"><span>短均多頭 <b id="arr_sb" class="up">-</b></span><span>短均空頭 <b id="arr_se" class="dn">-</b></span></div>
-<div class="mut" style="margin:0 0 6px">短均線 5／10／20，反應較快</div>
-<div class="kpi" style="gap:16px"><span>長均多頭 <b id="arr_lb" class="up" style="font-size:18px">-</b></span><span>長均空頭 <b id="arr_le" class="dn" style="font-size:18px">-</b></span></div>
+<div class="mut" style="margin:0 0 4px">短均線 5／10／20，反應較快</div>
+<div class="leg"><span><i style="background:#ff5b5b"></i>今日多頭</span><span><i style="background:#22c55e"></i>今日空頭</span><span><i style="background:#8b929c"></i>前一交易日（虛線）</span></div>
+<div class="mut" style="margin:0 0 2px">多頭排列</div>
+<div id="c_arr_sb"></div>
+<div class="mut" style="margin:6px 0 2px">空頭排列</div>
+<div id="c_arr_se"></div>
+<div class="kpi" style="gap:16px;margin-top:10px"><span>長均多頭 <b id="arr_lb" class="up" style="font-size:18px">-</b></span><span>長均空頭 <b id="arr_le" class="dn" style="font-size:18px">-</b></span></div>
 <div class="mut" style="margin:0 0 4px">長均線 10／20／60，中期趨勢</div>
-<div id="c_arr"></div>
+<div class="leg"><span><i style="background:#ff9f43"></i>今日多頭</span><span><i style="background:#4ea1ff"></i>今日空頭</span><span><i style="background:#8b929c"></i>前一交易日（虛線）</span></div>
+<div class="mut" style="margin:0 0 2px">多頭排列</div>
+<div id="c_arr_lb"></div>
+<div class="mut" style="margin:6px 0 2px">空頭排列</div>
+<div id="c_arr_le"></div>
 <div class="mut">觀察項，與近日比較，無固定門檻｜即時價＋先前收盤自算，非投資建議</div>
 </div>
 <div class="card hm" id="heatcard" data-v="heat"><h2>族群熱力圖 <span class="mut" id="hstat"></span></h2>
@@ -275,6 +284,22 @@ StockChart.ts('c_twd',{kind:'hm',height:180,pad:['09:00','13:30'],dec:3,minRange
  series:[{name:'USD/TWD',color:'#4ea1ff',data,colorFn:pv!=null?(v=>v>pv?'#22c55e':v<pv?'#ff5b5b':'#9aa4b2'):undefined}]});}
 let ARRM='all';
 function arrPct(x){return (x&&typeof x.pct==='number')?x.pct.toFixed(1)+'%':'-'}
+function arrPts(hist,idx){return (hist||[]).map(r=>[r[0],r[idx]]).filter(p=>p[0]>='09:00'&&p[0]<='13:30'&&typeof p[1]==='number')}
+function arrYRange(series){
+  const vs=series.flatMap(s=>(s.data||[]).map(p=>p[1]).filter(v=>typeof v==='number'));
+  if(!vs.length)return undefined;
+  const mn=Math.min(...vs),mx=Math.max(...vs);
+  const pad=Math.max((mx-mn)*0.15,0.3);
+  return [Math.max(0,+(mn-pad).toFixed(2)),Math.min(100,+(mx+pad).toFixed(2))];
+}
+function arrMini(id,today,prev,todayColor,todayName){
+  const el=document.getElementById(id);if(!el||!window.StockChart)return;
+  if(!today.length){el.innerHTML='';return}
+  const series=[];
+  if(prev&&prev.length)series.push({name:'前一交易日',color:'#8b929c',dashed:true,width:1.5,last:false,data:prev});
+  series.push({name:todayName,color:todayColor,data:today});
+  StockChart.ts(id,{kind:'hm',height:140,pad:['09:00','13:30'],range:arrYRange(series),unit:'%',dec:1,series});
+}
 function renderArr(){
   const A=D&&D.ma_arr, card=document.getElementById('arrcard');
   if(!card)return;
@@ -288,15 +313,15 @@ function renderArr(){
   document.getElementById('arr_lb').textContent=arrPct(m.long_bull);
   document.getElementById('arr_le').textContent=arrPct(m.long_bear);
   document.querySelectorAll('#arrseg button').forEach(b=>b.classList.toggle('on',b.dataset.m===ARRM));
-  const hist=A.hist||[], el=document.getElementById('c_arr');
-  if(el&&hist.length>=2&&window.StockChart){
-    StockChart.ts('c_arr',{kind:'hm',height:160,pad:['09:00','13:30'],range:[0,100],unit:'%',dec:1,series:[
-      {name:'短均多頭',color:'#ff5b5b',data:hist.map(r=>[r[0],r[1]])},
-      {name:'短均空頭',color:'#22c55e',data:hist.map(r=>[r[0],r[2]])},
-      {name:'長均多頭',color:'#ff9f43',dashed:true,width:1.5,data:hist.map(r=>[r[0],r[3]])},
-      {name:'長均空頭',color:'#4ea1ff',dashed:true,width:1.5,data:hist.map(r=>[r[0],r[4]])}
-    ]});
-  }else if(el){el.innerHTML=''}
+  const hist=A.hist||[], prev=A.hist_prev||[];
+  if(hist.length>=2&&window.StockChart){
+    arrMini('c_arr_sb',arrPts(hist,1),arrPts(prev,1),'#ff5b5b','今日短均多頭');
+    arrMini('c_arr_se',arrPts(hist,2),arrPts(prev,2),'#22c55e','今日短均空頭');
+    arrMini('c_arr_lb',arrPts(hist,3),arrPts(prev,3),'#ff9f43','今日長均多頭');
+    arrMini('c_arr_le',arrPts(hist,4),arrPts(prev,4),'#4ea1ff','今日長均空頭');
+  }else{
+    for(const id of['c_arr_sb','c_arr_se','c_arr_lb','c_arr_le']){const el=document.getElementById(id);if(el)el.innerHTML=''}
+  }
 }
 document.addEventListener('click',e=>{const b=e.target.closest('#arrseg button');if(!b||!D)return;ARRM=b.dataset.m;renderArr()});
 function render(){if(!D)return;document.getElementById('demo').style.display=D.demo?'block':'none';
