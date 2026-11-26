@@ -672,7 +672,7 @@ function applyAmt(el,mode){const old=el.value,caret=el.selectionStart,next=group
  el.value=next;let n=0,pos=next.length;if(!atEnd){for(let i=0;i<next.length;i++){if(/[\d.\-]/.test(next[i])&&++n>=sig){pos=i+1;break}}}
  try{el.setSelectionRange(pos,pos)}catch(e){}}
 
-let FB=null,fbP=null,user=null,started=false,PF=null,SNAP=[],dirty=false,PX={},PXM={},TX=null,IDX=null,pxT=0,pmode='pos',timer=null;
+let FB=null,fbP=null,user=null,started=false,PF=null,SNAP=[],dirty=false,PX={},PXM={},TX=null,IDX=null,SFUT={},SFLIVE={},pxT=0,pmode='pos',timer=null;
 const empty=()=>({stocks:[],margin:[],futures:[],futMargin:0,cash:0,other:0,debt:0});
 
 function loadFB(){return fbP||(fbP=(async()=>{const b='https://www.gstatic.com/firebasejs/'+FBV+'/';
@@ -712,6 +712,11 @@ async function loadPrices(force){
  // 台指期：期交所近月一般盤收盤（txf.json）；拿不到才暫用加權
  TX=null;const T=await getJ([RAW+'txf.json','txf.json']);
  if(T&&T.last>0)TX={p:T.last,prev:T.prev,d:T.date,lbl:'台指期近月 '+T.month+' 收盤',est:false};
+ SFUT={};SFLIVE={};
+ const SFJ=await getJ([RAW+'stkfut.json','stkfut.json']);
+ if(SFJ&&SFJ.px)SFUT=SFJ.px;
+ const LP=await getJ([RAW+'live_px.json','live_px.json']);
+ if(LP&&LP.sf)SFLIVE=LP.sf;
  const S=await getJ(['signals/data.json']);
  if(S&&S.DATA&&S.DATA.taiex&&S.DATA.taiex.close&&S.DATA.taiex.close.v){const v=S.DATA.taiex.close.v,p=parseFloat(S.DATA.taiex.pct);IDX={v,d:S.DATA.taiex.close.as_of,prev:Number.isFinite(p)?v/(1+p/100):null};
   if(!TX)TX={p:v,prev:IDX.prev,d:(IDX.d||'').replace(/-/g,''),lbl:'暫用加權估算',est:true}}
@@ -739,10 +744,19 @@ function normalizeMargin(P){for(const r of(P&&P.margin)||[]){if(r.loanManual===t
 function nameOf(code){const c=String(code||'').trim();return(NAMES[c]&&NAMES[c].n)||(CNAMES[c]&&CNAMES[c][0])||''}
 function avgBits(r,v,kind,loanAmt){const avg=num(r.avg),q=num(r.q);if(!(avg>0)||!q||!(v>0))return{html:'',u:0,ok:false};const cost=avg*q,u=v-cost;let rate='';if(kind==='margin'){const eq=cost-loanAmt;rate=eq>0?`<span class="${cls(u)}">報酬率 ${pc(u/eq*100)}（自備款）</span>`:'<span class="mut">報酬率 —（自備款）</span>'}else rate=`<span class="${cls(u)}">報酬率 ${pc(u/cost*100)}</span>`;return{html:`<span>成本 ${n0(cost)}</span><span class="${cls(u)}">未實現 ${sg(u)}</span>${rate}`,u,ok:true}}
 
+
+function sfQuote(code,mini){const u=SFUT[String(code||'').trim()];if(!u)return null;
+ const live=SFLIVE[String(code||'').trim()]||{},wantMini=!!mini,hasMini=(u.mini&&u.mini.last>0)||(live.mini&&live.mini.p>0),useMini=wantMini&&hasMini;
+ const base=useMini?u.mini:u,lv=useMini?(live.mini||{}):live,p=lv&&lv.p>0?lv.p:(base&&base.last>0?base.last:null);
+ if(!(p>0))return null;
+ const prev=lv&&lv.prev>0?lv.prev:(base&&base.prev);
+ return{p,prev,src:lv&&lv.p>0?'live':'close',contract:(lv&&lv.contract)||(base&&(base.symbol||((base.contract||'')+(base.month||'')))),month:base&&base.month,fname:base&&base.fname,date:base&&base.date,mini:useMini,fallbackMini:wantMini&&!hasMini}}
+function monthLbl(m){return m&&String(m).length===6?m.slice(0,4)+'/'+m.slice(4): (m||'')}
+
 function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mPrev=0,loan=0,fut=0,futPnl=0,futDay=0,grp={},miss=0,pnl=0,pnlHas=false;
  for(const r of P.stocks){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;continue}const v=q*x.p;stock+=v;if(x.prev)stockPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'stocks',0);if(a.ok){pnl+=a.u;pnlHas=true}}
  for(const r of P.margin){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;loan+=effectiveLoan(r);continue}const v=q*x.p,ln=effectiveLoan(r);loan+=ln;mmv+=v;if(x.prev)mPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'margin',ln);if(a.ok){pnl+=a.u;pnlHas=true}}
- for(const r of P.futures){const isSF=r.p===SF,q=num(r.q),pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0);let p=0,prev=null;if(r.mp>0)p=r.mp;else if(isSF){const x=PX[String(r.c||'').trim()];if(x){p=x.p;prev=x.prev}else if(r.c)miss++}else if(TX){p=TX.p||0;prev=TX.prev}fut+=Math.abs(q)*pv*p;if(num(r.cost)>0&&p)futPnl+=(p-num(r.cost))*q*pv;if(!(r.mp>0)&&prev)futDay+=(p-prev)*q*pv}
+ for(const r of P.futures){const isSF=r.p===SF,q=num(r.q),pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0);let p=0,prev=null;if(r.mp>0)p=r.mp;else if(isSF){const q=sfQuote(r.c,num(r.pv)===100);if(q){p=q.p;prev=q.prev}else{const x=PX[String(r.c||'').trim()];if(x){p=x.p;prev=x.prev}else if(r.c)miss++}}else if(TX){p=TX.p||0;prev=TX.prev}fut+=Math.abs(q)*pv*p;if(num(r.cost)>0&&p)futPnl+=(p-num(r.cost))*q*pv;if(!(r.mp>0)&&prev)futDay+=(p-prev)*q*pv}
  const cash=num(P.cash),other=num(P.other),debt=num(P.debt),fm=num(P.futMargin);
  // 帳戶保證金＝期貨帳戶權益（已含未實現損益），淨值只算它，不算名目、不另加未實現
  const net=stock+mmv-loan+fm+cash+other-debt,gross=stock+mmv+fm+cash+other;
@@ -784,10 +798,14 @@ function pie(c){const C=['#4ea1ff','#ff9f43','#b48cff','#22c55e','#f6c344','#ff5
   g+=`<path d="M${x0},${y0}A${R},${R} 0 ${lg} 1 ${x1},${y1}L${x2},${y2}A${r},${r} 0 ${lg} 0 ${x3},${y3}Z" fill="${C[i%10]}"/>`;a=a1});
  $('as-pie').innerHTML=`<svg viewBox="0 0 150 150">${g}</svg><ul>${items.map((x,i)=>`<li><span><i style="background:${C[i%10]}"></i>${esc(x[0])}</span><span>${(x[1]/tot*100).toFixed(1)}%</span></li>`).join('')}</ul>`+(pmode==='pos'?'<p class="mut" style="flex-basis:100%;margin:4px 0 0">以市值計；期貨用帳戶保證金，融資用市值（未扣借款）</p>':'<p class="mut" style="flex-basis:100%;margin:4px 0 0">現股＋融資市值；族群取自本站熱力圖分類，沒有分類的歸「其他」</p>')}
 
-function rowInfo(r,kind,c){if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0),man=r.mp>0;let p=null,prev=null,lbl='';
-  if(man)p=r.mp;else if(isSF){const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入股票代號</span>';const x=PX[code],nm=nameOf(code);if(!x)return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到現貨價（請勾手動價）</span>`;p=x.p;prev=x.prev;lbl='以現貨價估算'}else{p=TX&&TX.p;prev=TX&&TX.prev;lbl=TX?TX.lbl:''}
-  const code=String(r.c||'').trim(),nm=isSF?nameOf(code):'',ch=p&&prev?(p/prev-1)*100:null,notional=Math.abs(num(r.q))*pv*(p||0),upnl=num(r.cost)>0&&p?(p-num(r.cost))*num(r.q)*pv:null,px=p?(isSF?p:n0(p)):'無價格';
-  return`${isSF?`<span class="nm">${esc(nm||code)}</span>`:''}<span>${man?'<span class="as-man">手動價</span> ':''}${px}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}${!man&&lbl?` <span class="mut">${esc(lbl)}</span>`:''}</span><span>名目 ${n0(notional)}</span>${upnl!=null?`<span class="${cls(upnl)}">未實現 ${sg(upnl)}</span>`:''}`}
+function rowInfo(r,kind,c){if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0),man=r.mp>0;let p=null,prev=null,lbl='',basisHtml='',q=null,spot=null;
+  if(man)p=r.mp;else if(isSF){const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入股票代號</span>';q=sfQuote(code,num(r.pv)===100);spot=PX[code];const nm=nameOf(code)||(q&&q.fname)||'';
+   if(q){p=q.p;prev=q.prev;lbl=(q.contract?q.contract+' ':'')+(q.month?monthLbl(q.month)+' ':'')+'期貨價'+(q.src==='live'?'（盤中）':'');if(spot&&spot.p>0){const b=p-spot.p,bp=(b/spot.p)*100;basisHtml=`<span>對現貨 ${sg(b)}（${pc(bp)}）</span>`}}
+   else if(spot){p=spot.p;prev=spot.prev;lbl='以現貨價估算'}
+   else return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到期貨價與現貨價（請勾手動價）</span>`}
+  else{p=TX&&TX.p;prev=TX&&TX.prev;lbl=TX?TX.lbl:''}
+  const code=String(r.c||'').trim(),nm=isSF?(nameOf(code)||(q&&q.fname)||code):'',ch=p&&prev?(p/prev-1)*100:null,notional=Math.abs(num(r.q))*pv*(p||0),upnl=num(r.cost)>0&&p?(p-num(r.cost))*num(r.q)*pv:null,px=p?(isSF?p:n0(p)):'無價格';
+  return`${isSF?`<span class="nm">${esc(nm||code)}</span>`:''}<span>${man?'<span class="as-man">手動價</span> ':''}${px}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}${!man&&lbl?` <span class="mut">${esc(lbl)}</span>`:''}</span>${basisHtml}<span>名目 ${n0(notional)}</span>${upnl!=null?`<span class="${cls(upnl)}">未實現 ${sg(upnl)}</span>`:''}`}
  const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入代號</span>';const x=c.price(r),nm=nameOf(code);
  if(!x)return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到價格（興櫃等請勾手動價）</span>`;
  const v=num(r.q)*x.p,ch=x.prev?(x.p/x.prev-1)*100:null,ln=kind==='margin'?effectiveLoan(r):0,a=avgBits(r,v,kind,ln);
@@ -808,12 +826,12 @@ function renderEditor(){for(const k of['stocks','margin','futures']){$('as-'+k).
 function syncNames(){if(typeof D!=='undefined'&&D&&D.heat&&NAMES.__d!==D.heat){NAMES={__d:D.heat};for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}}
 function refresh(){if(!PF)return;syncNames();if(false&&typeof D!=='undefined'&&D&&D.heat){for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}const c=kpis();$('as-futsum').innerHTML=`<span>期貨部位市值 <b>${n0(c.fut)}</b></span><span>槓桿倍數 <b>${c.lev==null?'—':c.lev.toFixed(1)+'x'}</b></span>`;for(const el of document.querySelectorAll('#assetcard .as-row')){const r=PF[el.dataset.k][+el.dataset.i];if(!r)continue;const info=el.querySelector('.info');if(info)info.innerHTML=rowInfo(r,el.dataset.k,c);if(el.dataset.k==='margin'&&!isLoanManual(r)){const inp=el.querySelector('[data-f=loan]');if(inp&&document.activeElement!==inp)inp.value=fmtAmt(autoLoanDisp(r))}}lineChart();pie(c);
  const srcs=[...new Set(Object.values(PX).map(x=>x.src))].map(s=>({intra:'本站盤中資料（最新成交價）',heat:'本站熱力圖',hist:'本站日線收盤',close:'證交所／櫃買每日收盤',etf:'ETF：證交所／櫃買每日收盤'}[s]));
- $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>資料庫只存股數、口數、均價、借款與現金，市值都是打開時用最新價重算。個股期貨以現貨價估算，不是期貨報價。非投資建議。`;
+ $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>資料庫只存股數、口數、均價、借款與現金，市值都是打開時用最新價重算。個股期貨用期交所近月一般盤收盤（有盤中快照時優先）；沒有期貨報價才以現貨價估算。非投資建議。`;
  $('as-state').textContent=dirty?'有未儲存的變更':(PF.updatedAt?'已儲存':'');}
 
 function onInput(e){const el=e.target,mode=amtMode(el);if(mode&&e.type!=='click')applyAmt(el,mode);const row=el.closest('.as-row');if(!PF)return;
  if(row){const r=PF[row.dataset.k][+row.dataset.i],f=el.dataset.f;if(!r||!f)return;
-  if(f==='mpon'){if(el.checked){const x=row.dataset.k==='futures'&&r.p!==SF?(TX&&TX.p):(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
+  if(f==='mpon'){if(el.checked){let x;if(row.dataset.k==='futures'&&r.p===SF){const q=sfQuote(r.c,num(r.pv)===100);x=q?q.p:(PX[String(r.c||'').trim()]||{}).p}else if(row.dataset.k==='futures')x=TX&&TX.p;else x=(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
   if(f==='loanon'){if(el.checked){const auto=autoLoanDisp({...r,loanManual:false});r.loanManual=true;if(auto!=='')r.loan=auto}else r.loanManual=false;dirty=true;renderEditor();return}
   if(f==='sfsize'){r.pv=num(el.value)||2000;dirty=true;refresh();return}
   if(f==='p'){if(el.value==='__c'){r.p='';}else if(el.value===SF){r.p=SF;if(num(r.pv)!==100)r.pv=2000}else{r.p=el.value;r.pv=FUT[el.value]}dirty=true;renderEditor();return}
