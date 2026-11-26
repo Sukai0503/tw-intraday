@@ -151,7 +151,7 @@ function buyTable(){
     if(n> (r.hist_exec_recent||[]).length) lines.push(`…共 ${n} 次`);
     return `<td class="n" title="${esc(lines.join('\n'))}">${f(avg,dec)}%（${n}次）</td>`;
   };
-  document.getElementById('bbt').innerHTML=tbl(['日期','市場','代號名稱','張數','占發行股%','過往執行率','價格區間','目的'],list.map(r=>tr([md(r.date),esc(r.market),`<td class="nw">${esc(r.code+r.name)}</td>`,`<td class="n">${r.lots==null?'—':f(r.lots)}</td>`,pctCell(r),histCell(r),`<td class="nw">${esc(r.price)}</td>`,`<td class="nw">${esc(r.purpose)}${r.done?' <span class="mut">已完成</span>':''}</td>`],r.purpose==='維護信用'?'hl':'')),[3,4,5]);
+  document.getElementById('bbt').innerHTML=tbl(['日期','市場','代號名稱','張數','占發行股%','過往執行率','價格區間','目的'],list.map(r=>tr([md(r.date),esc(r.market),`<td class="nw"><a href="#" class="stk" data-code="${esc(r.code)}">${esc(r.code+r.name)}</a></td>`,`<td class="n">${r.lots==null?'—':f(r.lots)}</td>`,pctCell(r),histCell(r),`<td class="nw">${esc(r.price)}</td>`,`<td class="nw">${esc(r.purpose)}${r.done?' <span class="mut">已完成</span>':''}</td>`],r.purpose==='維護信用'?'hl':'')),[3,4,5]);
   document.querySelectorAll('#bsort button').forEach(b=>b.classList.toggle('on',b.dataset.s===BSORT));
 }
 
