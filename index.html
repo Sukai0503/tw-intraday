@@ -119,6 +119,8 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 .as-kpi span{display:block;color:#94a3b8;font-size:11.5px}.as-kpi b{font-size:17px;font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;color:#fff}
 .as-kpi.big b{font-size:26px}.as-kpi small{display:block;color:#94a3b8;font-size:11px;margin-top:2px}
 .as-kpi b.up{color:#ff5b5b}.as-kpi b.dn{color:#22c55e}
+.as-kpi b.as-mr.dang,.as-row .as-mr.dang{color:#ff5b5b;font-weight:700}
+.as-kpi b.as-mr.warn,.as-row .as-mr.warn{color:#ff9f43}
 .as-sec{margin:16px 0 6px;color:#dbb866;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .as-sec .mut{font-weight:400}
 .as-rows{display:flex;flex-direction:column;gap:6px}
@@ -705,6 +707,11 @@ function priceOf(r){if(r.mp>0)return{p:r.mp,prev:null,man:true};const x=PX[Strin
 function marginMV(r){const x=priceOf(r),q=num(r.q);return x&&q?q*x.p:0}
 function effectiveLoan(r){if(isLoanManual(r))return num(r.loan);const v=marginMV(r);return v>0?v*loanRatio(r.c):0}
 function autoLoanDisp(r){const v=effectiveLoan(r);return v>0?Math.round(v):''}
+function mrPct(mv,loan){return loan>0?mv/loan*100:null}
+function mrCls(pct){return pct==null?'':pct<130?'as-mr dang':pct<=166?'as-mr warn':''}
+function mrTxt(pct){return pct==null?'—':pct.toFixed(1)+'%'+(pct<130?' 低於130%追繳線':'')}
+function pxFmt(p){if(!Number.isFinite(p))return'—';return String(+p.toFixed(p>=100?1:2))}
+function callPx(loan,q){return loan>0&&q>0?loan*1.3/q:null}
 function normalizeMargin(P){for(const r of(P&&P.margin)||[]){if(r.loanManual===true||r.loanManual===false)continue;r.loanManual=num(r.loan)>0}}
 function nameOf(code){const c=String(code||'').trim();return(NAMES[c]&&NAMES[c].n)||(CNAMES[c]&&CNAMES[c][0])||''}
 function avgBits(r,v,kind,loanAmt){const avg=num(r.avg),q=num(r.q);if(!(avg>0)||!q||!(v>0))return{html:'',u:0,ok:false};const cost=avg*q,u=v-cost;let rate='';if(kind==='margin'){const eq=cost-loanAmt;rate=eq>0?`<span class="${cls(u)}">報酬率 ${pc(u/eq*100)}（自備款）</span>`:'<span class="mut">報酬率 —（自備款）</span>'}else rate=`<span class="${cls(u)}">報酬率 ${pc(u/cost*100)}</span>`;return{html:`<span>成本 ${n0(cost)}</span><span class="${cls(u)}">未實現 ${sg(u)}</span>${rate}`,u,ok:true}}
@@ -716,7 +723,7 @@ function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mP
  const cash=num(P.cash),other=num(P.other),debt=num(P.debt),fm=num(P.futMargin);
  // 帳戶保證金＝期貨帳戶權益（已含未實現損益），淨值只算它，不算名目、不另加未實現
  const net=stock+mmv-loan+fm+cash+other-debt,gross=stock+mmv+fm+cash+other;
- return{stock,mmv,loan,meq:mmv-loan,fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,net,day:stockPrev+mPrev+futDay,cashPct:gross>0?cash/gross*100:null,grp,miss,pnl,pnlHas,price:priceOf}}
+ return{stock,mmv,loan,meq:mmv-loan,mr:mrPct(mmv,loan),fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,net,day:stockPrev+mPrev+futDay,cashPct:gross>0?cash/gross*100:null,grp,miss,pnl,pnlHas,price:priceOf}}
 
 function snapDate(){const d=PXM.date||(TX&&TX.d);return d?ymd(String(d)):tpeDate()}
 function kpis(){const c=calc(),today=snapDate(),yr=today.slice(0,4);
@@ -729,6 +736,7 @@ function kpis(){const c=calc(),today=snapDate(),yr=today.slice(0,4);
   +k('未實現損益',c.pnlHas?sg(c.pnl):'—',c.pnlHas?'已填均價的現股＋融資':'填均價後顯示（現股、融資）',c.pnlHas?cls(c.pnl):null)
   +k('股票市值',n0(c.stock),'現股')
   +k('融資市值／借款',n0(c.mmv)+' / '+n0(c.loan),'融資淨值 '+n0(c.meq))
+  +k('整戶維持率',c.mr==null?'—':c.mr.toFixed(1)+'%',c.mr==null?'融資總市值÷融資總借款':(c.mr<130?'低於130%追繳線':'融資總市值÷融資總借款'),mrCls(c.mr))
   +k('期貨市值／保證金',n0(c.fut)+' / '+n0(c.fm),'槓桿 '+(c.lev==null?'—':c.lev.toFixed(1)+'x')+'｜'+(TX?TX.lbl:'無台指期價格'))
   +k('現金水位',c.cashPct==null?'—':c.cashPct.toFixed(1)+'%','現金 '+n0(c.cash)+'（占股票＋融資市值＋期貨保證金＋現金＋其他）');
  return c}
@@ -760,7 +768,8 @@ function rowInfo(r,kind,c){if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num
  const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入代號</span>';const x=c.price(r),nm=nameOf(code);
  if(!x)return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到價格（興櫃等請勾手動價）</span>`;
  const v=num(r.q)*x.p,ch=x.prev?(x.p/x.prev-1)*100:null,ln=kind==='margin'?effectiveLoan(r):0,a=avgBits(r,v,kind,ln);
- return`<span class="nm">${esc(nm||code)}</span><span>${x.man?'<span class="as-man">手動價</span> ':''}${x.p}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}</span><span>市值 ${n0(v)}</span>${kind==='margin'?`<span>淨值 ${n0(v-ln)}</span>`:''}${a.html}`}
+ const mr=kind==='margin'?mrPct(v,ln):null,cp=kind==='margin'?callPx(ln,num(r.q)):null;
+ return`<span class="nm">${esc(nm||code)}</span><span>${x.man?'<span class="as-man">手動價</span> ':''}${x.p}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}</span><span>市值 ${n0(v)}</span>${kind==='margin'?`<span>淨值 ${n0(v-ln)}</span><span class="${mrCls(mr)}">維持率 ${mrTxt(mr)}</span>${cp!=null?`<span>追繳價 ${pxFmt(cp)}</span>`:''}`:''}${a.html}`}
 
 function rowHTML(r,i,kind){const ov=`<div class="ov"><label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" data-f="mpon" ${r.mp>0?'checked':''}>手動價（預設關，自動抓最新價）</label>${r.mp>0?`<input type="number" step="any" inputmode="decimal" data-f="mp" value="${esc(r.mp)}">`:''}${kind==='margin'?`<label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" data-f="loanon" ${isLoanManual(r)?'checked':''}>手動借款（預設關，自動帶市值6成／上櫃5成）</label>`:''}</div>`;
  const del=`<button class="del" data-del="${i}" type="button" aria-label="刪除">✕</button>`;
