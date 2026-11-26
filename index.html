@@ -705,8 +705,9 @@ function loanHint(code){return mktOf(code)==='otc'?'自備 5成（2倍）':'自�
 function isLoanManual(r){return r.loanManual===true}
 function priceOf(r){if(r.mp>0)return{p:r.mp,prev:null,man:true};const x=PX[String(r.c||'').trim()];return x?{p:x.p,prev:x.prev,man:false,src:x.src,d:x.d}:null}
 function marginMV(r){const x=priceOf(r),q=num(r.q);return x&&q?q*x.p:0}
-function effectiveLoan(r){if(isLoanManual(r))return num(r.loan);const v=marginMV(r);return v>0?v*loanRatio(r.c):0}
-function autoLoanDisp(r){const v=effectiveLoan(r);return v>0?Math.round(v):''}
+function effectiveLoan(r){if(isLoanManual(r))return num(r.loan);const ratio=loanRatio(r.c),avg=num(r.avg),q=num(r.q);if(avg>0&&q)return Math.round(avg*q*ratio);const v=marginMV(r);return v>0?Math.round(v*ratio):0}
+function autoLoanDisp(r){const v=effectiveLoan(r);return v>0?v:''}
+function loanAutoHint(r){const auto='自動：均價×股數×6成（上櫃5成）';if(isLoanManual(r))return loanHint(r.c);return num(r.avg)>0?auto:auto+'。未填均價，借款暫以現價估算，維持率僅供參考'}
 function mrPct(mv,loan){return loan>0?mv/loan*100:null}
 function mrCls(pct){return pct==null?'':pct<130?'as-mr dang':pct<=166?'as-mr warn':''}
 function mrTxt(pct){return pct==null?'—':pct.toFixed(1)+'%'+(pct<130?' 低於130%追繳線':'')}
@@ -778,7 +779,7 @@ function rowHTML(r,i,kind){const ov=`<div class="ov"><label style="flex-directio
   ${isSF?`<label>股票代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c||'')}"></label><label>契約<select data-f="sfsize"><option value="2000" ${num(r.pv)!==100?'selected':''}>一般 2,000 股</option><option value="100" ${num(r.pv)===100?'selected':''}>小型 100 股</option></select></label>`:pre?'':`<label>自訂名稱<input type="text" maxlength="20" data-f="pn" value="${esc(r.p)}"></label>`}${isSF?'':`<label>每點價值<input type="number" step="any" inputmode="decimal" data-f="pv" value="${esc(num(r.pv)||FUT[r.p]||'')}"></label>`}<label>成本點位（選填）<input type="number" step="any" inputmode="decimal" data-f="cost" value="${esc(r.cost||'')}"></label><div class="info"></div>${ov}</div>`}
  const loanMan=kind==='margin'&&isLoanManual(r);
  return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c)}"></label><label>股數<input type="number" step="1" inputmode="numeric" data-f="q" value="${esc(r.q)}"></label>${del}
-  <label>均價（選填）<input type="number" step="any" inputmode="decimal" data-f="avg" value="${esc(r.avg||'')}"></label>${kind==='margin'?`<label>融資借款金額<input type="number" step="any" inputmode="decimal" data-f="loan" value="${esc(loanMan?(r.loan??''):autoLoanDisp(r))}" ${loanMan?'':'disabled'}><span class="hint">${loanHint(r.c)}${loanMan?'':'，自動依市值計算'}</span></label>`:''}<div class="info"></div>${ov}</div>`}
+  <label>均價（選填）<input type="number" step="any" inputmode="decimal" data-f="avg" value="${esc(r.avg||'')}"></label>${kind==='margin'?`<label>融資借款金額<input type="number" step="any" inputmode="decimal" data-f="loan" value="${esc(loanMan?(r.loan??''):autoLoanDisp(r))}" ${loanMan?'':'disabled'}><span class="hint">${loanAutoHint(r)}</span></label>`:''}<div class="info"></div>${ov}</div>`}
 
 function renderEditor(){for(const k of['stocks','margin','futures']){$('as-'+k).innerHTML=PF[k].length?PF[k].map((r,i)=>rowHTML(r,i,k)).join(''):'<p class="mut" style="margin:2px 0">尚無資料</p>'}
  $('as-fm').value=PF.futMargin||'';$('as-cash').value=PF.cash||'';$('as-other').value=PF.other||'';$('as-debt').value=PF.debt||'';refresh()}
