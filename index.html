@@ -129,8 +129,10 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 .as-row .del{background:none;border:0;color:#8b929c;font-size:18px;cursor:pointer;padding:4px 6px}
 .as-row .info{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 12px;color:#cfd3d8;font-size:12px;font-family:ui-monospace,Consolas,monospace}
 .as-row .info .nm{font-family:inherit;color:#fff;font-weight:700}
-.as-row .ov{grid-column:1/-1;display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:11.5px}
+.as-row .ov{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:#94a3b8;font-size:11.5px}
 .as-row .ov input[type=checkbox]{width:auto}.as-row .ov input[type=number]{max-width:120px;padding:3px 6px;font-size:12.5px}
+.as-row input:disabled{opacity:.75;color:#cfd3d8;cursor:default}
+.as-row .hint{color:#94a3b8;font-size:10.5px;line-height:1.4}
 .as-man{background:#5a3a00;color:#ffd38a;border-radius:4px;padding:0 5px;font-size:10.5px;font-family:-apple-system,"Noto Sans TC",sans-serif}
 .as-cash{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.as-cash label{display:flex;flex-direction:column;color:#94a3b8;font-size:11px;gap:2px}
 .as-bar{position:sticky;bottom:8px;display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;background:#0b1426e6;padding:8px;border-radius:10px}
@@ -641,7 +643,7 @@ addEventListener('hashchange',applyView);applyView();
 (function(){
 const FBV='10.12.2',FBC={apiKey:"AIzaSyAuzCzSTeShnLBUPiq9Z-50aBTmBOHu6d8",authDomain:"tw-intraday-assets-8e19e.firebaseapp.com",projectId:"tw-intraday-assets-8e19e",storageBucket:"tw-intraday-assets-8e19e.firebasestorage.app",messagingSenderId:"979991804770",appId:"1:979991804770:web:ff0a38b8861c4d1f4e8a3b"};
 const RAW='https://raw.githubusercontent.com/Sukai0503/tw-intraday/data/';
-const FUT={'大台':200,'小台':50,'微台':10};
+const FUT={'大台':200,'小台':50,'微台':10},SF='個股期貨';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n0=v=>Number.isFinite(v)?Math.round(v).toLocaleString('en-US'):'—';
@@ -659,7 +661,7 @@ function loadFB(){return fbP||(fbP=(async()=>{const b='https://www.gstatic.com/f
 async function getJ(urls){for(const u of urls){try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(30000)});if(r.ok)return await r.json()}catch(e){}}return null}
 function tpeDate(){return new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'})}
 function ymd(s){return s&&s.length===8?s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6):s}
-function codes(){if(!PF)return[];return[...new Set([...PF.stocks,...PF.margin].map(r=>String(r.c||'').trim()).filter(Boolean))]}
+function codes(){if(!PF)return[];const a=[...PF.stocks,...PF.margin];for(const r of PF.futures){if(r.p===SF&&r.c)a.push(r)}return[...new Set(a.map(r=>String(r.c||'').trim()).filter(Boolean))]}
 
 /* 價格：intraday.json（全市場、今日最新價＋昨收）→ data.json 熱力圖個股 → hist.json 最近收盤 */
 async function loadPrices(force){
@@ -695,15 +697,26 @@ async function loadPrices(force){
 }
 let NAMES={},CNAMES={};
 
-function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mPrev=0,loan=0,fut=0,futPnl=0,futDay=0,grp={},miss=0;
- const price=(r)=>{if(r.mp>0)return{p:r.mp,prev:null,man:true};const x=PX[String(r.c||'').trim()];return x?{p:x.p,prev:x.prev,man:false,src:x.src,d:x.d}:null};
- for(const r of P.stocks){const x=price(r),q=num(r.q);if(!x){if(r.c)miss++;continue}const v=q*x.p;stock+=v;if(x.prev)stockPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v}
- for(const r of P.margin){const x=price(r),q=num(r.q);loan+=num(r.loan);if(!x){if(r.c)miss++;continue}const v=q*x.p;mmv+=v;if(x.prev)mPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v}
- for(const r of P.futures){const q=num(r.q),pv=num(r.pv)||FUT[r.p]||0,p=r.mp>0?r.mp:(TX&&TX.p)||0;fut+=Math.abs(q)*pv*p;if(num(r.cost)>0&&p)futPnl+=(p-num(r.cost))*q*pv;if(!(r.mp>0)&&TX&&TX.prev)futDay+=(TX.p-TX.prev)*q*pv}
+function mktOf(code){const c=String(code||'').trim();const row=CNAMES[c];if(row&&row[3]==='otc')return'otc';if(row&&row[3]==='tse')return'tse';if(/^otc/i.test(c))return'otc';if(/^tse/i.test(c))return'tse';return'tse'}
+function loanRatio(code){return mktOf(code)==='otc'?0.5:0.6}
+function loanHint(code){return mktOf(code)==='otc'?'自備 5成（2倍）':'自備 4成（2.5倍）'}
+function isLoanManual(r){return r.loanManual===true}
+function priceOf(r){if(r.mp>0)return{p:r.mp,prev:null,man:true};const x=PX[String(r.c||'').trim()];return x?{p:x.p,prev:x.prev,man:false,src:x.src,d:x.d}:null}
+function marginMV(r){const x=priceOf(r),q=num(r.q);return x&&q?q*x.p:0}
+function effectiveLoan(r){if(isLoanManual(r))return num(r.loan);const v=marginMV(r);return v>0?v*loanRatio(r.c):0}
+function autoLoanDisp(r){const v=effectiveLoan(r);return v>0?Math.round(v):''}
+function normalizeMargin(P){for(const r of(P&&P.margin)||[]){if(r.loanManual===true||r.loanManual===false)continue;r.loanManual=num(r.loan)>0}}
+function nameOf(code){const c=String(code||'').trim();return(NAMES[c]&&NAMES[c].n)||(CNAMES[c]&&CNAMES[c][0])||''}
+function avgBits(r,v,kind,loanAmt){const avg=num(r.avg),q=num(r.q);if(!(avg>0)||!q||!(v>0))return{html:'',u:0,ok:false};const cost=avg*q,u=v-cost;let rate='';if(kind==='margin'){const eq=cost-loanAmt;rate=eq>0?`<span class="${cls(u)}">報酬率 ${pc(u/eq*100)}（自備款）</span>`:'<span class="mut">報酬率 —（自備款）</span>'}else rate=`<span class="${cls(u)}">報酬率 ${pc(u/cost*100)}</span>`;return{html:`<span>成本 ${n0(cost)}</span><span class="${cls(u)}">未實現 ${sg(u)}</span>${rate}`,u,ok:true}}
+
+function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mPrev=0,loan=0,fut=0,futPnl=0,futDay=0,grp={},miss=0,pnl=0,pnlHas=false;
+ for(const r of P.stocks){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;continue}const v=q*x.p;stock+=v;if(x.prev)stockPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'stocks',0);if(a.ok){pnl+=a.u;pnlHas=true}}
+ for(const r of P.margin){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;loan+=isLoanManual(r)?num(r.loan):0;continue}const v=q*x.p,ln=effectiveLoan(r);loan+=ln;mmv+=v;if(x.prev)mPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'margin',ln);if(a.ok){pnl+=a.u;pnlHas=true}}
+ for(const r of P.futures){const isSF=r.p===SF,q=num(r.q),pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0);let p=0,prev=null;if(r.mp>0)p=r.mp;else if(isSF){const x=PX[String(r.c||'').trim()];if(x){p=x.p;prev=x.prev}else if(r.c)miss++}else if(TX){p=TX.p||0;prev=TX.prev}fut+=Math.abs(q)*pv*p;if(num(r.cost)>0&&p)futPnl+=(p-num(r.cost))*q*pv;if(!(r.mp>0)&&prev)futDay+=(p-prev)*q*pv}
  const cash=num(P.cash),other=num(P.other),debt=num(P.debt),fm=num(P.futMargin);
  // 帳戶保證金＝期貨帳戶權益（已含未實現損益），淨值只算它，不算名目、不另加未實現
  const net=stock+mmv-loan+fm+cash+other-debt,gross=stock+mmv+fm+cash+other;
- return{stock,mmv,loan,meq:mmv-loan,fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,net,day:stockPrev+mPrev+futDay,cashPct:gross>0?cash/gross*100:null,grp,miss,price}}
+ return{stock,mmv,loan,meq:mmv-loan,fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,net,day:stockPrev+mPrev+futDay,cashPct:gross>0?cash/gross*100:null,grp,miss,pnl,pnlHas,price:priceOf}}
 
 function snapDate(){const d=PXM.date||(TX&&TX.d);return d?ymd(String(d)):tpeDate()}
 function kpis(){const c=calc(),today=snapDate(),yr=today.slice(0,4);
@@ -713,6 +726,7 @@ function kpis(){const c=calc(),today=snapDate(),yr=today.slice(0,4);
  $('as-kpis').innerHTML=k('總淨值',n0(c.net),'股票＋融資淨值＋期貨帳戶保證金＋現金＋其他−負債',null,1)
   +k('今日損益',sg(c.day),prev?'vs 上次紀錄 '+prev.id+'：'+sg(c.net-prev.net):'最近交易日 vs 前一日收盤',cls(c.day))
   +k('今年損益',ytd==null?'—':sg(ytd),first?'起點 '+first.id:'今年尚無紀錄',cls(ytd))
+  +k('未實現損益',c.pnlHas?sg(c.pnl):'—',c.pnlHas?'已填均價的現股＋融資':'填均價後顯示（現股、融資）',c.pnlHas?cls(c.pnl):null)
   +k('股票市值',n0(c.stock),'現股')
   +k('融資市值／借款',n0(c.mmv)+' / '+n0(c.loan),'融資淨值 '+n0(c.meq))
   +k('期貨市值／保證金',n0(c.fut)+' / '+n0(c.fm),'槓桿 '+(c.lev==null?'—':c.lev.toFixed(1)+'x')+'｜'+(TX?TX.lbl:'無台指期價格'))
@@ -739,40 +753,47 @@ function pie(c){const C=['#4ea1ff','#ff9f43','#b48cff','#22c55e','#f6c344','#ff5
   g+=`<path d="M${x0},${y0}A${R},${R} 0 ${lg} 1 ${x1},${y1}L${x2},${y2}A${r},${r} 0 ${lg} 0 ${x3},${y3}Z" fill="${C[i%10]}"/>`;a=a1});
  $('as-pie').innerHTML=`<svg viewBox="0 0 150 150">${g}</svg><ul>${items.map((x,i)=>`<li><span><i style="background:${C[i%10]}"></i>${esc(x[0])}</span><span>${(x[1]/tot*100).toFixed(1)}%</span></li>`).join('')}</ul>`+(pmode==='pos'?'<p class="mut" style="flex-basis:100%;margin:4px 0 0">以市值計；期貨用帳戶保證金，融資用市值（未扣借款）</p>':'<p class="mut" style="flex-basis:100%;margin:4px 0 0">現股＋融資市值；族群取自本站熱力圖分類，沒有分類的歸「其他」</p>')}
 
-function rowInfo(r,kind,c){if(kind==='futures'){const pv=num(r.pv)||FUT[r.p]||0,p=r.mp>0?r.mp:(TX&&TX.p);return`<span>${r.mp>0?'<span class="as-man">手動價</span> ':''}${p?n0(p)+(r.mp>0?'':' '+esc(TX.lbl)):'無價格'}</span><span>名目 ${n0(Math.abs(num(r.q))*pv*(p||0))}</span>${num(r.cost)>0&&p?`<span class="${cls((p-num(r.cost))*num(r.q))}">未實現 ${sg((p-num(r.cost))*num(r.q)*pv)}</span>`:''}`}
- const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入代號</span>';const x=c.price(r),nm=NAMES[code]?NAMES[code].n:(CNAMES[code]?CNAMES[code][0]:'');
+function rowInfo(r,kind,c){if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0),man=r.mp>0;let p=null,prev=null,lbl='';
+  if(man)p=r.mp;else if(isSF){const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入股票代號</span>';const x=PX[code],nm=nameOf(code);if(!x)return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到現貨價（請勾手動價）</span>`;p=x.p;prev=x.prev;lbl='以現貨價估算'}else{p=TX&&TX.p;prev=TX&&TX.prev;lbl=TX?TX.lbl:''}
+  const code=String(r.c||'').trim(),nm=isSF?nameOf(code):'',ch=p&&prev?(p/prev-1)*100:null,notional=Math.abs(num(r.q))*pv*(p||0),upnl=num(r.cost)>0&&p?(p-num(r.cost))*num(r.q)*pv:null,px=p?(isSF?p:n0(p)):'無價格';
+  return`${isSF?`<span class="nm">${esc(nm||code)}</span>`:''}<span>${man?'<span class="as-man">手動價</span> ':''}${px}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}${!man&&lbl?` <span class="mut">${esc(lbl)}</span>`:''}</span><span>名目 ${n0(notional)}</span>${upnl!=null?`<span class="${cls(upnl)}">未實現 ${sg(upnl)}</span>`:''}`}
+ const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入代號</span>';const x=c.price(r),nm=nameOf(code);
  if(!x)return`<span class="nm">${esc(code)} ${esc(nm)}</span><span class="dn">找不到價格（興櫃等請勾手動價）</span>`;
- const v=num(r.q)*x.p,ch=x.prev?(x.p/x.prev-1)*100:null;
- return`<span class="nm">${esc(nm||code)}</span><span>${x.man?'<span class="as-man">手動價</span> ':''}${x.p}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}</span><span>市值 ${n0(v)}</span>${kind==='margin'?`<span>淨值 ${n0(v-num(r.loan))}</span>`:''}`}
+ const v=num(r.q)*x.p,ch=x.prev?(x.p/x.prev-1)*100:null,ln=kind==='margin'?effectiveLoan(r):0,a=avgBits(r,v,kind,ln);
+ return`<span class="nm">${esc(nm||code)}</span><span>${x.man?'<span class="as-man">手動價</span> ':''}${x.p}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}</span><span>市值 ${n0(v)}</span>${kind==='margin'?`<span>淨值 ${n0(v-ln)}</span>`:''}${a.html}`}
 
-function rowHTML(r,i,kind){const ov=`<div class="ov"><label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" data-f="mpon" ${r.mp>0?'checked':''}>手動價（預設關，自動抓最新價）</label>${r.mp>0?`<input type="number" step="any" inputmode="decimal" data-f="mp" value="${esc(r.mp)}">`:''}</div>`;
+function rowHTML(r,i,kind){const ov=`<div class="ov"><label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" data-f="mpon" ${r.mp>0?'checked':''}>手動價（預設關，自動抓最新價）</label>${r.mp>0?`<input type="number" step="any" inputmode="decimal" data-f="mp" value="${esc(r.mp)}">`:''}${kind==='margin'?`<label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" data-f="loanon" ${isLoanManual(r)?'checked':''}>手動借款（預設關，自動帶市值6成／上櫃5成）</label>`:''}</div>`;
  const del=`<button class="del" data-del="${i}" type="button" aria-label="刪除">✕</button>`;
- if(kind==='futures'){const pre=FUT[r.p]!=null;return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>商品<select data-f="p">${Object.keys(FUT).map(k=>`<option ${r.p===k?'selected':''}>${k}</option>`).join('')}<option value="__c" ${pre?'':'selected'}>自訂</option></select></label><label>口數（空單用負數）<input type="number" step="1" inputmode="numeric" data-f="q" value="${esc(r.q)}"></label>${del}
-  ${pre?'':`<label>自訂名稱<input type="text" maxlength="20" data-f="pn" value="${esc(r.p)}"></label>`}<label>每點價值<input type="number" step="any" inputmode="decimal" data-f="pv" value="${esc(num(r.pv)||FUT[r.p]||'')}"></label><label>成本點位（選填）<input type="number" step="any" inputmode="decimal" data-f="cost" value="${esc(r.cost||'')}"></label><div class="info"></div>${ov}</div>`}
+ if(kind==='futures'){const isSF=r.p===SF,pre=FUT[r.p]!=null;
+  return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>商品<select data-f="p">${Object.keys(FUT).map(k=>`<option ${r.p===k?'selected':''}>${k}</option>`).join('')}<option value="${SF}" ${isSF?'selected':''}>${SF}</option><option value="__c" ${pre||isSF?'':'selected'}>自訂</option></select></label><label>口數（空單用負數）<input type="number" step="1" inputmode="numeric" data-f="q" value="${esc(r.q)}"></label>${del}
+  ${isSF?`<label>股票代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c||'')}"></label><label>契約<select data-f="sfsize"><option value="2000" ${num(r.pv)!==100?'selected':''}>一般 2,000 股</option><option value="100" ${num(r.pv)===100?'selected':''}>小型 100 股</option></select></label>`:pre?'':`<label>自訂名稱<input type="text" maxlength="20" data-f="pn" value="${esc(r.p)}"></label>`}${isSF?'':`<label>每點價值<input type="number" step="any" inputmode="decimal" data-f="pv" value="${esc(num(r.pv)||FUT[r.p]||'')}"></label>`}<label>成本點位（選填）<input type="number" step="any" inputmode="decimal" data-f="cost" value="${esc(r.cost||'')}"></label><div class="info"></div>${ov}</div>`}
+ const loanMan=kind==='margin'&&isLoanManual(r);
  return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c)}"></label><label>股數<input type="number" step="1" inputmode="numeric" data-f="q" value="${esc(r.q)}"></label>${del}
-  ${kind==='margin'?`<label style="grid-column:1/3">融資借款金額<input type="number" step="any" inputmode="decimal" data-f="loan" value="${esc(r.loan)}"></label>`:''}<div class="info"></div>${ov}</div>`}
+  <label>均價（選填）<input type="number" step="any" inputmode="decimal" data-f="avg" value="${esc(r.avg||'')}"></label>${kind==='margin'?`<label>融資借款金額<input type="number" step="any" inputmode="decimal" data-f="loan" value="${esc(loanMan?(r.loan??''):autoLoanDisp(r))}" ${loanMan?'':'disabled'}><span class="hint">${loanHint(r.c)}${loanMan?'':'，自動依市值計算'}</span></label>`:''}<div class="info"></div>${ov}</div>`}
 
 function renderEditor(){for(const k of['stocks','margin','futures']){$('as-'+k).innerHTML=PF[k].length?PF[k].map((r,i)=>rowHTML(r,i,k)).join(''):'<p class="mut" style="margin:2px 0">尚無資料</p>'}
  $('as-fm').value=PF.futMargin||'';$('as-cash').value=PF.cash||'';$('as-other').value=PF.other||'';$('as-debt').value=PF.debt||'';refresh()}
 function syncNames(){if(typeof D!=='undefined'&&D&&D.heat&&NAMES.__d!==D.heat){NAMES={__d:D.heat};for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}}
-function refresh(){if(!PF)return;syncNames();if(false&&typeof D!=='undefined'&&D&&D.heat){for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}const c=kpis();$('as-futsum').innerHTML=`<span>期貨部位市值 <b>${n0(c.fut)}</b></span><span>槓桿倍數 <b>${c.lev==null?'—':c.lev.toFixed(1)+'x'}</b></span>`;for(const el of document.querySelectorAll('#assetcard .as-row')){const r=PF[el.dataset.k][+el.dataset.i];if(r)el.querySelector('.info').innerHTML=rowInfo(r,el.dataset.k,c)}lineChart();pie(c);
+function refresh(){if(!PF)return;syncNames();if(false&&typeof D!=='undefined'&&D&&D.heat){for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}const c=kpis();$('as-futsum').innerHTML=`<span>期貨部位市值 <b>${n0(c.fut)}</b></span><span>槓桿倍數 <b>${c.lev==null?'—':c.lev.toFixed(1)+'x'}</b></span>`;for(const el of document.querySelectorAll('#assetcard .as-row')){const r=PF[el.dataset.k][+el.dataset.i];if(!r)continue;const info=el.querySelector('.info');if(info)info.innerHTML=rowInfo(r,el.dataset.k,c);if(el.dataset.k==='margin'&&!isLoanManual(r)){const inp=el.querySelector('[data-f=loan]');if(inp&&document.activeElement!==inp)inp.value=autoLoanDisp(r)}}lineChart();pie(c);
  const srcs=[...new Set(Object.values(PX).map(x=>x.src))].map(s=>({intra:'本站盤中資料（最新成交價）',heat:'本站熱力圖',hist:'本站日線收盤',close:'證交所／櫃買每日收盤',etf:'ETF：證交所／櫃買每日收盤'}[s]));
- $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>資料庫只存股數、口數、借款與現金，市值都是打開時用最新價重算。非投資建議。`;
+ $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>資料庫只存股數、口數、均價、借款與現金，市值都是打開時用最新價重算。個股期貨以現貨價估算，不是期貨報價。非投資建議。`;
  $('as-state').textContent=dirty?'有未儲存的變更':(PF.updatedAt?'已儲存':'');}
 
 function onInput(e){const el=e.target,row=el.closest('.as-row');if(!PF)return;
  if(row){const r=PF[row.dataset.k][+row.dataset.i],f=el.dataset.f;if(!r||!f)return;
-  if(f==='mpon'){if(el.checked){const x=row.dataset.k==='futures'?(TX&&TX.p):(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
-  if(f==='p'){if(el.value==='__c'){r.p='';}else{r.p=el.value;r.pv=FUT[el.value]}dirty=true;renderEditor();return}
+  if(f==='mpon'){if(el.checked){const x=row.dataset.k==='futures'&&r.p!==SF?(TX&&TX.p):(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
+  if(f==='loanon'){if(el.checked){const auto=autoLoanDisp({...r,loanManual:false});r.loanManual=true;if(auto!=='')r.loan=auto}else r.loanManual=false;dirty=true;renderEditor();return}
+  if(f==='sfsize'){r.pv=num(el.value)||2000;dirty=true;refresh();return}
+  if(f==='p'){if(el.value==='__c'){r.p='';}else if(el.value===SF){r.p=SF;if(num(r.pv)!==100)r.pv=2000}else{r.p=el.value;r.pv=FUT[el.value]}dirty=true;renderEditor();return}
   if(f==='pn')r.p=el.value.slice(0,20);else if(f==='c')r.c=el.value.trim().toUpperCase().slice(0,8);else r[f]=el.value===''?'':num(el.value);
   dirty=true;if(f==='c'&&e.type==='change'&&r.c&&!PX[r.c]){loadPrices(true).then(refresh)}else refresh();return}
  if(el.id==='as-fm'){PF.futMargin=num(el.value);dirty=true;refresh();return}
  if(el.id==='as-cash'||el.id==='as-other'||el.id==='as-debt'){PF[el.id.slice(3)]=num(el.value);dirty=true;refresh()}}
 
 function clean(){const n=v=>Number.isFinite(+v)?+v:0,o={stocks:[],margin:[],futures:[],futMargin:n(PF.futMargin),cash:n(PF.cash),other:n(PF.other),debt:n(PF.debt)};
- for(const r of PF.stocks){if(!r.c)continue;const x={c:String(r.c).slice(0,8),q:n(r.q)};if(r.mp>0)x.mp=n(r.mp);o.stocks.push(x)}
- for(const r of PF.margin){if(!r.c)continue;const x={c:String(r.c).slice(0,8),q:n(r.q),loan:n(r.loan)};if(r.mp>0)x.mp=n(r.mp);o.margin.push(x)}
- for(const r of PF.futures){const x={p:String(r.p||'自訂').slice(0,20),q:n(r.q),pv:n(r.pv)||FUT[r.p]||0};if(n(r.cost)>0)x.cost=n(r.cost);if(r.mp>0)x.mp=n(r.mp);o.futures.push(x)}
+ for(const r of PF.stocks){if(!r.c)continue;const x={c:String(r.c).slice(0,8),q:n(r.q)};if(r.mp>0)x.mp=n(r.mp);if(n(r.avg)>0)x.avg=n(r.avg);o.stocks.push(x)}
+ for(const r of PF.margin){if(!r.c)continue;const man=isLoanManual(r),x={c:String(r.c).slice(0,8),q:n(r.q),loan:man?n(r.loan):n(autoLoanDisp(r)),loanManual:man};if(r.mp>0)x.mp=n(r.mp);if(n(r.avg)>0)x.avg=n(r.avg);o.margin.push(x)}
+ for(const r of PF.futures){const isSF=r.p===SF,x={p:isSF?SF:String(r.p||'自訂').slice(0,20),q:n(r.q),pv:isSF?(n(r.pv)===100?100:2000):(n(r.pv)||FUT[r.p]||0)};if(isSF&&r.c)x.c=String(r.c).slice(0,8);if(n(r.cost)>0)x.cost=n(r.cost);if(r.mp>0)x.mp=n(r.mp);o.futures.push(x)}
  return o}
 async function saveSnap(){if(!user||!PF)return;const c=calc();if(!(c.stock||c.mmv||c.fut||c.fm||c.cash||c.other||c.debt))return;const id=snapDate();const F=FB.F;
  const s={net:Math.round(c.net),stock:Math.round(c.stock),margin:Math.round(c.meq),marginMV:Math.round(c.mmv),marginLoan:Math.round(c.loan),futures:Math.round(c.fut),futPnl:Math.round(c.futPnl),futMargin:Math.round(c.fm),cash:Math.round(c.cash),other:Math.round(c.other),debt:Math.round(c.debt),taiex:IDX&&IDX.v||0,tx:TX&&!TX.est?TX.p:0,ts:F.serverTimestamp()};
@@ -782,7 +803,7 @@ async function save(){if(!user)return;const b=$('as-save');b.disabled=true;$('as
  catch(e){$('as-state').textContent='儲存失敗：'+(e.code||e.message)}finally{b.disabled=false}}
 
 async function loadUser(){const F=FB.F;$('as-state').textContent='讀取中…';
- try{const d=await F.getDoc(F.doc(FB.db,'users',user.uid,'portfolio','current'));PF=d.exists()?Object.assign(empty(),d.data()):empty();
+ try{const d=await F.getDoc(F.doc(FB.db,'users',user.uid,'portfolio','current'));PF=d.exists()?Object.assign(empty(),d.data()):empty();normalizeMargin(PF);
   const qs=await F.getDocs(F.collection(FB.db,'users',user.uid,'snapshots'));SNAP=qs.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>a.id<b.id?-1:1)}
  catch(e){PF=PF||empty();$('as-state').textContent='讀取失敗：'+(e.code||e.message)}
  dirty=false;await loadPrices(true);renderEditor();await saveSnap();refresh()}
@@ -797,7 +818,7 @@ async function start(){if(started)return;started=true;
  $('as-save').onclick=save;
  const card=$('assetcard');card.addEventListener('input',onInput);card.addEventListener('change',onInput);
  card.addEventListener('click',e=>{const a=e.target.closest('[data-add]'),d=e.target.closest('[data-del]');if(!PF)return;
-  if(a){const k=a.dataset.add;PF[k].push(k==='futures'?{p:'微台',q:1,pv:10}:k==='margin'?{c:'',q:'',loan:''}:{c:'',q:''});dirty=true;renderEditor();const rows=$('as-'+k).querySelectorAll('.as-row');const last=rows[rows.length-1];if(last){const inp=last.querySelector('input');inp&&inp.focus()}}
+  if(a){const k=a.dataset.add;PF[k].push(k==='futures'?{p:'微台',q:1,pv:10}:k==='margin'?{c:'',q:'',loan:'',loanManual:false}:{c:'',q:''});dirty=true;renderEditor();const rows=$('as-'+k).querySelectorAll('.as-row');const last=rows[rows.length-1];if(last){const inp=last.querySelector('input');inp&&inp.focus()}}
   if(d){const row=d.closest('.as-row');PF[row.dataset.k].splice(+row.dataset.i,1);dirty=true;renderEditor()}
   const pm=e.target.closest('#as-pmode button');if(pm){pmode=pm.dataset.m;for(const b of document.querySelectorAll('#as-pmode button'))b.classList.toggle('on',b===pm);refresh()}});
  $('as-cmp').onchange=lineChart;
