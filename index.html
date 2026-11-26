@@ -146,7 +146,7 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 .as-src{margin-top:12px;color:#8b929c;font-size:11px;line-height:1.8}
 @media(max-width:480px){.as-cash{grid-template-columns:1fr 1fr}.as-kpi.big b{font-size:22px}}
 .as-fut{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;background:#14233c;border-radius:10px;padding:8px;margin:0 0 6px}.as-fut label{display:flex;flex-direction:column;color:#94a3b8;font-size:11px;gap:2px}.as-fut input{width:100%;background:#0d1a2e;border:1px solid #2a3446;border-radius:6px;color:#fff;padding:6px 7px;font:inherit;font-size:14px}
-.as-futsum{display:flex;flex-direction:column;gap:2px;color:#94a3b8;font-size:12px}.as-futsum b{color:#fff;font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-left:4px}
+.as-futsum{display:flex;flex-direction:column;gap:2px;color:#94a3b8;font-size:12px}.as-futsum b{color:#fff;font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-left:4px}.as-ussum{margin:4px 0 10px;display:flex;flex-wrap:wrap;gap:12px;color:#94a3b8;font-size:12px}.as-ussum b{color:#fff;font-family:ui-monospace,Consolas,monospace;font-size:15px;margin-left:4px}
 </style><link rel="icon" href="favicon.png?v=1"><link rel="apple-touch-icon" href="icon-180.png?v=1"></head><body><div class="wrap">
 <div id="demo" style="display:none;background:#5a3a00;color:#ffd38a;border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:13px">⚠ 示範資料：以下數字與曲線為假資料，僅展示版面</div>
 <div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button id="thm" class="thm" type="button"></button></div><nav class="nav"><a id="nv-intra" href="./#intra">今日盤中</a><a id="nv-heat" href="./#heat">族群熱力</a><a id="nv-inst" href="./#inst">法人同步</a><a id="nv-perf" href="./#perf">個股業績</a><a href="signals/">非常態投資</a><a id="nv-asset" href="./#asset">資產</a></nav>
@@ -240,7 +240,7 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 <section class="inst" id="assetcard" data-v="asset" aria-labelledby="asset-heading">
 <h2 id="asset-heading">資產總覽<span>照券商庫存更新，不用逐筆記帳</span></h2>
 <div id="as-out">
-<p class="as-note">用自己的 Google 帳號登入後，可以記錄現股、融資、期貨和現金，網站每次打開都會用最新股價和台指期重算市值，並每天自動留一筆淨值紀錄。<br>每個帳號只能讀寫自己的資料，其他登入的人看不到。</p>
+<p class="as-note">用自己的 Google 帳號登入後，可以記錄現股、融資、期貨、美股和現金，網站每次打開都會用最新股價和台指期重算市值，並每天自動留一筆淨值紀錄。<br>每個帳號只能讀寫自己的資料，其他登入的人看不到。</p>
 <button class="as-btn" id="as-login" type="button">用 Google 登入</button>
 <p class="mut" id="as-msg" role="status" aria-live="polite"></p>
 </div>
@@ -259,6 +259,11 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 <div class="as-fut"><label>帳戶保證金（期貨帳戶權益數）<input type="text" inputmode="numeric" id="as-fm" autocomplete="off"></label><div class="as-futsum" id="as-futsum"></div></div>
 <p class="mut" style="margin:0 0 6px">口數正數＝多單、負數＝空單。部位市值＝台指期價格×每點價值×口數（多空都取絕對值），每次打開用最新價重算。淨值只算帳戶保證金（權益數已含未實現損益），成本點位只用來顯示各筆未實現，不重複計入。</p>
 <div class="as-rows" id="as-futures"></div>
+<div class="as-sec">美股 <button class="as-btn sec sm" data-add="us" type="button">＋ 新增</button></div>
+<div class="as-fut" id="as-fxbar"><label>美元匯率（TWD）<input type="text" inputmode="decimal" id="as-usdx" autocomplete="off"></label><label style="flex-direction:row;align-items:center;gap:8px;margin-top:18px"><input type="checkbox" id="as-usdxon">手動匯率（預設關，自動帶入）</label><div class="as-futsum" id="as-usfx"></div></div>
+<p class="mut" style="margin:0 0 6px">代號例如 NVDA、TSLA、QQQ（ETF 也可）。股數可為碎股。市值先以美元計算，再依匯率換成台幣後計入總淨值與未實現。常見代號會在美股收盤後自動更新；沒有報價時請勾手動價。</p>
+<div class="as-rows" id="as-us"></div>
+<div class="as-ussum" id="as-ussum"></div>
 <div class="as-sec">現金與其他</div>
 <div class="as-cash"><label>現金（銀行＋券商交割）<input type="text" inputmode="numeric" id="as-cash" autocomplete="off"></label><label>其他資產<input type="text" inputmode="numeric" id="as-other" autocomplete="off"></label><label>負債<input type="text" inputmode="numeric" id="as-debt" autocomplete="off"></label></div>
 <div class="as-bar"><span class="mut" id="as-state"></span><button class="as-btn" id="as-save" type="button">儲存</button></div>
@@ -655,8 +660,9 @@ const cls=v=>v>0?'up':v<0?'dn':'';
 const num=v=>{const x=parseFloat(String(v==null?'':v).replace(/,/g,''));return Number.isFinite(x)?x:0};
 function amtMode(el){if(!el)return null;const f=el.dataset&&el.dataset.f||'',id=el.id||'';
  if(id==='as-fm'||id==='as-cash'||id==='as-other'||id==='as-debt')return{dec:false,signed:false};
+ if(id==='as-usdx')return{dec:true,signed:false};
  if(f==='avg'||f==='mp'||f==='cost')return{dec:true,signed:false};
- if(f==='q')return{dec:false,signed:true};
+ if(f==='q'){const row=el.closest&&el.closest('.as-row');if(row&&row.dataset.k==='us')return{dec:true,signed:false};return{dec:false,signed:true}}
  if(f==='loan'||f==='repay'||f==='pv')return{dec:false,signed:false};
  return null}
 function groupAmt(raw,dec,signed){let s=String(raw==null?'':raw);const t=s.replace(/,/g,''),neg=!!signed&&/^-/.test(t.trim());
@@ -672,8 +678,8 @@ function applyAmt(el,mode){const old=el.value,caret=el.selectionStart,next=group
  el.value=next;let n=0,pos=next.length;if(!atEnd){for(let i=0;i<next.length;i++){if(/[\d.\-]/.test(next[i])&&++n>=sig){pos=i+1;break}}}
  try{el.setSelectionRange(pos,pos)}catch(e){}}
 
-let FB=null,fbP=null,user=null,started=false,PF=null,SNAP=[],dirty=false,PX={},PXM={},TX=null,IDX=null,SFUT={},SFLIVE={},pxT=0,pmode='pos',timer=null;
-const empty=()=>({stocks:[],margin:[],futures:[],futMargin:0,cash:0,other:0,debt:0});
+let FB=null,fbP=null,user=null,started=false,PF=null,SNAP=[],dirty=false,PX={},PXM={},TX=null,IDX=null,SFUT={},SFLIVE={},USPX={},USFX=null,pxT=0,pmode='pos',timer=null;
+const empty=()=>({stocks:[],margin:[],futures:[],us:[],futMargin:0,cash:0,other:0,debt:0,usdx:0,usdxManual:false});
 
 function loadFB(){return fbP||(fbP=(async()=>{const b='https://www.gstatic.com/firebasejs/'+FBV+'/';
  const [app,auth,fs]=await Promise.all([import(b+'firebase-app.js'),import(b+'firebase-auth.js'),import(b+'firebase-firestore.js')]);
@@ -717,6 +723,9 @@ async function loadPrices(force){
  if(SFJ&&SFJ.px)SFUT=SFJ.px;
  const LP=await getJ([RAW+'live_px.json','live_px.json']);
  if(LP&&LP.sf)SFLIVE=LP.sf;
+ USPX={};USFX=null;
+ const U=await getJ([RAW+'us_px.json','us_px.json']);
+ if(U&&U.px)USPX=U.px;if(U&&U.fx)USFX=U.fx;
  const S=await getJ(['signals/data.json']);
  if(S&&S.DATA&&S.DATA.taiex&&S.DATA.taiex.close&&S.DATA.taiex.close.v){const v=S.DATA.taiex.close.v,p=parseFloat(S.DATA.taiex.pct);IDX={v,d:S.DATA.taiex.close.as_of,prev:Number.isFinite(p)?v/(1+p/100):null};
   if(!TX)TX={p:v,prev:IDX.prev,d:(IDX.d||'').replace(/-/g,''),lbl:'暫用加權估算',est:true}}
@@ -728,6 +737,10 @@ function loanRatio(code){return mktOf(code)==='otc'?0.5:0.6}
 function loanHint(code){return mktOf(code)==='otc'?'自備 5成（2倍）':'自備 4成（2.5倍）'}
 function isLoanManual(r){return r.loanManual===true}
 function priceOf(r){if(r.mp>0)return{p:r.mp,prev:null,man:true};const x=PX[String(r.c||'').trim()];return x?{p:x.p,prev:x.prev,man:false,src:x.src,d:x.d}:null}
+function usCode(c){return String(c||'').trim().toUpperCase().replace(/\./g,'-')}
+function usd(v,d){if(!Number.isFinite(v))return'—';const p=d==null?2:d,n=Math.abs(v).toFixed(p),[a,b]=n.split('.');return(v<0?'-':'')+'$'+a.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(b!=null?'.'+b:'')}
+function fxRate(){if(PF&&PF.usdxManual&&num(PF.usdx)>0)return num(PF.usdx);return(USFX&&USFX.usdTwd>0)?USFX.usdTwd:0}
+function usPx(r){if(num(r.mp)>0)return{p:num(r.mp),prev:null,man:true};const x=USPX[usCode(r.c)];return x&&x.p>0?{p:x.p,prev:x.prev,man:false,n:x.n,t:x.t,pct:x.pct,stale:!!x.stale}:null}
 function marginMV(r){const x=priceOf(r),q=num(r.q);return x&&q?q*x.p:0}
 function repayAmt(r){return Math.max(0,num(r.repay))}
 function baseLoan(r){if(isLoanManual(r))return num(r.loan);const ratio=loanRatio(r.c),avg=num(r.avg),q=num(r.q);if(avg>0&&q)return Math.round(avg*q*ratio);const v=marginMV(r);return v>0?Math.round(v*ratio):0}
@@ -753,29 +766,31 @@ function sfQuote(code,mini){const u=SFUT[String(code||'').trim()];if(!u)return n
  return{p,prev,src:lv&&lv.p>0?'live':'close',contract:(lv&&lv.contract)||(base&&(base.symbol||((base.contract||'')+(base.month||'')))),month:base&&base.month,fname:base&&base.fname,date:base&&base.date,mini:useMini,fallbackMini:wantMini&&!hasMini}}
 function monthLbl(m){return m&&String(m).length===6?m.slice(0,4)+'/'+m.slice(4): (m||'')}
 
-function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mPrev=0,loan=0,fut=0,futPnl=0,futDay=0,grp={},miss=0,pnl=0,pnlHas=false;
+function calc(){syncNames();const P=PF||empty();let stock=0,stockPrev=0,mmv=0,mPrev=0,loan=0,fut=0,futPnl=0,futDay=0,usUsd=0,usTwd=0,usDay=0,grp={},miss=0,pnl=0,pnlHas=false;
  for(const r of P.stocks){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;continue}const v=q*x.p;stock+=v;if(x.prev)stockPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'stocks',0);if(a.ok){pnl+=a.u;pnlHas=true}}
  for(const r of P.margin){const x=priceOf(r),q=num(r.q);if(!x){if(r.c)miss++;loan+=effectiveLoan(r);continue}const v=q*x.p,ln=effectiveLoan(r);loan+=ln;mmv+=v;if(x.prev)mPrev+=q*(x.p-x.prev);const g=(NAMES[r.c]&&NAMES[r.c].g)||'其他';grp[g]=(grp[g]||0)+v;const a=avgBits(r,v,'margin',ln);if(a.ok){pnl+=a.u;pnlHas=true}}
  for(const r of P.futures){const isSF=r.p===SF,q=num(r.q),pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0);let p=0,prev=null;if(r.mp>0)p=r.mp;else if(isSF){const q=sfQuote(r.c,num(r.pv)===100);if(q){p=q.p;prev=q.prev}else{const x=PX[String(r.c||'').trim()];if(x){p=x.p;prev=x.prev}else if(r.c)miss++}}else if(TX){p=TX.p||0;prev=TX.prev}fut+=Math.abs(q)*pv*p;if(num(r.cost)>0&&p)futPnl+=(p-num(r.cost))*q*pv;if(!(r.mp>0)&&prev)futDay+=(p-prev)*q*pv}
- const cash=num(P.cash),other=num(P.other),debt=num(P.debt),fm=num(P.futMargin);
- // 帳戶保證金＝期貨帳戶權益（已含未實現損益），淨值只算它，不算名目、不另加未實現
- const net=stock+mmv-loan+fm+cash+other-debt,gross=stock+mmv+fm+cash+other;
- return{stock,mmv,loan,meq:mmv-loan,mr:mrPct(mmv,loan),fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,net,day:stockPrev+mPrev+futDay,cashPct:gross>0?cash/gross*100:null,grp,miss,pnl,pnlHas,price:priceOf}}
+ const cash=num(P.cash),other=num(P.other),debt=num(P.debt),fm=num(P.futMargin),fx=fxRate();
+ for(const r of P.us||[]){const x=usPx(r),q=num(r.q);if(!x){if(r.c)miss++;continue}const uv=q*x.p;usUsd+=uv;if(fx>0)usTwd+=uv*fx;if(!x.man&&x.prev&&fx>0)usDay+=q*(x.p-x.prev)*fx;const avg=num(r.avg);if(avg>0&&q&&fx>0){pnl+=(uv-avg*q)*fx;pnlHas=true}}
+ // 帳戶保證金＝期貨帳戶權益（已含未實現損益），淨值只算它，不算名目、不另加未實現；美股以台幣市值計入
+ const net=stock+mmv-loan+fm+cash+other-debt+usTwd,gross=stock+mmv+fm+cash+other+usTwd;
+ return{stock,mmv,loan,meq:mmv-loan,mr:mrPct(mmv,loan),fut,futPnl,fm,lev:fm>0?fut/fm:null,cash,other,debt,usUsd,usTwd,fx,net,day:stockPrev+mPrev+futDay+usDay,cashPct:gross>0?cash/gross*100:null,grp,miss,pnl,pnlHas,price:priceOf}}
 
 function snapDate(){const d=PXM.date||(TX&&TX.d);return d?ymd(String(d)):tpeDate()}
 function kpis(){const c=calc(),today=snapDate(),yr=today.slice(0,4);
  const prior=SNAP.filter(s=>s.id<today),prev=prior[prior.length-1],first=SNAP.find(s=>s.id.slice(0,4)===yr);
  const ytd=first&&first.id!==today?c.net-first.net:null;
  const k=(l,v,s,cl,big)=>`<div class="as-kpi${big?' big':''}"><span>${l}</span><b class="${cl||''}">${v}</b>${s?`<small>${s}</small>`:''}</div>`;
- $('as-kpis').innerHTML=k('總淨值',n0(c.net),'股票＋融資淨值＋期貨帳戶保證金＋現金＋其他−負債',null,1)
+ $('as-kpis').innerHTML=k('總淨值',n0(c.net),'股票＋融資淨值＋期貨帳戶保證金＋美股（台幣）＋現金＋其他−負債',null,1)
   +k('今日損益',sg(c.day),prev?'vs 上次紀錄 '+prev.id+'：'+sg(c.net-prev.net):'最近交易日 vs 前一日收盤',cls(c.day))
   +k('今年損益',ytd==null?'—':sg(ytd),first?'起點 '+first.id:'今年尚無紀錄',cls(ytd))
-  +k('未實現損益',c.pnlHas?sg(c.pnl):'—',c.pnlHas?'已填均價的現股＋融資':'填均價後顯示（現股、融資）',c.pnlHas?cls(c.pnl):null)
+  +k('未實現損益',c.pnlHas?sg(c.pnl):'—',c.pnlHas?'已填均價的現股＋融資＋美股（台幣）':'填均價後顯示（現股、融資、美股）',c.pnlHas?cls(c.pnl):null)
   +k('股票市值',n0(c.stock),'現股')
+  +k('美股市值',(c.usUsd?usd(c.usUsd)+' / ':'')+n0(c.usTwd),(c.fx>0?'USD/TWD '+c.fx.toFixed(3):'尚無匯率')+'｜計入總淨值（台幣）')
   +k('融資市值／借款',n0(c.mmv)+' / '+n0(c.loan),'融資淨值 '+n0(c.meq))
   +k('整戶維持率',c.mr==null?'—':c.mr.toFixed(1)+'%',c.mr==null?'融資總市值÷融資總借款':(c.mr<130?'低於130%追繳線':'融資總市值÷融資總借款'),mrCls(c.mr))
   +k('期貨市值／保證金',n0(c.fut)+' / '+n0(c.fm),'槓桿 '+(c.lev==null?'—':c.lev.toFixed(1)+'x')+'｜'+(TX?TX.lbl:'無台指期價格'))
-  +k('現金水位',c.cashPct==null?'—':c.cashPct.toFixed(1)+'%','現金 '+n0(c.cash)+'（占股票＋融資市值＋期貨保證金＋現金＋其他）');
+  +k('現金水位',c.cashPct==null?'—':c.cashPct.toFixed(1)+'%','現金 '+n0(c.cash)+'（占股票＋融資市值＋期貨保證金＋美股＋現金＋其他）');
  return c}
 
 function lineChart(){const el=$('as-line');const S=SNAP.filter(s=>Number.isFinite(s.net));if(S.length<1){el.innerHTML='<p class="mut">每次打開或儲存會自動記一筆（一天一筆），累積兩天以上就會畫出走勢。</p>';return}
@@ -790,15 +805,17 @@ function lineChart(){const el=$('as-line');const S=SNAP.filter(s=>Number.isFinit
  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${g}</svg><div class="leg"><span><i style="background:#4ea1ff"></i>${cmp?'我的淨值 %':'總淨值'}</span>${cmp?'<span><i style="background:#ff9f43"></i>加權指數 %（存紀錄當天收盤）</span>':''}</div>`}
 
 function pie(c){const C=['#4ea1ff','#ff9f43','#b48cff','#22c55e','#f6c344','#ff5b5b','#33e1f0','#7bd88f','#e879f9','#94a3b8'];
- let items=pmode==='pos'?[['一般持股',c.stock],['融資（市值）',c.mmv],['期貨保證金',c.fm],['現金',c.cash],['其他資產',c.other]]:Object.entries(c.grp).sort((a,b)=>b[1]-a[1]);
+ let items=pmode==='pos'?[['一般持股',c.stock],['融資（市值）',c.mmv],['美股（台幣）',c.usTwd],['期貨保證金',c.fm],['現金',c.cash],['其他資產',c.other]]:Object.entries(c.grp).sort((a,b)=>b[1]-a[1]);
  items=items.filter(x=>x[1]>0);if(pmode==='grp'&&items.length>9){const rest=items.slice(8).reduce((s,x)=>s+x[1],0);items=items.slice(0,8).concat([['其餘',rest]])}
  const tot=items.reduce((s,x)=>s+x[1],0);if(!tot){$('as-pie').innerHTML='<p class="mut">填入部位後顯示</p>';return}
  let a=0,g='';const R=60,r=36,cx=75,cy=75;items.forEach((x,i)=>{const f=x[1]/tot;if(f>=.9999){g+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${C[i%10]}" stroke-width="${R-r}"/>`;return}
   const a1=a+f*2*Math.PI,P=(rad,ang)=>[cx+rad*Math.sin(ang),cy-rad*Math.cos(ang)],[x0,y0]=P(R,a),[x1,y1]=P(R,a1),[x2,y2]=P(r,a1),[x3,y3]=P(r,a),lg=f>.5?1:0;
   g+=`<path d="M${x0},${y0}A${R},${R} 0 ${lg} 1 ${x1},${y1}L${x2},${y2}A${r},${r} 0 ${lg} 0 ${x3},${y3}Z" fill="${C[i%10]}"/>`;a=a1});
- $('as-pie').innerHTML=`<svg viewBox="0 0 150 150">${g}</svg><ul>${items.map((x,i)=>`<li><span><i style="background:${C[i%10]}"></i>${esc(x[0])}</span><span>${(x[1]/tot*100).toFixed(1)}%</span></li>`).join('')}</ul>`+(pmode==='pos'?'<p class="mut" style="flex-basis:100%;margin:4px 0 0">以市值計；期貨用帳戶保證金，融資用市值（未扣借款）</p>':'<p class="mut" style="flex-basis:100%;margin:4px 0 0">現股＋融資市值；族群取自本站熱力圖分類，沒有分類的歸「其他」</p>')}
+ $('as-pie').innerHTML=`<svg viewBox="0 0 150 150">${g}</svg><ul>${items.map((x,i)=>`<li><span><i style="background:${C[i%10]}"></i>${esc(x[0])}</span><span>${(x[1]/tot*100).toFixed(1)}%</span></li>`).join('')}</ul>`+(pmode==='pos'?'<p class="mut" style="flex-basis:100%;margin:4px 0 0">以市值計；期貨用帳戶保證金，融資用市值（未扣借款），美股用台幣市值</p>':'<p class="mut" style="flex-basis:100%;margin:4px 0 0">現股＋融資市值；族群取自本站熱力圖分類，沒有分類的歸「其他」</p>')}
 
-function rowInfo(r,kind,c){if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0),man=r.mp>0;let p=null,prev=null,lbl='',basisHtml='',q=null,spot=null;
+function rowInfo(r,kind,c){if(kind==='us'){const code=usCode(r.c);if(!code)return'<span class="mut">輸入代號，例如 NVDA、QQQ</span>';const x=usPx(r),nm=(x&&x.n)||'';if(!x)return`<span class="nm">${esc(code)}</span><span class="dn">找不到美股報價（請勾手動價；常見代號會在收盤後更新）</span>`;const q=num(r.q),uv=q*x.p,fx=c.fx||fxRate(),tv=fx>0?uv*fx:null,ch=x.prev?(x.p/x.prev-1)*100:(x.pct!=null?x.pct:null),avg=num(r.avg);let a='';if(avg>0&&q){const cost=avg*q,u=uv-cost,rate=cost?u/cost*100:null,costT=fx>0?cost*fx:null,uT=fx>0?u*fx:null;a=`<span>成本 ${usd(cost)}${costT!=null?'／'+n0(costT):''}</span><span class="${cls(u)}">未實現 ${usd(u)}${uT!=null?'／'+sg(uT):''}</span>${rate!=null?`<span class="${cls(u)}">報酬率 ${pc(rate)}</span>`:''}`}
+ return`<span class="nm">${esc(nm||code)}</span><span>${x.man?'<span class="as-man">手動價</span> ':''}${usd(x.p)}${ch!=null?` <span class="${cls(ch)}">${pc(ch)}</span>`:''}${!x.man&&x.t?` <span class="mut">${esc(x.t)}${x.stale?' 暫用上次':''}</span>`:''}</span><span>市值 ${usd(uv)}${tv!=null?'／'+n0(tv):''}</span>${a}`}
+ if(kind==='futures'){const isSF=r.p===SF,pv=isSF?(num(r.pv)||2000):(num(r.pv)||FUT[r.p]||0),man=r.mp>0;let p=null,prev=null,lbl='',basisHtml='',q=null,spot=null;
   if(man)p=r.mp;else if(isSF){const code=String(r.c||'').trim();if(!code)return'<span class="mut">輸入股票代號</span>';q=sfQuote(code,num(r.pv)===100);spot=PX[code];const nm=nameOf(code)||(q&&q.fname)||'';
    if(q){p=q.p;prev=q.prev;lbl=(q.contract?q.contract+' ':'')+(q.month?monthLbl(q.month)+' ':'')+'期貨價'+(q.src==='live'?'（盤中）':'');if(spot&&spot.p>0){const b=p-spot.p,bp=(b/spot.p)*100;basisHtml=`<span>對現貨 ${sg(b)}（${pc(bp)}）</span>`}}
    else if(spot){p=spot.p;prev=spot.prev;lbl='以現貨價估算'}
@@ -817,43 +834,54 @@ function rowHTML(r,i,kind){const ov=`<div class="ov"><label style="flex-directio
  if(kind==='futures'){const isSF=r.p===SF,pre=FUT[r.p]!=null;
   return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>商品<select data-f="p">${Object.keys(FUT).map(k=>`<option ${r.p===k?'selected':''}>${k}</option>`).join('')}<option value="${SF}" ${isSF?'selected':''}>${SF}</option><option value="__c" ${pre||isSF?'':'selected'}>自訂</option></select></label><label>口數（空單用負數）<input type="text" inputmode="numeric" data-f="q" value="${esc(fmtAmt(r.q,false,true))}" autocomplete="off"></label>${del}
   ${isSF?`<label>股票代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c||'')}"></label><label>契約<select data-f="sfsize"><option value="2000" ${num(r.pv)!==100?'selected':''}>一般 2,000 股</option><option value="100" ${num(r.pv)===100?'selected':''}>小型 100 股</option></select></label>`:pre?'':`<label>自訂名稱<input type="text" maxlength="20" data-f="pn" value="${esc(r.p)}"></label>`}${isSF?'':`<label>每點價值<input type="text" inputmode="numeric" data-f="pv" value="${esc(fmtAmt(num(r.pv)||FUT[r.p]||''))}" autocomplete="off"></label>`}<label>成本點位（選填）<input type="text" inputmode="decimal" data-f="cost" value="${esc(fmtAmt(r.cost||'',true))}" autocomplete="off"></label><div class="info"></div>${ov}</div>`}
+ if(kind==='us')return`<div class="as-row" data-k="us" data-i="${i}"><label>代號<input type="text" maxlength="12" autocapitalize="characters" data-f="c" value="${esc(r.c)}" placeholder="NVDA"></label><label>股數<input type="text" inputmode="decimal" data-f="q" value="${esc(fmtAmt(r.q,true))}" autocomplete="off"></label>${del}
+  <label>均價 USD（選填）<input type="text" inputmode="decimal" data-f="avg" value="${esc(fmtAmt(r.avg||'',true))}" autocomplete="off"></label><div class="info"></div>${ov}</div>`;
  const loanMan=kind==='margin'&&isLoanManual(r);
  return`<div class="as-row" data-k="${kind}" data-i="${i}"><label>代號<input type="text" maxlength="8" autocapitalize="characters" data-f="c" value="${esc(r.c)}"></label><label>股數<input type="text" inputmode="numeric" data-f="q" value="${esc(fmtAmt(r.q))}" autocomplete="off"></label>${del}
   <label>均價（選填）<input type="text" inputmode="decimal" data-f="avg" value="${esc(fmtAmt(r.avg||'',true))}" autocomplete="off"></label>${kind==='margin'?`<label>融資借款金額<input type="text" inputmode="numeric" data-f="loan" value="${esc(fmtAmt(loanMan?(r.loan??''):autoLoanDisp(r)))}" ${loanMan?'':'disabled'} autocomplete="off"><span class="hint">${loanAutoHint(r)}</span></label><label>補繳金額（選填）<input type="text" inputmode="numeric" data-f="repay" value="${esc(fmtAmt(r.repay||''))}" autocomplete="off"></label>`:''}<div class="info"></div>${ov}</div>`}
 
-function renderEditor(){for(const k of['stocks','margin','futures']){$('as-'+k).innerHTML=PF[k].length?PF[k].map((r,i)=>rowHTML(r,i,k)).join(''):'<p class="mut" style="margin:2px 0">尚無資料</p>'}
- $('as-fm').value=fmtAmt(PF.futMargin||'');$('as-cash').value=fmtAmt(PF.cash||'');$('as-other').value=fmtAmt(PF.other||'');$('as-debt').value=fmtAmt(PF.debt||'');refresh()}
+function renderEditor(){if(!Array.isArray(PF.us))PF.us=[];
+ for(const k of['stocks','margin','futures','us']){$('as-'+k).innerHTML=PF[k].length?PF[k].map((r,i)=>rowHTML(r,i,k)).join(''):'<p class="mut" style="margin:2px 0">尚無資料</p>'}
+ $('as-fm').value=fmtAmt(PF.futMargin||'');$('as-cash').value=fmtAmt(PF.cash||'');$('as-other').value=fmtAmt(PF.other||'');$('as-debt').value=fmtAmt(PF.debt||'');
+ const usdxon=$('as-usdxon');if(usdxon)usdxon.checked=!!PF.usdxManual;const usdx=$('as-usdx');if(usdx){usdx.disabled=!PF.usdxManual;usdx.value=fmtAmt(PF.usdxManual?(PF.usdx||''):((USFX&&USFX.usdTwd)||''),true)}refresh()}
 function syncNames(){if(typeof D!=='undefined'&&D&&D.heat&&NAMES.__d!==D.heat){NAMES={__d:D.heat};for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}}
-function refresh(){if(!PF)return;syncNames();if(false&&typeof D!=='undefined'&&D&&D.heat){for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}const c=kpis();$('as-futsum').innerHTML=`<span>期貨部位市值 <b>${n0(c.fut)}</b></span><span>槓桿倍數 <b>${c.lev==null?'—':c.lev.toFixed(1)+'x'}</b></span>`;for(const el of document.querySelectorAll('#assetcard .as-row')){const r=PF[el.dataset.k][+el.dataset.i];if(!r)continue;const info=el.querySelector('.info');if(info)info.innerHTML=rowInfo(r,el.dataset.k,c);if(el.dataset.k==='margin'&&!isLoanManual(r)){const inp=el.querySelector('[data-f=loan]');if(inp&&document.activeElement!==inp)inp.value=fmtAmt(autoLoanDisp(r))}}lineChart();pie(c);
+function refresh(){if(!PF)return;syncNames();if(false&&typeof D!=='undefined'&&D&&D.heat){for(const r of D.heat.stocks){if(!NAMES[r[0]])NAMES[r[0]]={n:r[1],g:D.heat.groups[r[2]]||r[12]||''}}}const c=kpis();$('as-futsum').innerHTML=`<span>期貨部位市值 <b>${n0(c.fut)}</b></span><span>槓桿倍數 <b>${c.lev==null?'—':c.lev.toFixed(1)+'x'}</b></span>`;
+ const fxEl=$('as-usfx'),usSum=$('as-ussum'),manFx=!!(PF.usdxManual&&num(PF.usdx)>0);
+ if(fxEl)fxEl.innerHTML=c.fx>0?`<span>美元匯率 <b>${c.fx.toFixed(3)}</b>${manFx?' <span class="as-man">手動</span>':''}</span>`+(!manFx&&USFX&&USFX.time?`<span class="mut">${esc(USFX.time)}（${esc((USFX.src||'Yahoo USDTWD=X'))}）${USFX.stale?' 暫用上次':''}</span>`:''):'<span class="dn">尚無匯率（請填手動匯率）</span>';
+ if(usSum)usSum.innerHTML=`<span>美股小計 <b>${usd(c.usUsd)}</b>／<b>${n0(c.usTwd)}</b></span>`;for(const el of document.querySelectorAll('#assetcard .as-row')){const r=PF[el.dataset.k][+el.dataset.i];if(!r)continue;const info=el.querySelector('.info');if(info)info.innerHTML=rowInfo(r,el.dataset.k,c);if(el.dataset.k==='margin'&&!isLoanManual(r)){const inp=el.querySelector('[data-f=loan]');if(inp&&document.activeElement!==inp)inp.value=fmtAmt(autoLoanDisp(r))}}lineChart();pie(c);
  const srcs=[...new Set(Object.values(PX).map(x=>x.src))].map(s=>({intra:'本站盤中資料（最新成交價）',heat:'本站熱力圖',hist:'本站日線收盤',close:'證交所／櫃買每日收盤',etf:'ETF：證交所／櫃買每日收盤'}[s]));
- $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>資料庫只存股數、口數、均價、借款與現金，市值都是打開時用最新價重算。個股期貨用期交所近月一般盤收盤（有盤中快照時優先）；沒有期貨報價才以現貨價估算。非投資建議。`;
+ $('as-src').innerHTML=`股價：${srcs.length?srcs.join('、'):'—'}${PXM.date?'，資料日 '+ymd(PXM.date):''}；每次打開都重新抓；盤中個股約每 5 分鐘更新，ETF 用最近收盤。<br>期貨：${TX?esc(TX.lbl)+' '+n0(TX.p)+'（'+ymd(TX.d)+'）'+(TX.est?'，期貨價格暫缺，以加權指數代替':'，資料：期交所'):'無'}。<br>美股：Yahoo Finance 日線收盤（us_px.json）${USFX&&USFX.usdTwd?`；USD/TWD ${USFX.usdTwd}${USFX.time?'（'+esc(USFX.time)+'）':''}`:''}。美股收盤後（台北約 05:30／06:30）及每次發布更新。找不到代號請勾手動價。<br>資料庫只存股數、口數、均價、借款、美股與現金，市值都是打開時用最新價重算。個股期貨用期交所近月一般盤收盤（有盤中快照時優先）；沒有期貨報價才以現貨價估算。非投資建議。`;
  $('as-state').textContent=dirty?'有未儲存的變更':(PF.updatedAt?'已儲存':'');}
 
 function onInput(e){const el=e.target,mode=amtMode(el);if(mode&&e.type!=='click')applyAmt(el,mode);const row=el.closest('.as-row');if(!PF)return;
  if(row){const r=PF[row.dataset.k][+row.dataset.i],f=el.dataset.f;if(!r||!f)return;
-  if(f==='mpon'){if(el.checked){let x;if(row.dataset.k==='futures'&&r.p===SF){const q=sfQuote(r.c,num(r.pv)===100);x=q?q.p:(PX[String(r.c||'').trim()]||{}).p}else if(row.dataset.k==='futures')x=TX&&TX.p;else x=(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
+  if(f==='mpon'){if(el.checked){let x;if(row.dataset.k==='us')x=(USPX[usCode(r.c)]||{}).p;else if(row.dataset.k==='futures'&&r.p===SF){const q=sfQuote(r.c,num(r.pv)===100);x=q?q.p:(PX[String(r.c||'').trim()]||{}).p}else if(row.dataset.k==='futures')x=TX&&TX.p;else x=(PX[String(r.c||'').trim()]||{}).p;r.mp=x||1}else delete r.mp;dirty=true;renderEditor();return}
   if(f==='loanon'){if(el.checked){const auto=autoLoanDisp({...r,loanManual:false});r.loanManual=true;if(auto!=='')r.loan=auto}else r.loanManual=false;dirty=true;renderEditor();return}
   if(f==='sfsize'){r.pv=num(el.value)||2000;dirty=true;refresh();return}
   if(f==='p'){if(el.value==='__c'){r.p='';}else if(el.value===SF){r.p=SF;if(num(r.pv)!==100)r.pv=2000}else{r.p=el.value;r.pv=FUT[el.value]}dirty=true;renderEditor();return}
-  if(f==='pn')r.p=el.value.slice(0,20);else if(f==='c')r.c=el.value.trim().toUpperCase().slice(0,8);else{const t=String(el.value).replace(/,/g,'').trim();r[f]=t===''||t==='-'||t==='.'||t==='-.'?'':num(el.value)}
+  if(f==='pn')r.p=el.value.slice(0,20);else if(f==='c'){const us=row.dataset.k==='us';r.c=(us?usCode(el.value):el.value.trim().toUpperCase()).slice(0,us?12:8)}else{const t=String(el.value).replace(/,/g,'').trim();r[f]=t===''||t==='-'||t==='.'||t==='-.'?'':num(el.value)}
   dirty=true;if(f==='c'&&e.type==='change'&&r.c&&!PX[r.c]){loadPrices(true).then(refresh)}else refresh();return}
  if(el.id==='as-fm'){PF.futMargin=num(el.value);dirty=true;refresh();return}
+ if(el.id==='as-usdxon'){if(el.checked){PF.usdxManual=true;if(!(num(PF.usdx)>0)&&USFX&&USFX.usdTwd)PF.usdx=USFX.usdTwd}else PF.usdxManual=false;dirty=true;renderEditor();return}
+ if(el.id==='as-usdx'){PF.usdx=num(el.value);dirty=true;refresh();return}
  if(el.id==='as-cash'||el.id==='as-other'||el.id==='as-debt'){PF[el.id.slice(3)]=num(el.value);dirty=true;refresh()}}
 
-function clean(){const n=v=>num(v),o={stocks:[],margin:[],futures:[],futMargin:n(PF.futMargin),cash:n(PF.cash),other:n(PF.other),debt:n(PF.debt)};
+function clean(){const n=v=>num(v),o={stocks:[],margin:[],futures:[],us:[],futMargin:n(PF.futMargin),cash:n(PF.cash),other:n(PF.other),debt:n(PF.debt)};
  for(const r of PF.stocks){if(!r.c)continue;const x={c:String(r.c).slice(0,8),q:n(r.q)};if(r.mp>0)x.mp=n(r.mp);if(n(r.avg)>0)x.avg=n(r.avg);o.stocks.push(x)}
  for(const r of PF.margin){if(!r.c)continue;const man=isLoanManual(r),x={c:String(r.c).slice(0,8),q:n(r.q),loan:man?n(r.loan):n(autoLoanDisp(r)),loanManual:man};if(r.mp>0)x.mp=n(r.mp);if(n(r.avg)>0)x.avg=n(r.avg);if(n(r.repay)>0)x.repay=n(r.repay);o.margin.push(x)}
  for(const r of PF.futures){const isSF=r.p===SF,x={p:isSF?SF:String(r.p||'自訂').slice(0,20),q:n(r.q),pv:isSF?(n(r.pv)===100?100:2000):(n(r.pv)||FUT[r.p]||0)};if(isSF&&r.c)x.c=String(r.c).slice(0,8);if(n(r.cost)>0)x.cost=n(r.cost);if(r.mp>0)x.mp=n(r.mp);o.futures.push(x)}
+ for(const r of PF.us||[]){if(!r.c)continue;const x={c:usCode(r.c).slice(0,12),q:n(r.q)};if(r.mp>0)x.mp=n(r.mp);if(n(r.avg)>0)x.avg=n(r.avg);o.us.push(x)}
+ if(PF.usdxManual&&n(PF.usdx)>0){o.usdx=n(PF.usdx);o.usdxManual=true}
  return o}
-async function saveSnap(){if(!user||!PF)return;const c=calc();if(!(c.stock||c.mmv||c.fut||c.fm||c.cash||c.other||c.debt))return;const id=snapDate();const F=FB.F;
- const s={net:Math.round(c.net),stock:Math.round(c.stock),margin:Math.round(c.meq),marginMV:Math.round(c.mmv),marginLoan:Math.round(c.loan),futures:Math.round(c.fut),futPnl:Math.round(c.futPnl),futMargin:Math.round(c.fm),cash:Math.round(c.cash),other:Math.round(c.other),debt:Math.round(c.debt),taiex:IDX&&IDX.v||0,tx:TX&&!TX.est?TX.p:0,ts:F.serverTimestamp()};
+async function saveSnap(){if(!user||!PF)return;const c=calc();if(!(c.stock||c.mmv||c.fut||c.fm||c.cash||c.other||c.debt||c.usTwd||c.usUsd))return;const id=snapDate();const F=FB.F;
+ const s={net:Math.round(c.net),stock:Math.round(c.stock),margin:Math.round(c.meq),marginMV:Math.round(c.mmv),marginLoan:Math.round(c.loan),futures:Math.round(c.fut),futPnl:Math.round(c.futPnl),futMargin:Math.round(c.fm),cash:Math.round(c.cash),other:Math.round(c.other),debt:Math.round(c.debt),us:Math.round(c.usTwd||0),usUsd:Math.round((c.usUsd||0)*100)/100,usdx:c.fx||0,taiex:IDX&&IDX.v||0,tx:TX&&!TX.est?TX.p:0,ts:F.serverTimestamp()};
  try{await F.setDoc(F.doc(FB.db,'users',user.uid,'snapshots',id),s);const j=SNAP.findIndex(x=>x.id===id),loc={id,...s,ts:null};if(j>=0)SNAP[j]=loc;else{SNAP.push(loc);SNAP.sort((a,b)=>a.id<b.id?-1:1)}}catch(e){console.warn('snapshot',e)}}
 async function save(){if(!user)return;const b=$('as-save');b.disabled=true;$('as-state').textContent='儲存中…';const F=FB.F;
  try{const o=clean();await F.setDoc(F.doc(FB.db,'users',user.uid,'portfolio','current'),{...o,updatedAt:F.serverTimestamp()});PF={...o,updatedAt:1};dirty=false;await saveSnap();renderEditor();$('as-state').textContent='已儲存 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}
  catch(e){$('as-state').textContent='儲存失敗：'+(e.code||e.message)}finally{b.disabled=false}}
 
 async function loadUser(){const F=FB.F;$('as-state').textContent='讀取中…';
- try{const d=await F.getDoc(F.doc(FB.db,'users',user.uid,'portfolio','current'));PF=d.exists()?Object.assign(empty(),d.data()):empty();normalizeMargin(PF);
+ try{const d=await F.getDoc(F.doc(FB.db,'users',user.uid,'portfolio','current'));PF=d.exists()?Object.assign(empty(),d.data()):empty();if(!Array.isArray(PF.us))PF.us=[];normalizeMargin(PF);
   const qs=await F.getDocs(F.collection(FB.db,'users',user.uid,'snapshots'));SNAP=qs.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>a.id<b.id?-1:1)}
  catch(e){PF=PF||empty();$('as-state').textContent='讀取失敗：'+(e.code||e.message)}
  dirty=false;await loadPrices(true);renderEditor();await saveSnap();refresh()}

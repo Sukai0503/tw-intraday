@@ -1,0 +1,8 @@
+{
+  "tickers": [
+    "NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "GOOGL", "GOOG", "META",
+    "AMD", "AVGO", "TSM", "QQQ", "SPY", "SOXX", "VOO", "VTI", "IWM",
+    "NFLX", "INTC", "MU", "ARM", "PLTR", "AMAT", "ASML", "BRK-B",
+    "JPM", "V", "MA", "COST", "BABA", "PDD", "SMCI", "COIN", "NVO"
+  ]
+}
