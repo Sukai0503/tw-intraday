@@ -155,6 +155,11 @@ body:not(.vasset) [data-v="asset"]{display:none!important}
 <div class="kpi"><span>目前 <b id="cur">-</b> 億</span><span>比昨同時 <b id="pct">-</b></span></div>
 <div class="leg"><span><i style="background:var(--today)"></i>今日</span><span><i style="background:var(--prev)"></i>前一交易日</span></div>
 <div id="c1"></div></div>
+<div class="card" data-v="intra" id="estcard" style="display:none"><h2>加權預估量（億）<span class="mut">上市</span></h2>
+<div class="kpi"><span>目前預估 <b id="estv">-</b> 億</span><span>比昨日全日 <b id="estp">-</b></span></div>
+<div class="mut" id="estn"></div>
+<div class="leg"><span><i style="background:var(--today)"></i><span id="estlegend">預估量</span></span><span id="estprev"><i style="background:var(--mut)"></i>昨日全日</span><span id="estavg"><i style="background:var(--or)"></i><span id="estavglabel">5 日均</span></span></div>
+<div id="c3"></div></div>
 <div class="card" data-v="intra"><h2>盤中廣度</h2>
 <div class="kpi"><span>站上20MA <b id="b20" style="color:var(--or)">-</b></span><span>站上均價線 <b id="bvw" style="color:var(--bl)">-</b></span></div>
 <div class="leg"><span><i style="background:var(--or)"></i>站上20MA %</span><span><i style="background:var(--bl)"></i>站上均價線 %</span></div>
@@ -333,6 +338,34 @@ function renderArr(){
   }
 }
 document.addEventListener('click',e=>{const b=e.target.closest('#arrseg button');if(!b||!D)return;ARRM=b.dataset.m;renderArr()});
+function renderEst(){
+  const X=D.est,card=document.getElementById('estcard');
+  card.style.display=X?'':'none';
+  if(!X)return;
+  const fmt=v=>Math.round(v).toLocaleString();
+  const linear=X.method==='linear',name=linear?'線性估算（無歷史）':'預估量';
+  document.getElementById('estv').textContent=X.last==null?'-':fmt(X.last);
+  const pct=X.last!=null&&X.prev_total>0?Math.round((X.last/X.prev_total-1)*1000)/10:null;
+  const pe=document.getElementById('estp');
+  pe.textContent=pct==null?'-':(pct>0?'+':'')+pct+'%';
+  pe.className=pct==null?'':pct>=0?'up':'dn';
+  document.getElementById('estn').textContent=(linear?name:
+    `預估量＝目前累計成交金額 ÷ 近 ${X.n} 日同時點平均累計佔全日比例`)+'；開盤初期波動大；僅供觀察';
+  document.getElementById('estlegend').textContent=name;
+  const avgLabel=`${X.n} 日均`;
+  document.getElementById('estavglabel').textContent=avgLabel;
+  document.getElementById('estprev').hidden=X.prev_total==null;
+  document.getElementById('estavg').hidden=X.avg5_total==null;
+  const hlines=[
+    {v:X.prev_total,color:'#8b929c',title:'昨日全日'},
+    {v:X.avg5_total,color:'#ff9f43',title:avgLabel}
+  ].filter(h=>h.v!=null);
+  const values=X.est.map(p=>p[1]).sort((a,b)=>a-b);
+  const median=values.length?(values[Math.floor((values.length-1)/2)]+values[Math.floor(values.length/2)])/2:0;
+  const top=1.3*Math.max(1,median,...hlines.map(h=>h.v));
+  StockChart.ts('c3',{kind:'hm',height:210,pad:['09:00','13:30'],range:[0,top],unit:' 億',fmt,
+    series:[{name,type:'area',color:'#4ea1ff',data:X.est}],hlines}).catch(e=>console.error(e));
+}
 function render(){if(!D)return;document.getElementById('demo').style.display=D.demo?'block':'none';
 document.getElementById('ttl').textContent=`今日盤中｜即時 ${D.updated}`;
 const v=D.value,td=v.today,pv=v.prev;
@@ -340,6 +373,7 @@ document.getElementById('cur').textContent=v.cur!=null?Math.round(v.cur).toLocal
 const pe=document.getElementById('pct');if(v.vs_prev_pct!=null){pe.textContent=(v.vs_prev_pct>0?'+':'')+v.vs_prev_pct+'%';pe.className=v.vs_prev_pct>=0?'up':'dn'}
 const mx=Math.max(1,...td.map(p=>p[1]),...pv.map(p=>p[1]));const st=nice(mx),top=Math.ceil(mx/st)*st;const tk=[];for(let a=0;a<=top;a+=st)tk.push(a);
 StockChart.ts('c1',{kind:'hm',height:210,pad:['09:00','13:30'],unit:' 億',fmt:v=>Math.round(v).toLocaleString(),series:[{name:'前一交易日',color:'#8b929c',width:1.5,last:false,data:pv},{name:'今日',type:'area',color:'#4ea1ff',data:td}]});
+try{renderEst()}catch(e){console.error(e)}
 const br=D.breadth.map(b=>[b[0],b[1],b[2]]);const last=br[br.length-1];
 if(last){document.getElementById('b20').textContent=last[1]+'%';document.getElementById('bvw').textContent=last[2]+'%'}
 const Y=p=>T+(1-p/100)*(H-T-B);
@@ -351,7 +385,7 @@ g+=path(br.map(b=>[b[0],b[1]]),0,100,'var(--or)',2.2)+path(br.map(b=>[b[0],b[2]]
 StockChart.ts('c2',{kind:'hm',height:210,pad:['09:00','13:30'],range:[0,100],unit:'%',dec:1,hlines:[{v:70,color:'#ff5b5b',title:'買盤強'},{v:50,color:'#9aa4b2',title:''},{v:30,color:'#22c55e',title:'賣壓重'}],series:[{name:'站上20MA',color:'#ff9f43',data:br.map(b=>[b[0],b[1]])},{name:'站上均價線',color:'#4ea1ff',data:br.map(b=>[b[0],b[2]])}]});try{renderHeat()}catch(e){console.error(e)}
 try{renderArr()}catch(e){console.error(e)}
 try{renderTwd()}catch(e){console.error(e)}
-document.getElementById('foot').innerHTML=D.demo?'示範資料，非真實行情。資料來源接上後會每分鐘自動更新。<br>僅供盤面觀察，非投資建議。':`${D.date.slice(0,4)}/${D.date.slice(4,6)}/${D.date.slice(6)}　前一交易日 ${D.prev_date?D.prev_date.slice(4,6)+'/'+D.prev_date.slice(6):'-'}　更新 ${D.updated_full}<br>成交金額約每分鐘更新（證交所 MIS），頁面每 60 秒自動重抓；廣度約每 1 分鐘，全上市櫃普通股約 ${D.universe||'-'} 檔。族群＝證交所／櫃買中心官方產業別。20MA 含即時價；均價線為依成交量增量估算的當日 VWAP${D.notes?'（'+D.notes+'）':''}。多空頭排列比例：短均 5／10／20（反應較快）、長均 10／20／60（中期趨勢），盤中以即時價＋先前收盤自算，僅觀察項，無固定門檻。<br>僅供盤面觀察，非投資建議。`;}
+document.getElementById('foot').innerHTML=D.demo?'示範資料，非真實行情。資料來源接上後會每分鐘自動更新。<br>僅供盤面觀察，非投資建議。':`${D.date.slice(0,4)}/${D.date.slice(4,6)}/${D.date.slice(6)}　前一交易日 ${D.prev_date?D.prev_date.slice(4,6)+'/'+D.prev_date.slice(6):'-'}　更新 ${D.updated_full}<br>成交金額約每分鐘更新（證交所 MIS），頁面每 60 秒自動重抓；廣度約每 1 分鐘，全上市櫃普通股約 ${D.universe||'-'} 檔。族群＝證交所／櫃買中心官方產業別。20MA 含即時價；均價線為依成交量增量估算的當日 VWAP${D.notes?'（'+D.notes+'）':''}。多空頭排列比例：短均 5／10／20（反應較快）、長均 10／20／60（中期趨勢），盤中以即時價＋先前收盤自算，僅觀察項，無固定門檻。<br>加權預估量以今日累計成交金額除以歷史同時點的平均累計比例，資料來源為證交所 MIS／MI_5MINS；無歷史資料時按開盤後經過時間線性估算。<br>僅供盤面觀察，非投資建議。`;}
 let HK='d1',HZ=null,HIST=null,HM=null,HCLOSE=null;
 const LIM={d1:5,d3:10,d10:20};
 function mix(a,b,t){return a.map((x,i)=>Math.round(x+(b[i]-x)*t))}
