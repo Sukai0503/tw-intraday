@@ -282,6 +282,7 @@ function reclaimCard(R){
    <div class="cap">家數走勢（止跌／站回20MA／站上20MA／站上60MA／20日新低）｜拖曳看各日</div>
    <div id="reclaim_ch" style="min-height:210px"></div>
    <div class="cap" style="margin-top:8px">族群（止跌且站回20MA）：${gs||'無'}</div>
+   <div class="cap" style="margin-top:4px">熱力宇宙跌破關鍵日低點（${f((R.key_broke_rows||[]).length)} 檔，其後最低距低點%）：${(R.key_broke_rows||[]).map(x=>`<a href="#" class="stk" data-code="${esc(x.code)}">${esc(x.code)} ${esc(x.name)}</a> ${x.key_vs_post==null?'':f(x.key_vs_post,2)+'%'}`).join('、')||'無'}</div>
    <div class="seg" id="rsort" style="margin:6px 0;flex-wrap:wrap"><span class="mut" style="align-self:center">排序</span><button data-s="vs20" class="on">距20MA</button><button data-s="vs60">距60MA</button><button data-s="chg">漲跌%</button><button data-s="vol">量比</button><button data-s="stage">階段</button><button data-s="group">族群</button><button data-s="key">關鍵日低點</button></div>
    <div id="reclaim_tbl"></div>
    <div class="cap">${esc(R.ref_low_note||'')}</div></div>`;
