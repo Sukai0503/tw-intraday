@@ -1,7 +1,7 @@
 {
  "DATA": {
   "trade_date": "2026-11-26",
-  "updated_at": "2026-11-27 14:43（台北時間）",
+  "updated_at": "2026-11-27 17:04（台北時間）",
   "taiex": {
    "close": {
     "v": 39151.81,
@@ -40,8 +40,7 @@
    "twse_latest": {
     "v": 139.67,
     "as_of": "2026-11-26",
-    "src": "玩股網（扣除ETF），瀏覽器讀取",
-    "stale": false
+    "src": "玩股網（扣除ETF）"
    },
    "tpex_latest": {
     "v": 177.59,
@@ -50,42 +49,6 @@
     "stale": true
    },
    "series": [
-    [
-     "10/20",
-     157.49
-    ],
-    [
-     "10/21",
-     161.21
-    ],
-    [
-     "10/22",
-     155.76
-    ],
-    [
-     "10/27",
-     154.77
-    ],
-    [
-     "10/28",
-     161.51
-    ],
-    [
-     "10/29",
-     157.21
-    ],
-    [
-     "10/30",
-     150.94
-    ],
-    [
-     "11/02",
-     150.96
-    ],
-    [
-     "11/03",
-     142.09
-    ],
     [
      "11/04",
      143.56
@@ -224,8 +187,7 @@
    "balance_yi": {
     "v": 3985.16,
     "as_of": "2026-11-26",
-    "src": "玩股網（扣除ETF）",
-    "stale": false
+    "src": "玩股網（扣除ETF）"
    }
   },
   "aux": {
@@ -3185,26 +3147,26 @@
   },
   "reclaim": {
    "as_of": "2026-11-27",
-   "as_of_time": "13:39:25",
-   "updated_at": "2026-11-27 14:43:41",
-   "px_source": "盤中熱力收盤快照（官方全日收盤尚未公布）｜asof 13:39:25",
-   "px_source_short": "熱力收盤快照",
-   "official": false,
+   "as_of_time": null,
+   "updated_at": "2026-11-27 17:08:28",
+   "px_source": "官方收盤（證交所 STOCK_DAY_ALL、櫃買每日收盤）",
+   "px_source_short": "官方收盤",
+   "official": true,
    "universe_n": 137,
    "counts": {
-    "above_20ma": 15,
+    "above_20ma": 13,
     "above_60ma": 6,
-    "zhide": 53,
-    "reclaimed_20ma": 15,
-    "zhide_and_reclaim20": 15,
-    "also_above_60": 3,
-    "new_20d_low": 3,
+    "zhide": 44,
+    "reclaimed_20ma": 13,
+    "zhide_and_reclaim20": 13,
+    "also_above_60": 4,
+    "new_20d_low": 1,
     "never_broke_1106": 8,
-    "reclaimed_20ma_today": 4,
-    "key_held": 127,
-    "key_broke": 10,
+    "reclaimed_20ma_today": 0,
+    "key_held": 129,
+    "key_broke": 8,
     "key_unknown": 0,
-    "key_held_list": 15,
+    "key_held_list": 13,
     "key_broke_list": 0
    },
    "list": [
@@ -3217,7 +3179,7 @@
      "px": 1480.0,
      "chg_pct": 7.25,
      "low": 1420.0,
-     "vol": 1110,
+     "vol": null,
      "vs20": 12.36,
      "vs60": 4.82,
      "above_20": true,
@@ -3238,7 +3200,7 @@
      "stage": 4,
      "stage_desc": "空頭排列，下跌段",
      "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.59
+     "vol_ratio": null
     },
     {
      "code": "2355",
@@ -3246,12 +3208,12 @@
      "groups": [
       "低軌衛星"
      ],
-     "px": 59.2,
-     "chg_pct": -1.66,
-     "low": 57.8,
-     "vol": 61686,
-     "vs20": 9.15,
-     "vs60": 22.45,
+     "px": 60.2,
+     "chg_pct": 9.85,
+     "low": 57.3,
+     "vol": 35945.434,
+     "vs20": 10.99,
+     "vs60": 24.52,
      "above_20": true,
      "above_60": true,
      "above_5": true,
@@ -3265,25 +3227,25 @@
      "key_low": 50.1,
      "key_post_low": 53.1,
      "key_held": true,
-     "key_vs_close": 18.16,
+     "key_vs_close": 20.16,
      "key_vs_post": 5.99,
      "stage": 1,
      "stage_desc": "多頭排列，穩定上漲",
      "ma_order": "5MA>20MA>60MA",
-     "vol_ratio": 2.09
+     "vol_ratio": 1.22
     },
     {
-     "code": "2379",
-     "name": "瑞昱",
+     "code": "3661",
+     "name": "世芯-KY",
      "groups": [
-      "IC設計"
+      "ASIC"
      ],
-     "px": 755.0,
-     "chg_pct": 3.42,
-     "low": 724.0,
-     "vol": 2932,
-     "vs20": 3.3,
-     "vs60": 1.84,
+     "px": 3735.0,
+     "chg_pct": 3.61,
+     "low": 3695.0,
+     "vol": 3443.706,
+     "vs20": 7.23,
+     "vs60": 0.64,
      "above_20": true,
      "above_60": true,
      "above_5": true,
@@ -3291,18 +3253,50 @@
      "zhide": true,
      "new_20d_low": false,
      "reclaimed_20": true,
-     "reclaimed_20_today": true,
-     "reclaimed_60_today": true,
-     "never_broke_1106": false,
-     "key_low": 656.0,
-     "key_post_low": 661.0,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": true,
+     "key_low": 3210.0,
+     "key_post_low": 3530.0,
      "key_held": true,
-     "key_vs_close": 15.09,
-     "key_vs_post": 0.76,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.82
+     "key_vs_close": 16.36,
+     "key_vs_post": 9.97,
+     "stage": 5,
+     "stage_desc": "熊市尾聲，可留意止跌",
+     "ma_order": "60MA>5MA>20MA",
+     "vol_ratio": 1.09
+    },
+    {
+     "code": "2618",
+     "name": "長榮航",
+     "groups": [
+      "航運"
+     ],
+     "px": 46.05,
+     "chg_pct": 0.77,
+     "low": 45.45,
+     "vol": 26232.946,
+     "vs20": 0.96,
+     "vs60": 6.11,
+     "above_20": true,
+     "above_60": true,
+     "above_5": true,
+     "above_240": true,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": true,
+     "key_low": 43.3,
+     "key_post_low": 44.65,
+     "key_held": true,
+     "key_vs_close": 6.35,
+     "key_vs_post": 3.12,
+     "stage": 1,
+     "stage_desc": "多頭排列，穩定上漲",
+     "ma_order": "5MA>20MA>60MA",
+     "vol_ratio": 0.75
     },
     {
      "code": "3665",
@@ -3311,12 +3305,12 @@
       "電源/零組件",
       "連接器/線材"
      ],
-     "px": 1680.0,
-     "chg_pct": -6.15,
-     "low": 1680.0,
-     "vol": 3648,
-     "vs20": 10.73,
-     "vs60": -12.92,
+     "px": 1790.0,
+     "chg_pct": 9.82,
+     "low": 1695.0,
+     "vol": 4006.029,
+     "vs20": 17.98,
+     "vs60": -7.22,
      "above_20": true,
      "above_60": false,
      "above_5": true,
@@ -3330,12 +3324,12 @@
      "key_low": 1240.0,
      "key_post_low": 1540.0,
      "key_held": true,
-     "key_vs_close": 35.48,
+     "key_vs_close": 44.35,
      "key_vs_post": 24.19,
      "stage": 5,
      "stage_desc": "熊市尾聲，可留意止跌",
      "ma_order": "60MA>5MA>20MA",
-     "vol_ratio": 0.91
+     "vol_ratio": 1.0
     },
     {
      "code": "2345",
@@ -3343,12 +3337,12 @@
      "groups": [
       "網通"
      ],
-     "px": 1555.0,
-     "chg_pct": -4.01,
-     "low": 1535.0,
-     "vol": 5200,
-     "vs20": 6.96,
-     "vs60": -12.64,
+     "px": 1620.0,
+     "chg_pct": 9.83,
+     "low": 1545.0,
+     "vol": 5534.554,
+     "vs20": 11.44,
+     "vs60": -8.98,
      "above_20": true,
      "above_60": false,
      "above_5": true,
@@ -3362,271 +3356,12 @@
      "key_low": 1200.0,
      "key_post_low": 1355.0,
      "key_held": true,
-     "key_vs_close": 29.58,
+     "key_vs_close": 35.0,
      "key_vs_post": 12.92,
      "stage": 4,
      "stage_desc": "空頭排列，下跌段",
      "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 1.01
-    },
-    {
-     "code": "6285",
-     "name": "啟碁",
-     "groups": [
-      "低軌衛星",
-      "網通"
-     ],
-     "px": 201.0,
-     "chg_pct": 4.15,
-     "low": 196.5,
-     "vol": 35994,
-     "vs20": 5.8,
-     "vs60": -9.59,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": false,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": false,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 160.0,
-     "key_post_low": 175.5,
-     "key_held": true,
-     "key_vs_close": 25.63,
-     "key_vs_post": 9.69,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 3.11
-    },
-    {
-     "code": "6669",
-     "name": "緯穎",
-     "groups": [
-      "ODM"
-     ],
-     "px": 1670.0,
-     "chg_pct": 6.37,
-     "low": 1535.0,
-     "vol": 7029,
-     "vs20": 5.5,
-     "vs60": -15.38,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": true,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": true,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 1275.0,
-     "key_post_low": 1360.0,
-     "key_held": true,
-     "key_vs_close": 30.98,
-     "key_vs_post": 6.67,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 1.72
-    },
-    {
-     "code": "3017",
-     "name": "奇鋐",
-     "groups": [
-      "散熱"
-     ],
-     "px": 2805.0,
-     "chg_pct": 0.36,
-     "low": 2770.0,
-     "vol": 4520,
-     "vs20": 4.18,
-     "vs60": -10.41,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": true,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": false,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 2005.0,
-     "key_post_low": 2360.0,
-     "key_held": true,
-     "key_vs_close": 39.9,
-     "key_vs_post": 17.71,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 1.23
-    },
-    {
-     "code": "3661",
-     "name": "世芯-KY",
-     "groups": [
-      "ASIC"
-     ],
-     "px": 3595.0,
-     "chg_pct": -3.75,
-     "low": 3540.0,
-     "vol": 2405,
-     "vs20": 3.21,
-     "vs60": -3.13,
-     "above_20": true,
-     "above_60": false,
-     "above_5": false,
-     "above_240": false,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": false,
-     "reclaimed_60_today": false,
-     "never_broke_1106": true,
-     "key_low": 3210.0,
-     "key_post_low": 3530.0,
-     "key_held": true,
-     "key_vs_close": 11.99,
-     "key_vs_post": 9.97,
-     "stage": 5,
-     "stage_desc": "熊市尾聲，可留意止跌",
-     "ma_order": "60MA>5MA>20MA",
-     "vol_ratio": 0.76
-    },
-    {
-     "code": "2313",
-     "name": "華通",
-     "groups": [
-      "PCB",
-      "低軌衛星"
-     ],
-     "px": 184.5,
-     "chg_pct": 9.82,
-     "low": 180.0,
-     "vol": 47894,
-     "vs20": 3.0,
-     "vs60": -14.32,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": false,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": true,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 139.5,
-     "key_post_low": 153.0,
-     "key_held": true,
-     "key_vs_close": 32.26,
-     "key_vs_post": 9.68,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 1.56
-    },
-    {
-     "code": "3044",
-     "name": "健鼎",
-     "groups": [
-      "PCB"
-     ],
-     "px": 483.5,
-     "chg_pct": -2.72,
-     "low": 483.0,
-     "vol": 2429,
-     "vs20": 1.99,
-     "vs60": -6.13,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": true,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": false,
-     "reclaimed_60_today": false,
-     "never_broke_1106": true,
-     "key_low": 397.5,
-     "key_post_low": 438.0,
-     "key_held": true,
-     "key_vs_close": 21.64,
-     "key_vs_post": 10.19,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.47
-    },
-    {
-     "code": "6139",
-     "name": "亞翔",
-     "groups": [
-      "半導體設備",
-      "廠務"
-     ],
-     "px": 597.0,
-     "chg_pct": -0.17,
-     "low": 593.0,
-     "vol": 1026,
-     "vs20": 1.82,
-     "vs60": -11.67,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": false,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": false,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 476.0,
-     "key_post_low": 546.0,
-     "key_held": true,
-     "key_vs_close": 25.42,
-     "key_vs_post": 14.71,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.44
-    },
-    {
-     "code": "2395",
-     "name": "研華",
-     "groups": [
-      "工業電腦"
-     ],
-     "px": 601.0,
-     "chg_pct": 2.04,
-     "low": 581.0,
-     "vol": 1594,
-     "vs20": 1.8,
-     "vs60": -9.07,
-     "above_20": true,
-     "above_60": false,
-     "above_5": true,
-     "above_240": true,
-     "zhide": true,
-     "new_20d_low": false,
-     "reclaimed_20": true,
-     "reclaimed_20_today": true,
-     "reclaimed_60_today": false,
-     "never_broke_1106": false,
-     "key_low": 511.0,
-     "key_post_low": 531.0,
-     "key_held": true,
-     "key_vs_close": 17.61,
-     "key_vs_post": 3.91,
-     "stage": 4,
-     "stage_desc": "空頭排列，下跌段",
-     "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.58
+     "vol_ratio": 1.08
     },
     {
      "code": "2368",
@@ -3634,12 +3369,12 @@
      "groups": [
       "PCB"
      ],
-     "px": 929.0,
-     "chg_pct": -6.63,
-     "low": 923.0,
-     "vol": 10071,
-     "vs20": 1.48,
-     "vs60": -12.16,
+     "px": 995.0,
+     "chg_pct": 9.94,
+     "low": 940.0,
+     "vol": 14733.142,
+     "vs20": 8.69,
+     "vs60": -5.92,
      "above_20": true,
      "above_60": false,
      "above_5": true,
@@ -3653,12 +3388,142 @@
      "key_low": 657.0,
      "key_post_low": 827.0,
      "key_held": true,
-     "key_vs_close": 41.4,
+     "key_vs_close": 51.45,
      "key_vs_post": 25.88,
      "stage": 4,
      "stage_desc": "空頭排列，下跌段",
      "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.92
+     "vol_ratio": 1.35
+    },
+    {
+     "code": "3044",
+     "name": "健鼎",
+     "groups": [
+      "PCB"
+     ],
+     "px": 497.0,
+     "chg_pct": 9.96,
+     "low": 476.0,
+     "vol": 5416.781,
+     "vs20": 4.84,
+     "vs60": -3.51,
+     "above_20": true,
+     "above_60": false,
+     "above_5": true,
+     "above_240": true,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": true,
+     "key_low": 397.5,
+     "key_post_low": 438.0,
+     "key_held": true,
+     "key_vs_close": 25.03,
+     "key_vs_post": 10.19,
+     "stage": 4,
+     "stage_desc": "空頭排列，下跌段",
+     "ma_order": "60MA>20MA>5MA",
+     "vol_ratio": 1.06
+    },
+    {
+     "code": "3017",
+     "name": "奇鋐",
+     "groups": [
+      "散熱"
+     ],
+     "px": 2795.0,
+     "chg_pct": 9.82,
+     "low": 2650.0,
+     "vol": 2640.441,
+     "vs20": 3.81,
+     "vs60": -10.73,
+     "above_20": true,
+     "above_60": false,
+     "above_5": true,
+     "above_240": true,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": false,
+     "key_low": 2005.0,
+     "key_post_low": 2360.0,
+     "key_held": true,
+     "key_vs_close": 39.4,
+     "key_vs_post": 17.71,
+     "stage": 4,
+     "stage_desc": "空頭排列，下跌段",
+     "ma_order": "60MA>20MA>5MA",
+     "vol_ratio": 0.72
+    },
+    {
+     "code": "6139",
+     "name": "亞翔",
+     "groups": [
+      "半導體設備",
+      "廠務"
+     ],
+     "px": 598.0,
+     "chg_pct": 7.75,
+     "low": 577.0,
+     "vol": 1775.643,
+     "vs20": 1.99,
+     "vs60": -11.52,
+     "above_20": true,
+     "above_60": false,
+     "above_5": true,
+     "above_240": false,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": false,
+     "key_low": 476.0,
+     "key_post_low": 546.0,
+     "key_held": true,
+     "key_vs_close": 25.63,
+     "key_vs_post": 14.71,
+     "stage": 4,
+     "stage_desc": "空頭排列，下跌段",
+     "ma_order": "60MA>20MA>5MA",
+     "vol_ratio": 0.77
+    },
+    {
+     "code": "6285",
+     "name": "啟碁",
+     "groups": [
+      "低軌衛星",
+      "網通"
+     ],
+     "px": 193.0,
+     "chg_pct": 9.97,
+     "low": 179.5,
+     "vol": 11381.762,
+     "vs20": 1.59,
+     "vs60": -13.19,
+     "above_20": true,
+     "above_60": false,
+     "above_5": true,
+     "above_240": false,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": false,
+     "key_low": 160.0,
+     "key_post_low": 175.5,
+     "key_held": true,
+     "key_vs_close": 20.63,
+     "key_vs_post": 9.69,
+     "stage": 4,
+     "stage_desc": "空頭排列，下跌段",
+     "ma_order": "60MA>20MA>5MA",
+     "vol_ratio": 0.98
     },
     {
      "code": "8112",
@@ -3666,12 +3531,12 @@
      "groups": [
       "記憶體模組"
      ],
-     "px": 78.5,
-     "chg_pct": -0.63,
-     "low": 77.9,
-     "vol": 2164,
-     "vs20": 0.91,
-     "vs60": -4.95,
+     "px": 79.0,
+     "chg_pct": 0.77,
+     "low": 78.0,
+     "vol": 4483.432,
+     "vs20": 1.56,
+     "vs60": -4.35,
      "above_20": true,
      "above_60": false,
      "above_5": true,
@@ -3685,50 +3550,76 @@
      "key_low": 67.7,
      "key_post_low": 74.5,
      "key_held": true,
-     "key_vs_close": 15.95,
+     "key_vs_close": 16.69,
      "key_vs_post": 10.04,
      "stage": 4,
      "stage_desc": "空頭排列，下跌段",
      "ma_order": "60MA>20MA>5MA",
-     "vol_ratio": 0.36
+     "vol_ratio": 0.74
+    },
+    {
+     "code": "3231",
+     "name": "緯創",
+     "groups": [
+      "ODM"
+     ],
+     "px": 167.0,
+     "chg_pct": 9.87,
+     "low": 155.0,
+     "vol": 35671.887,
+     "vs20": 0.83,
+     "vs60": -7.03,
+     "above_20": true,
+     "above_60": false,
+     "above_5": true,
+     "above_240": true,
+     "zhide": true,
+     "new_20d_low": false,
+     "reclaimed_20": true,
+     "reclaimed_20_today": false,
+     "reclaimed_60_today": false,
+     "never_broke_1106": false,
+     "key_low": 143.0,
+     "key_post_low": 148.0,
+     "key_held": true,
+     "key_vs_close": 16.78,
+     "key_vs_post": 3.5,
+     "stage": 4,
+     "stage_desc": "空頭排列，下跌段",
+     "ma_order": "60MA>20MA>5MA",
+     "vol_ratio": 1.17
     }
    ],
    "key_broke_rows": [
     {
-     "code": "2886",
-     "name": "兆豐金",
-     "key_vs_post": -5.24,
-     "key_vs_close": -5.24
-    },
-    {
      "code": "3006",
      "name": "晶豪科",
      "key_vs_post": -4.34,
-     "key_vs_close": 6.65
+     "key_vs_close": 6.94
+    },
+    {
+     "code": "2886",
+     "name": "兆豐金",
+     "key_vs_post": -2.82,
+     "key_vs_close": -2.82
     },
     {
      "code": "3034",
      "name": "聯詠",
      "key_vs_post": -2.4,
-     "key_vs_close": 6.49
+     "key_vs_close": 7.21
     },
     {
      "code": "6505",
      "name": "台塑化",
      "key_vs_post": -2.03,
-     "key_vs_close": 9.24
+     "key_vs_close": 8.73
     },
     {
      "code": "6446",
      "name": "藥華藥",
      "key_vs_post": -1.88,
-     "key_vs_close": 8.92
-    },
-    {
-     "code": "2892",
-     "name": "第一金",
-     "key_vs_post": -1.38,
-     "key_vs_close": -1.38
+     "key_vs_close": 10.33
     },
     {
      "code": "2357",
@@ -3740,31 +3631,20 @@
      "code": "2317",
      "name": "鴻海",
      "key_vs_post": -0.49,
-     "key_vs_close": 6.83
-    },
-    {
-     "code": "3443",
-     "name": "創意",
-     "key_vs_post": -0.1,
-     "key_vs_close": 4.73
+     "key_vs_close": 5.61
     },
     {
      "code": "4904",
      "name": "遠傳",
      "key_vs_post": 0.0,
-     "key_vs_close": 0.97
+     "key_vs_close": 1.46
     }
    ],
    "groups": [
     {
      "name": "低軌衛星",
-     "n": 4,
-     "universe": 4
-    },
-    {
-     "name": "PCB",
      "n": 3,
-     "universe": 5
+     "universe": 4
     },
     {
      "name": "網通",
@@ -3772,9 +3652,9 @@
      "universe": 2
     },
     {
-     "name": "工業電腦",
-     "n": 1,
-     "universe": 1
+     "name": "PCB",
+     "n": 2,
+     "universe": 5
     },
     {
      "name": "廠務",
@@ -3797,7 +3677,7 @@
      "universe": 5
     },
     {
-     "name": "IC設計",
+     "name": "航運",
      "n": 1,
      "universe": 5
     },
@@ -4066,19 +3946,19 @@
     {
      "date": "2026-11-27",
      "n": 137,
-     "above_20ma": 15,
+     "above_20ma": 13,
      "above_60ma": 6,
-     "zhide": 53,
-     "reclaimed_20ma": 15,
-     "zhide_and_reclaim20": 15,
-     "also_above_60": 3,
-     "new_20d_low": 3,
+     "zhide": 44,
+     "reclaimed_20ma": 13,
+     "zhide_and_reclaim20": 13,
+     "also_above_60": 4,
+     "new_20d_low": 1,
      "never_broke_1106": 8,
-     "reclaimed_20ma_today": 4,
-     "key_held": 127,
-     "key_broke": 10,
+     "reclaimed_20ma_today": 0,
+     "key_held": 129,
+     "key_broke": 8,
      "key_unknown": 0,
-     "key_held_list": 15,
+     "key_held_list": 13,
      "key_broke_list": 0
     }
    ],
@@ -5677,5 +5557,5 @@
    "左側股票策略（菱形、三角形）與右側極短線（他說資金已轉到帳戶，下週開始用期選做極端操作、打爆擊）要分開規劃，不要混用同一套節奏（EP356）。與原規則「先切割帳戶與周期，勿混淆資金用途與投資週期」一致"
   ]
  },
- "generated_at": "2026-11-27T14:43:42+08:00"
+ "generated_at": "2026-11-27T17:08:29+08:00"
 }
