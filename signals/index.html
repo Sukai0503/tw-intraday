@@ -23,6 +23,10 @@ h1{font-size:19px;margin:4px 0 2px}.sub{color:var(--mut);font-size:12px;margin-b
 @media (max-width:560px){.mets{grid-template-columns:repeat(2,1fr)}}
 .met{background:#1e222b;border-radius:10px;padding:8px 10px}.met .v{font-size:18px;font-weight:700;line-height:1.3}.met .l{font-size:12px;color:#c9ced6}.met .d{font-size:11px;color:var(--mut)}
 .met.warning .v{color:var(--warn)}.met.danger .v{color:var(--dang)}
+.keyday{background:#1e222b;border-radius:10px;padding:8px 10px;margin:0 0 10px}
+.keyday .kh{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:0 0 4px}
+.keyday .kl{font-size:13px;color:#c9ced6;margin:2px 0;line-height:1.65}
+.keyday .ks{font-weight:700}
 .rows{margin:4px 0 8px}.row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #222731}
 .row .t{flex:0 0 82px;font-weight:600;font-size:14px}.row .w{flex:1;font-size:13px;color:#c9ced6}
 .pill{flex:0 0 auto;font-size:11.5px;border-radius:999px;padding:1px 9px;background:#2a2f39;color:#aab1bb;white-space:nowrap}
@@ -224,6 +228,28 @@ function arrChart(mkt){
 }
 
 
+function keyHeldCell(r){
+  if(r.key_held==null)return '<span class="mut">無資料</span>';
+  const lab=r.key_held?'守住':'跌破';
+  const tone=r.key_held?'':' warning';
+  const vs=r.key_held?r.key_vs_close: (r.key_vs_post??r.key_vs_close);
+  const signed=vs==null?'':` ${vs>0?'+':''}${f(vs,2)}%`;
+  const tip=[];
+  if(r.key_low!=null)tip.push(`關鍵日低點 ${f(r.key_low,2)}`);
+  if(r.key_vs_close!=null)tip.push(`收盤距低點 ${r.key_vs_close>0?'+':''}${f(r.key_vs_close,2)}%`);
+  if(r.key_post_low!=null)tip.push(`其後最低 ${f(r.key_post_low,2)}${r.key_vs_post!=null?`（${r.key_vs_post>0?'+':''}${f(r.key_vs_post,2)}%）`:''}`);
+  return `<span class="pill${tone}" title="${esc(tip.join('｜'))}">${lab}</span>${signed}`;
+}
+function keyIndexLine(x){
+  if(!x)return '<div class="kl">無資料</div>';
+  const held=x.held==null?'尚無其後交易日':(x.held?'守住':'跌破');
+  const tone=x.held===false?' warning':'';
+  const vs=(v)=>v==null?'—':`${v>0?'+':''}${f(v,2)}%`;
+  const close=x.close==null?'—':`${f(x.close,2)}${x.close_date?`（${md(x.close_date)}，距低點 ${vs(x.close_vs)}）`:''}`;
+  const post=x.post_low==null?'—':`${f(x.post_low,2)}${x.post_low_date?`（${md(x.post_low_date)}，${vs(x.post_vs)}）`:''}`;
+  const low=x.key_low==null?'無資料':f(x.key_low,2);
+  return `<div class="kl"><span class="pill${tone}">${esc(x.name)} ${held}</span>｜關鍵日低點 ${low}｜收 ${close}｜其後最低 ${post}</div>`;
+}
 function reclaimCard(R){
   if(!R||!R.counts)return '';
   window._RECLAIM=R;window._RSORT=window._RSORT||'vs20';
@@ -231,8 +257,17 @@ function reclaimCard(R){
   const src=R.px_source_short||R.px_source||'';
   const met=(v,l,d)=>`<div class="met"><div class="v">${v}</div><div class="l">${esc(l)}</div><div class="d">${esc(d||'')}</div></div>`;
   const gs=(R.groups||[]).slice(0,8).map(g=>`${esc(g.name)} ${g.n}/${g.universe}`).join('、');
+  const kd=R.key_day?md(R.key_day):'11/23';
+  const ki=R.key_index||{};
+  const unk=c.key_unknown?`，無資料 ${f(c.key_unknown)}`: '';
+  const listN=(c.key_held_list??0)+(c.key_broke_list??0);
+  const listTxt=listN?`本表（止跌且站回20MA）守住 ${f(c.key_held_list)}／跌破 ${f(c.key_broke_list)}`:'';
   return `<div class="card" id="reclaimbox"><h2>率先止跌、站回均線的個股（盤中熱力） <span class="mut">${esc(R.as_of||'')}${R.as_of_time?' '+esc(R.as_of_time):''}${stale}</span></h2>
-   <div class="cap">Wade 11/25：「哪些個股能夠率先停止破底並重新站回重要均線」。宇宙＝盤中熱力 ${f(R.universe_n)} 檔。11/6 低點為設定的參考日，不是推算出來的門檻。止跌＝今低嚴格高於 11/6、近10日、近20日低點。站回20MA＝收盤（或標示的報價）站上前一日算出的20MA，且近5個收盤日曾收在當日20MA之下。${esc(src)}${R.official?'':'｜'+esc(R.px_source||'')}。盤面觀察，不是買賣建議。</div>
+   <div class="cap">Wade 11/25：「哪些個股能夠率先停止破底並重新站回重要均線」。宇宙＝盤中熱力 ${f(R.universe_n)} 檔。11/6 低點為設定的參考日，不是推算出來的門檻。止跌＝今低嚴格高於 11/6、近10日、近20日低點。站回20MA＝收盤（或標示的報價）站上前一日算出的20MA，且近5個收盤日曾收在當日20MA之下。關鍵日低點欄＝該股其後最低是否嚴格高於關鍵日當天低點。${esc(src)}${R.official?'':'｜'+esc(R.px_source||'')}。盤面觀察，不是買賣建議。</div>
+   <div class="keyday"><div class="kh"><span>關鍵日設定</span><b>${esc(R.key_day||'2026-11-23')}</b><span class="mut">預設 11/23，不是推算出來的門檻</span></div>
+    ${keyIndexLine(ki.taiex)}${keyIndexLine(ki.tpex)}
+    <div class="kl">熱力宇宙：守住 ${f(c.key_held)}／跌破 ${f(c.key_broke)}（共 ${f(R.universe_n)}${unk}）${listTxt?`｜${listTxt}`:''}</div>
+    <div class="cap" style="margin:4px 0 0">${esc(R.key_day_note||'')}</div></div>
    <div class="mets">
     ${met(f(c.zhide_and_reclaim20),'止跌且站回20MA',c.also_above_60!=null?`其中 ${f(c.also_above_60)} 檔也站上60MA`:'')}
     ${met(f(c.zhide),'止跌','今低高於參考低點')}
@@ -242,11 +277,12 @@ function reclaimCard(R){
     ${met(f(c.reclaimed_20ma_today),'今天才站回20MA','')}
     ${met(f(c.never_broke_1106),'11/6起未跌破','')}
     ${met(f(c.reclaimed_20ma),'站回20MA','含近日曾跌破')}
+    ${met(f(c.key_held),'關鍵日守住',`跌破 ${f(c.key_broke)}`)}
    </div>
    <div class="cap">家數走勢（止跌／站回20MA／站上20MA／站上60MA／20日新低）｜拖曳看各日</div>
    <div id="reclaim_ch" style="min-height:210px"></div>
    <div class="cap" style="margin-top:8px">族群（止跌且站回20MA）：${gs||'無'}</div>
-   <div class="seg" id="rsort" style="margin:6px 0;flex-wrap:wrap"><span class="mut" style="align-self:center">排序</span><button data-s="vs20" class="on">距20MA</button><button data-s="vs60">距60MA</button><button data-s="chg">漲跌%</button><button data-s="vol">量比</button><button data-s="stage">階段</button><button data-s="group">族群</button></div>
+   <div class="seg" id="rsort" style="margin:6px 0;flex-wrap:wrap"><span class="mut" style="align-self:center">排序</span><button data-s="vs20" class="on">距20MA</button><button data-s="vs60">距60MA</button><button data-s="chg">漲跌%</button><button data-s="vol">量比</button><button data-s="stage">階段</button><button data-s="group">族群</button><button data-s="key">關鍵日低點</button></div>
    <div id="reclaim_tbl"></div>
    <div class="cap">${esc(R.ref_low_note||'')}</div></div>`;
 }
@@ -276,7 +312,8 @@ function reclaimTable(){
     chg:numK('chg_pct'),
     vol:numK('vol_ratio'),
     stage:(a,b)=>(a.stage??99)-(b.stage??99),
-    group:(a,b)=>((a.groups||[])[0]||'').localeCompare((b.groups||[])[0]||'','zh-Hant')||numK('vs20')(a,b)
+    group:(a,b)=>((a.groups||[])[0]||'').localeCompare((b.groups||[])[0]||'','zh-Hant')||numK('vs20')(a,b),
+    key:(a,b)=>(Number(b.key_held===true)-Number(a.key_held===true))||numK('key_vs_close')(a,b)
   };
   list.sort(sorts[s]||sorts.vs20);
   const yn=v=>v?'是':'';
@@ -295,10 +332,11 @@ function reclaimTable(){
       st,
       `<td class="n">${r.vol_ratio==null?'—':f(r.vol_ratio,2)}</td>`,
       yn(r.reclaimed_20_today),
-      yn(r.never_broke_1106)
+      yn(r.never_broke_1106),
+      keyHeldCell(r)
     ]);
   });
-  el.innerHTML=list.length?tbl(['代號名稱','族群','收盤','漲跌%','距20MA%','距60MA%','站上60MA','均線循環階段','量比','今天才站回','11/6起未跌破'],rows,[2,3,4,5,8]):'<div class="mut">今日沒有同時符合止跌且站回20MA的個股</div>';
+  el.innerHTML=list.length?tbl(['代號名稱','族群','收盤','漲跌%','距20MA%','距60MA%','站上60MA','均線循環階段','量比','今天才站回','11/6起未跌破','關鍵日低點'],rows,[2,3,4,5,8]):'<div class="mut">今日沒有同時符合止跌且站回20MA的個股</div>';
   document.querySelectorAll('#rsort button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
 }
 
